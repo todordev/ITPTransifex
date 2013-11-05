@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset>
+
+		<field name="name" type="text" class="span6"
+			label="COM_ITPTRANSIFEX_NAME"
+            description="COM_ITPTRANSIFEX_PACKAGE_NAME_DESC" 
+			filter="trim" 
+			required="true" />
+
+        <field name="filename" type="text" class="span6"
+	        label="COM_ITPTRANSIFEX_FILENAME"
+	        description="COM_ITPTRANSIFEX_PACKAGE_FILENAME_DESC"
+        />
+		
+        <field name="lang_code" type="text"
+            label="COM_ITPTRANSIFEX_LANG_CODE"
+            description="COM_ITPTRANSIFEX_LANG_CODE_DESC"
+            readonly="true" 
+        />
+        
+        <field name="version" type="text"
+            label="COM_ITPTRANSIFEX_VERSION"
+            description="COM_ITPTRANSIFEX_VERSION_DESC"
+        />
+        
+		<field name="id" type="text" 
+            label="JGLOBAL_FIELD_ID_LABEL"
+            description="JGLOBAL_FIELD_ID_DESC"
+            default="0"  
+            readonly="true" 
+        />
+
+        <field name="description" type="textarea" class="span6"
+            label="COM_ITPTRANSIFEX_DESCRIPTION" 
+            description="COM_ITPTRANSIFEX_PACKAGE_DESCRIPTION_DESC"
+            rows="5" 
+        />
+           
+       <field name="hash" type="hidden" />
+       <field name="project_id" type="hidden" />
+         
+	</fieldset>
+</form>

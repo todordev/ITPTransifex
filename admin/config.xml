@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    
+    <fieldset name="basic" label="COM_ITPTRANSIFEX_BASIC" description="COM_ITPTRANSIFEX_BASIC_PARAMS">
+        <field name="username" type="text" size="50" label="COM_ITPTRANSIFEX_USERNAME" description="COM_ITPTRANSIFEX_USERNAME_DESC" />
+        <field name="password" type="password" size="50" label="COM_ITPTRANSIFEX_PASSWORD" description="COM_ITPTRANSIFEX_PASSWORD_DESC" />
+        <field name="api_url" type="text" default="https://www.transifex.com/api/2/" size="50" label="COM_ITPTRANSIFEX_API_URL" description="COM_ITPTRANSIFEX_API_URL_DESC" />
+    </fieldset>
+    
+    <fieldset name="basic" label="COM_ITPTRANSIFEX_MANIFEST" description="COM_ITPTRANSIFEX_MANIFEST_PARAMS">
+        <field name="author" type="text" class="span6" label="COM_ITPTRANSIFEX_AUTHOR" description="COM_ITPTRANSIFEX_AUTHOR_DESC" />
+        <field name="author_email" type="text" class="span6" label="COM_ITPTRANSIFEX_AUTHOR_EMAIL" description="COM_ITPTRANSIFEX_AUTHOR_EMAIL_DESC" />
+        <field name="copyright" type="text" class="span6" label="COM_ITPTRANSIFEX_COPYRIGHT" description="COM_ITPTRANSIFEX_COPYRIGHT_DESC" />
+        <field name="site" type="text" class="span6" label="COM_ITPTRANSIFEX_SITE" description="COM_ITPTRANSIFEX_SITE_DESC" />
+    </fieldset>
+    
+</config>
