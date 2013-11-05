@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_languages` (
   `name` varchar(128) NOT NULL,
   `code` char(5) NOT NULL,
   `short_code` char(2) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_itptfx_code` (`code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__itptfx_packages` (

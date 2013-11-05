@@ -24,7 +24,7 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin {
      * Proxy for getModel.
      * @since   1.6
      */
-    public function getModel($name = 'Projects', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true)) {
+    public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true)) {
         $model = parent::getModel($name, $prefix, $config);
         return $model;
     }
@@ -73,5 +73,23 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin {
         $this->displayMessage(JText::plural('COM_ITPTRANSIFEX_PROJECTS_SYNCHRONIZED', count($pks)), $redirectOptions);
     }
     
+    /**
+     * Remove records which have been connected with a project.
+     *
+     * @param JModelLegacy $model
+     * @param array $cid
+     */
+    protected function postDeleteHook(JModelLegacy $model, $cid = null) {
     
+        try {
+            
+            $model->removePackages($cid);
+            $model->removeResources($cid);
+            
+        } catch (Exception $e) {
+            JLog::add($e->getMessage());
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
+        }
+    
+    }
 }

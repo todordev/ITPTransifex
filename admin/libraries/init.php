@@ -33,6 +33,3 @@ JLoader::register("ItpTransifexVersion", ITPTRANSIFEX_PATH_LIBRARY . DIRECTORY_S
 
 // Register helpers
 JLoader::register("ItpTransifexHelper", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "helpers" . DIRECTORY_SEPARATOR . "itptransifex.php");
-
-JLoader::register("ItpTransifexProject", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "project.php");
-JLoader::register("ItpTransifexProjects", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "projects.php");
