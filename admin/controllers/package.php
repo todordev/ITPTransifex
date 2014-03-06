@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -17,7 +17,7 @@ jimport('itprism.controller.form.backend');
  *
  * @package      ITPTransifex
  * @subpackage   Components
- * @since		1.6
+ * @since		 1.6
  */
 class ItpTransifexControllerPackage extends ITPrismControllerFormBackend {
 
@@ -33,7 +33,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend {
     /**
      * Save an item
      */
-    public function save() {
+    public function save($key = null, $urlVar = null) {
         
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
         
@@ -55,7 +55,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend {
         $form = $model->getForm($data, false);
         /** @var $form JForm **/
         
-        if (! $form) {
+        if (!$form) {
             throw new Exception($model->getError(), 500);
         }
         
@@ -82,87 +82,38 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend {
         $this->displayMessage(JText::_('COM_ITPTRANSIFEX_PACKAGE_SAVED'), $redirectOptions);
     }
     
-    /**
-     * This method  downloads the language files
-     * from Transifex and creates a language package.
-     *
-     * @throws Exception
-     */
-    public function create() {
-    
-        JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+    public function download() {
     
         $app = JFactory::getApplication();
         /** @var $app JAdministrator **/
     
-        // Get form data
-        $projectId      = $app->input->getInt('project_id');
-        $resourcesIDs   = $app->input->get('cid', array(), 'array');
-        $storeData      = $app->input->getBool("store_data");
+        $ids        = $app->input->get("cid", array(), "array");
     
-        $model = $this->getModel();
-        /** @var $model ItpTransifexModelPackage **/
-    
-        $redirectOptions = array(
-            "view" => "resources"
-        );
-    
-        JArrayHelper::toInteger($resourcesIDs);
+        $packageId  = (int)array_pop($ids);
     
         // Check for validation errors.
-        if (empty($resourcesIDs)) {
-            $this->displayWarning(JText::_("COM_ITPTRANSIFEX_INVALID_ITEM"), $redirectOptions);
-            return;
+        if (!$packageId) {
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_INVALID_PACKAGE'));
         }
+    
+        $params = JComponentHelper::getParams($this->option);
+        $serviceOptions = array(
+            "username" => $params->get("username"),
+            "password" => $params->get("password"),
+            "url"      => $params->get("api_url")
+        );
     
         try {
     
-            $date = new JDate();
-    
-            $data = array(
-                "name"           => JString::trim($app->input->getString("name")),
-                "filename"       => JString::trim($app->input->getString("filename")),
-                "description"    => $app->input->getString("description"),
-                "version"        => $app->input->getString("version", "1.0"),
-                "creation_date"  => $date->format(JText::_("DATE_FORMAT_LC3")),
-                "lang_code"      => $app->input->getString("lang_code"),
-            );
-    
-            if(!$data["lang_code"]) {
-                $this->displayWarning(JText::_("COM_ITPTRANSIFEX_INVALID_LANG_CODE"), $redirectOptions);
-                return;
-            }
-    
-            if(!$data["filename"]) {
-                $this->displayWarning(JText::_("COM_ITPTRANSIFEX_INVALID_FILENAME"), $redirectOptions);
-                return;
-            }
-    
-            $params = JComponentHelper::getParams($this->option);
-            $serviceOptions = array(
-                "username"  => $params->get("username"),
-                "password"  => $params->get("password"),
-                "url"       => $params->get("api_url")."project"
-            );
-    
-            $fileURI = $model->prepareFiles($projectId, $resourcesIDs, $data, $serviceOptions);
-            $app->setUserState("file_download", $fileURI);
-    
-            if($storeData) {
-    
-                $modelPackage = JModelLegacy::getInstance("Package", "ItpTransifexModel", array('ignore_request' => true));
-    
-                // Store data
-                $idsString    = implode(",", $resourcesIDs).",".$data["lang_code"];
-                $packageHash  = md5($idsString);
-    
-                $data["project_id"] = $projectId;
-                $data["hash"]       = $packageHash;
-                $data["resources"]  = $resourcesIDs;
-    
-                $packageId = $modelPackage->save($data);
-                $modelPackage->saveResourcesIds($packageId, $resourcesIDs);
-                
+            $model    = $this->getModel();
+            /** @var $model ItpTransifexModelPackage **/
+            
+            $model->setTransifexOptions($serviceOptions);
+            
+            $filePath = $model->prepareFiles($packageId);
+            
+            if(!$filePath) {
+                $filePath = $model->createErrorFile();
             }
     
         } catch (Exception $e) {
@@ -170,7 +121,25 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend {
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
     
-        $this->displayMessage(JText::_('COM_ITPTRANSIFEX_PACKAGE_CREATED'), $redirectOptions);
+        $filesize = filesize($filePath);
+        $fileName = JFile::getName($filePath);
+    
+        JResponse::setHeader('Content-Type', 'application/octet-stream', true);
+        JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
+        JResponse::setHeader('Content-Transfer-Encoding', 'binary', true);
+        JResponse::setHeader('Pragma', 'no-cache', true);
+        JResponse::setHeader('Expires', '0', true);
+        JResponse::setHeader('Content-Disposition', 'attachment; filename='.$fileName, true);
+        JResponse::setHeader('Content-Length', $filesize, true);
+        
+        $doc = JFactory::getDocument();
+        $doc->setMimeEncoding('application/octet-stream');
+        
+        JResponse::sendHeaders();
+        
+        echo file_get_contents($filePath);
+        
+        JFactory::getApplication()->close();
     }
     
 }

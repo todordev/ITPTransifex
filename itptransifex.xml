@@ -4,16 +4,16 @@
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
 	<authorUrl>http://itprism.com</authorUrl>
-	<copyright>Copyright (C) 2013 Todor Iliev ( ITPrism.com )</copyright>
+	<copyright>Copyright (C) 2014 Todor Iliev ( ITPrism.com )</copyright>
 	<license>http://www.gnu.org/copyleft/gpl.html</license>
-	<version>1.0</version>
-	<creationDate>05 November, 2013</creationDate>
+	<version>1.1</version>
+	<creationDate>04 March, 2014</creationDate>
 	<description><![CDATA[
-    <p><a href="#" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
-    <p><a href='#' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
-    <p>Invest in the extension and help for its improvement. You can <a href="http://itprism.com/sponsorship" title="Sponsoring" target="_blank">sponsor the extension via SMS, PayPal or Bitcoin</a>.</p>
+    <p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
+    <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
+    <p>Invest in the extension and help for its improvement. You can <a href="http://itprism.com/sponsorship" target="_blank">sponsor the extension via SMS, PayPal or Bitcoin</a>.</p>
     <p><a href="http://itprism.com/" target="_blank">Subscribe for the newsletter</a> to receive <strong>gifts</strong>, <strong>discount codes</strong>, information about <strong>updates</strong> and information about <strong>new ITPrism extensions</strong>.</p>
-    <p>Please, <a href="#">vote for the extension</a> on Joomla! Extensions Directory</p>
+    <p>Please, <a href="http://extensions.joomla.org/extensions/languages/language-edition/25806">vote for the extension</a> on Joomla! Extensions Directory</p>
     ]]></description>
 
 	<install>
@@ -36,6 +36,8 @@
 	
 	<media destination="com_itptransifex" folder="media">
 		<filename>index.html</filename>
+        
+		<folder>css</folder>
 		<folder>images</folder>
 		<folder>js</folder>		
 	</media>
@@ -44,6 +46,7 @@
 	<files folder="site">
         <folder>controllers</folder>
         <folder>helpers</folder>
+        <folder>language</folder>
         <folder>models</folder>
         <folder>views</folder>
 		<filename>controller.php</filename>
@@ -52,10 +55,6 @@
 		<filename>itptransifex.php</filename>
 	</files>
 
-	<languages folder="site">
-		<language tag="en-GB">language/en-GB/en-GB.com_itptransifex.ini</language>
-	</languages>
-	
 	<administration>
 		<menu link="option=com_itptransifex">COM_ITPTRANSIFEX</menu>
 	
@@ -63,6 +62,7 @@
 			<folder>assets</folder>
 			<folder>controllers</folder>
 			<folder>helpers</folder>
+			<folder>language</folder>
 			<folder>libraries</folder>
 			<folder>models</folder>
 			<folder>sql</folder>
@@ -74,10 +74,5 @@
 			<filename>itptransifex.php</filename>
 		</files>
 		
-		<languages folder="admin">
-			<language tag="en-GB">language/en-GB/en-GB.com_itptransifex.ini</language>
-			<language tag="en-GB">language/en-GB/en-GB.com_itptransifex.sys.ini</language>
-		</languages>
-			
 	</administration>
 </extension>

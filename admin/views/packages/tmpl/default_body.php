@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -21,14 +21,26 @@ defined('_JEXEC') or die;
                 <?php echo JText::sprintf("COM_ITPTRANSIFEX_PROJECT_S", $item->title);?>
             </div>
         </td>
-		<td class="nowrap  hidden-phone">
+		<td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->filename); ?>
 		</td>
-		<td class="nowrap center  hidden-phone">
-		    <?php echo $this->escape($item->lang_code); ?>
+		<td class="nowrap hidden-phone">
+		    <?php echo $this->escape($item->language_name); ?>
 		</td>
-		<td class="nowrap center  hidden-phone">
+		<td class="nowrap center hidden-phone">
+		    <?php echo $this->escape($item->language); ?>
+		</td>
+		<td class="nowrap center hidden-phone">
+		    <?php echo $this->escape($item->type); ?>
+		</td>
+		<td class="nowrap center hidden-phone">
 		    <?php echo $this->escape($item->version); ?>
+		</td>
+		<td class="nowrap center hidden-phone">
+		    <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&format=raw&package_id=".(int)$item->id);?>" class="btn js-btn-resources-list">
+                <i class="icon-eye-open"></i> 
+                ( <?php echo $this->numberOfResources[$item->id]->number; ?> )
+            </a>
 		</td>
         <td class="nowrap center hidden-phone"><?php echo $item->id;?></td>
 	</tr>

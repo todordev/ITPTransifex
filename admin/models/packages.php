@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -32,7 +32,9 @@ class ItpTransifexModelPackages extends JModelList {
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'name', 'a.name',
+                'type', 'a.type',
+                'project', 'a.project_id',
+                'language_name', 'c.name',
             );
         }
 
@@ -58,6 +60,12 @@ class ItpTransifexModelPackages extends JModelList {
         $value = $this->getUserStateFromRequest($this->context.'.filter.project', 'filter_project');
         $this->setState('filter.project', $value);
         
+        $value = $this->getUserStateFromRequest($this->context.'.filter.language', 'filter_language');
+        $this->setState('filter.language', $value);
+        
+        $value = $this->getUserStateFromRequest($this->context.'.filter.type', 'filter_type');
+        $this->setState('filter.type', $value);
+        
         // List state information.
         parent::populateState('a.id', 'asc');
         
@@ -78,6 +86,9 @@ class ItpTransifexModelPackages extends JModelList {
         
         // Compile the store id.
         $id.= ':' . $this->getState('filter.search');
+        $id.= ':' . $this->getState('filter.project');
+        $id.= ':' . $this->getState('filter.language');
+        $id.= ':' . $this->getState('filter.type');
 
         return parent::getStoreId($id);
     }
@@ -100,18 +111,32 @@ class ItpTransifexModelPackages extends JModelList {
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.filename, a.lang_code, a.version, a.project_id, ' .
-                'b.name AS title'
+                'a.id, a.name, a.filename, a.language, a.version, a.project_id, a.type, ' .
+                'b.name AS title, ' .
+                'c.name AS language_name'
             )
         );
         
         $query->from($db->quoteName("#__itptfx_packages", "a"));
         $query->leftJoin($db->quoteName("#__itptfx_projects", "b") . " ON a.project_id = b.id");
+        $query->leftJoin($db->quoteName("#__itptfx_languages", "c") . " ON a.language = c.code");
 
         // Filter by project
         $projectId= $this->getState('filter.project');
         if (!empty($projectId)) {
             $query->where('a.project_id = '.(int)$projectId);
+        }
+        
+        // Filter by language
+        $languageCode = $this->getState('filter.language');
+        if (!empty($languageCode)) {
+            $query->where('a.language = '. $db->quote($languageCode) );
+        }
+        
+        // Filter by type
+        $type = $this->getState('filter.type');
+        if (!empty($type)) {
+            $query->where('a.type = '. $db->quote($type) );
         }
         
         // Filter by search in title
@@ -140,4 +165,30 @@ class ItpTransifexModelPackages extends JModelList {
         
         return $orderCol.' '.$orderDirn;
     }
+    
+    /**
+     * Count resources of projects.
+     *
+     * @return array
+     */
+    public function countResources() {
+    
+        $db    = $this->getDbo();
+    
+        $query = $db->getQuery(true);
+        $query
+            ->select("a.package_id, COUNT(*) AS number")
+            ->from($db->quoteName("#__itptfx_packages_map", "a"))
+            ->group("a.package_id");
+    
+        $db->setQuery($query);
+        $results = $db->loadObjectList("package_id");
+    
+        if(!$results) {
+            $results = array();
+        }
+    
+        return $results;
+    }
+    
 }

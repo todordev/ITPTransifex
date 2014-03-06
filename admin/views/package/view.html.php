@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -80,7 +80,7 @@ class ItpTransifexViewPackage extends JViewLegacy {
 		JHtml::_('behavior.formvalidation');
 		JHtml::_('bootstrap.tooltip');
 		
-		$this->document->addScript(JURI::root() . 'media/'.$this->option.'/js/admin/'.strtolower($this->getName()).'.js');
+		$this->document->addScript('../media/'.$this->option.'/js/admin/'.strtolower($this->getName()).'.js');
         
 	}
 

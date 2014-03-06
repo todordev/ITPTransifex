@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -22,7 +22,7 @@ defined('_JEXEC') or die;
         
 	</div>
 	<div class="span4">
-		<a href="http://itprism.com/free-joomla-extensions/others/open-source-social-network" target="_blank"><img src="../media/com_itptransifex/images/logo.png" alt="<?php echo JText::_("COM_ITPTRANSIFEX");?>" /></a>
+		<a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank"><img src="../media/com_itptransifex/images/logo.png" alt="<?php echo JText::_("COM_ITPTRANSIFEX");?>" /></a>
         <a href="http://itprism.com" target="_blank" title="<?php echo JText::_("COM_ITPTRANSIFEX_PRODUCT");?>"><img src="../media/com_itptransifex/images/product_of_itprism.png" alt="<?php echo JText::_("COM_ITPTRANSIFEX_PRODUCT");?>" /></a>
         <p><?php echo JText::_("COM_ITPTRANSIFEX_YOUR_VOTE"); ?></p>
         <p><?php echo JText::_("COM_ITPTRANSIFEX_SPONSORSHIP"); ?></p>

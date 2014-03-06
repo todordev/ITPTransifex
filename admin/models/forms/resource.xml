@@ -39,11 +39,6 @@
             readonly="true" 
         />
         
-		<field name="category" type="text" 
-            label="COM_ITPTRANSIFEX_CATEGORY" 
-            readonly="true" 
-        />
-        
         <field name="source_language_code" type="text" 
             label="COM_ITPTRANSIFEX_SOURCE_LANGUAGE_CODE" 
             readonly="true" 
@@ -55,7 +50,7 @@
         />
         
         <field
-            name="published" type="radio" class="btn-group"
+            name="published" type="list" 
             label="JSTATUS"
             description="COM_ITPTRANSIFEX_RESOURCE_STATE_DESC"
             size="1"

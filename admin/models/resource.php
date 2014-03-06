@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -107,7 +107,7 @@ class ItpTransifexModelResource extends JModelAdmin {
      * Prepare and sanitise the table prior to saving.
      * @since	1.6
      */
-    protected function prepareTable(&$table) {
+    protected function prepareTable($table) {
          
         // Fix magic qutoes
         if( get_magic_quotes_gpc() ) {
@@ -125,7 +125,7 @@ class ItpTransifexModelResource extends JModelAdmin {
         $query
             ->select(
                     "a.id, a.name, a.alias, a.filename, a.type, a.i18n_type, " . 
-                    "a.category, a.source_language_code, a.project_id, " .
+                    "a.source_language_code, a.project_id, " .
                     "b.alias AS project_slug")
             ->from($db->quoteName("#__itptfx_resources", "a"))
             ->leftJoin($db->quoteName("#__itptfx_projects", "b") . " ON a.project_id = b.id")
@@ -139,7 +139,7 @@ class ItpTransifexModelResource extends JModelAdmin {
             $transifexUrl = JArrayHelper::getValue($options, "url");
             
             jimport("itprism.transifex.request");
-            $transifex = ITPrismTransifexRequest::getInstance($transifexUrl);
+            $transifex = new ITPrismTransifexRequest($transifexUrl);
             
             $transifex->setUsername($options["username"]);
             $transifex->setPassword($options["password"]);
@@ -163,7 +163,6 @@ class ItpTransifexModelResource extends JModelAdmin {
                     $query
                         ->update($db->quoteName("#__itptfx_resources"))
                         ->set($db->quoteName("name")     ."=". $db->quote($response->name))
-                        ->set($db->quoteName("category") ."=". $db->quote($response->category))
                         ->set($db->quoteName("source_language_code") ."=". $db->quote($response->source_language_code))
                         ->set($db->quoteName("i18n_type") ."=". $db->quote($response->i18n_type))
                         ->where($db->quoteName("alias") ."=". $db->quote($resource->alias));

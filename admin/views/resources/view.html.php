@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -36,22 +36,12 @@ class ItpTransifexViewResources extends JViewLegacy {
         
         $this->projectId  = $this->state->get("project_id");
         
-        $app = JFactory::getApplication();
-        /** @var $app JAdministrator **/
+        jimport("itptransifex.project");
+        $this->project = new ItpTransifexProject(JFactory::getDbo());
+        $this->project->load($this->projectId);
         
-        // Display the link to the file
-        $fileURI = $app->getUserState("file_download");
-        if(!empty($fileURI)) {
-            $fileName = basename($fileURI);
-            $app->enqueueMessage(JText::sprintf("COM_ITPTRANSIFEX_PACKAGE_DOWNLOAD", $fileURI, $fileName), "message");
-        }
-        $app->setUserState("file_download", null);
-        
-        $model = $this->getModel();
-        $this->languages  = $model->getLanguages();
-        
-        // HTML Helpers
-        JHtml::addIncludePath(ITPRISM_PATH_LIBRARY.'/ui/helpers');
+        $model         = JModelLegacy::getInstance("Package", "ItpTransifexModel", $config = array('ignore_request' => true));
+        $this->form    = $model->getForm();
         
         // Add submenu
         ItpTransifexHelper::addSubmenu("projects");
@@ -104,14 +94,6 @@ class ItpTransifexViewResources extends JViewLegacy {
             JHtml::_('select.options', JHtml::_('jgrid.publishedOptions', array("archived" => false)), 'value', 'text', $this->state->get('filter.state'), true)
         );
         
-        // Prepare filter categories
-        $categories = $model->getCategoriesOptions($this->projectId);
-        JHtmlSidebar::addFilter(
-            JText::_('COM_ITPTRANSIFEX_SELECT_CATEGORY'),
-            'filter_category',
-            JHtml::_('select.options', $categories, 'value', 'text', $this->state->get('filter.category'), true)
-        );
-        
         // Prepare filter types
         $types = array(
             "site" => "site",
@@ -135,9 +117,11 @@ class ItpTransifexViewResources extends JViewLegacy {
     protected function addToolbar(){
         
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_RESOURCES_MANAGER'));
+        JToolBarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_RESOURCES_MANAGER_S', $this->escape($this->project->getName()) ));
         JToolBarHelper::custom('package.create', "plus", "", JText::_("COM_ITPTRANSIFEX_CREATE_PACKAGE"), false);
 		JToolBarHelper::custom('resources.update', "refresh", "", JText::_("COM_ITPTRANSIFEX_UPDATE"), false);
+        JToolBarHelper::divider();
+        JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "resources.delete");
         JToolBarHelper::divider();
         
         // Help button
@@ -155,8 +139,11 @@ class ItpTransifexViewResources extends JViewLegacy {
 	 */
 	protected function setDocument() {
 	    
-		$this->document->setTitle(JText::_('COM_ITPTRANSIFEX_RESOURCES_MANAGER'));
+		$this->document->setTitle(JText::sprintf('COM_ITPTRANSIFEX_RESOURCES_MANAGER_S', $this->escape($this->project->getName()) ));
 
+		// Load language string in JavaScript
+		JText::script('COM_ITPTRANSIFEX_ERROR_RESOURCE_NOT_SELECTED');
+		
 		// Scripts
 		JHtml::_('behavior.multiselect');
 		JHtml::_('formbehavior.chosen', 'select');
@@ -165,16 +152,9 @@ class ItpTransifexViewResources extends JViewLegacy {
 		JHtml::_('itprism.ui.joomla_helper');
 		JHtml::_('itprism.ui.joomla_list');
 		
+		$this->document->addStyleSheet('../media/'.$this->option.'/css/admin/style.css');
 		$this->document->addScript('../media/'.$this->option.'/js/admin/'.JString::strtolower($this->getName()).'.js');
 		
-		$css = "
-	        #js-cp-modal {
-		        width: 1000px !important;
-		        left: 42% !important;
-	        }
-        ";
-		
-		$this->document->addStyleDeclaration($css);
 	}
     
 }

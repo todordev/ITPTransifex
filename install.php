@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -96,6 +96,27 @@ class pkg_itpTransifexInstallerScript {
                 $result = array("type" => "important", "text" => JText::_("JON"));
             } else {
                 $result = array("type" => "success"  , "text" => JText::_("JOFF"));
+            }
+            ItpTransifexInstallHelper::addRow($title, $result, $info);
+            
+            // Display result about verification FileInfo
+            $title  = JText::_("COM_ITPTRANSIFEX_FILEINFO");
+            $info   = "";
+            if( !function_exists('finfo_open') ) {
+                $info   = JText::_("COM_ITPTRANSIFEX_FILEINFO_INFO");
+                $result = array("type" => "important", "text" => JText::_("JOFF"));
+            } else {
+                $result = array("type" => "success", "text" => JText::_("JON"));
+            }
+            ItpTransifexInstallHelper::addRow($title, $result, $info);
+            
+            // Display result about verification FileInfo
+            $title  = JText::_("COM_ITPTRANSIFEX_PHP_VERSION");
+            $info   = "";
+            if (version_compare(PHP_VERSION, '5.3.0') < 0) {
+                $result = array("type" => "important", "text" => JText::_("COM_ITPTRANSIFEX_WARNING"));
+            } else {
+                $result = array("type" => "success", "text" => JText::_("JYES"));
             }
             ItpTransifexInstallHelper::addRow($title, $result, $info);
             

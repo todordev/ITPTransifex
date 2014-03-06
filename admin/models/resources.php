@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -65,10 +65,6 @@ class ItpTransifexModelResources extends JModelList {
         $value = $this->getUserStateFromRequest($this->context.'.project_id', 'id');
         $this->setState('project_id', $value);
         
-        // Get category
-        $value = $this->getUserStateFromRequest($this->context.'.filter.category', 'filter_category');
-        $this->setState('filter.category', $value);
-        
         // Filter type
         $value = $this->getUserStateFromRequest($this->context.'.filter.type', 'filter_type');
         $this->setState('filter.type', $value);
@@ -94,7 +90,6 @@ class ItpTransifexModelResources extends JModelList {
         
         // Compile the store id.
         $id .= ':' . $this->getState('filter.search');
-        $id .= ':' . $this->getState('filter.category');
         $id .= ':' . $this->getState('filter.type');
         $id .= ':' . $this->getState('filter.state');
         $id .= ':' . $this->getState('project_id');
@@ -121,19 +116,13 @@ class ItpTransifexModelResources extends JModelList {
             $this->getState(
                 'list.select',
                 'a.id, a.name, a.alias, a.filename, a.type, ' .
-                'a.published, a.category, a.source_language_code'
+                'a.published, a.source_language_code'
             )
         );
         
         $query->from($db->quoteName("#__itptfx_resources", "a"));
         
         $query->where('a.project_id = '.(int)$this->getState("project_id"));
-        
-        // Filter by category
-        $category = $this->getState('filter.category');
-        if(!empty($category)) {
-            $query->where('a.category = '. $db->quote($category));
-        }
         
         // Filter by type
         $type = $this->getState('filter.type');
@@ -194,29 +183,6 @@ class ItpTransifexModelResources extends JModelList {
             $results = array();
         }
         
-        return $results;
-    }
-    
-    public function getCategoriesOptions($projectId) {
-    
-        $db    = $this->getDbo();
-    
-        // Prepare project folder
-        $query = $db->getQuery(true);
-    
-        $query
-            ->select("a.category AS text, a.category AS value")
-            ->from($db->quoteName("#__itptfx_resources", "a"))
-            ->where("a.project_id = ".(int)$projectId)
-            ->group("category");
-    
-        $db->setQuery($query);
-        $results = $db->loadColumn();
-    
-        if(!$results) {
-            $results = array();
-        }
-    
         return $results;
     }
     

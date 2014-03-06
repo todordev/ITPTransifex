@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -44,32 +44,6 @@ class ItpTransifexHelper {
     		$vName == 'languages'
         );
 
-	}
-	
-	/**
-	 * Load and return projects as list options.
-	 * 
-	 * @return array
-	 */
-	public static function getProjectsOptions() {
-	    
-	    $db = JFactory::getDbo();
-	    
-	    $query = $db->getQuery(true);
-	    
-	    $query
-	       ->select("a.id AS value, a.name AS text")
-	       ->from($db->quoteName("#__itptfx_projects", "a"))
-	       ->group("a.name");
-	    
-	    $db->setQuery($query);
-	    $results = $db->loadAssocList();
-	    
-	    if(!$results) {
-	        $results = array();
-	    }
-	    
-	    return $results;
 	}
 	
 }

@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -21,19 +21,16 @@ defined('_JEXEC') or die;
         <td class="nowrap">
             <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resource&layout=edit&id=".(int)$item->id);?>"><?php echo $this->escape($item->name); ?></a>
         </td>
-        <td class="nowrap">
+        <td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->alias); ?>
 		</td>
-		<td class="nowrap">
+		<td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->filename); ?>
 		</td>
-		<td class="nowrap center">
+		<td class="nowrap center hidden-phone">
 		    <?php echo $this->escape($item->type); ?>
 		</td>
-		<td class="nowrap center">
-		    <?php echo $this->escape($item->category); ?>
-		</td>
-		<td class="nowrap center">
+		<td class="nowrap center hidden-phone">
 		  <?php echo $this->escape($item->source_language_code); ?>
 		</td>
         <td class="nowrap center hidden-phone"><?php echo $item->id;?></td>

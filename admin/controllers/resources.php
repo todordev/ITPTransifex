@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -65,6 +65,11 @@ class ItpTransifexControllerResources extends ITPrismControllerAdmin {
         try {
             
             $model->synchronize($pks, $options);
+
+        } catch (RuntimeException $e) {
+                
+            $this->displayWarning($e->getMessage(), $redirectOptions);
+            return;
             
         } catch (Exception $e) {
             JLog::add($e->getMessage());
@@ -73,6 +78,5 @@ class ItpTransifexControllerResources extends ITPrismControllerAdmin {
         
         $this->displayMessage(JText::plural('COM_ITPTRANSIFEX_N_ITEMS_SYNCHRONIZED', count($pks)), $redirectOptions);
     }
-    
     
 }

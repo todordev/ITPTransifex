@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -32,8 +32,8 @@ class ItpTransifexViewPackages extends JViewLegacy {
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
         
-        // HTML Helpers
-        JHtml::addIncludePath(ITPRISM_PATH_LIBRARY.'/ui/helpers');
+        $model = $this->getModel();
+        $this->numberOfResources = $model->countResources();
         
         // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
@@ -66,6 +66,7 @@ class ItpTransifexViewPackages extends JViewLegacy {
     
         $this->sortFields = array(
             'a.name'    => JText::_('COM_ITPTRANSIFEX_NAME'),
+            'c.name'    => JText::_('COM_ITPTRANSIFEX_LANGUAGE'),
             'a.id'      => JText::_('JGRID_HEADING_ID')
         );
     
@@ -78,10 +79,25 @@ class ItpTransifexViewPackages extends JViewLegacy {
     
         JHtmlSidebar::setAction('index.php?option='.$this->option.'&view='.$this->getName());
     
+        jimport("itptransifex.filters");
+        $fitlers = new ItpTransifexFilters(JFactory::getDbo());
+        
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_PROJECT'),
             'filter_project',
-            JHtml::_('select.options', ItpTransifexHelper::getProjectsOptions(), 'value', 'text', $this->state->get('filter.project'), true)
+            JHtml::_('select.options', $fitlers->getProjects(), 'value', 'text', $this->state->get('filter.project'), true)
+        );
+        
+        JHtmlSidebar::addFilter(
+            JText::_('COM_ITPTRANSIFEX_SELECT_LANGUAGE'),
+            'filter_language',
+            JHtml::_('select.options', $fitlers->getLanguages("code"), 'value', 'text', $this->state->get('filter.language'), true)
+        );
+        
+        JHtmlSidebar::addFilter(
+            JText::_('COM_ITPTRANSIFEX_SELECT_TYPE'),
+            'filter_type',
+            JHtml::_('select.options', $fitlers->getResourceTypes(), 'value', 'text', $this->state->get('filter.type'), true)
         );
     
         $this->sidebar = JHtmlSidebar::render();
@@ -100,6 +116,10 @@ class ItpTransifexViewPackages extends JViewLegacy {
         JToolBarHelper::editList('package.edit');
         JToolBarHelper::divider();
         JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "packages.delete");
+        JToolBarHelper::divider();
+        
+        JToolBarHelper::custom("package.download", 'download', null, JText::_("COM_ITPTRANSIFEX_DOWNLOAD"));
+        
         JToolBarHelper::divider();
         JToolBarHelper::custom('packages.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
         
@@ -120,6 +140,8 @@ class ItpTransifexViewPackages extends JViewLegacy {
 		JHtml::_('bootstrap.tooltip');
 		
 		JHtml::_('itprism.ui.joomla_list');
+		
+		$this->document->addScript('../media/'.$this->option.'/js/admin/'.JString::strtolower($this->getName()).'.js');
 	}
     
 }

@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<extension type="package" version="3.1" method="upgrade">
+<extension type="package" version="3.2" method="upgrade">
 	<name>ITP Transifex Packages</name>
 	<packagename>itptransifex</packagename>
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
 	<authorUrl>http://itprism.com</authorUrl>
-	<copyright>Copyright (C) 2013 Todor Iliev ( ITPrism.com )</copyright>
+	<copyright>Copyright (C) 2014 Todor Iliev ( ITPrism.com )</copyright>
 	<license>http://www.gnu.org/copyleft/gpl.html</license>
 	<url>http://itprism.com</url>
 	<packager>Todor Iliev</packager>
-	<packagerurl>http://www.itprism.com</packagerurl>
-	<version>1.0</version>
-	<creationDate>05 November, 2013</creationDate>
+	<packagerurl>http://itprism.com</packagerurl>
+	<version>1.1</version>
+	<creationDate>04 March, 2014</creationDate>
 	<description><![CDATA[
-	<p><a href="#" target="_blank">ITP Transifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
+	<p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
+    <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
 	<p>Invest in the extension and help for its improvement. You can <a href="http://itprism.com/sponsorship" target="_blank">sponsor the extension via SMS, PayPal or Bitcoin</a>.</p>
 	<p><a href="http://itprism.com/" target="_blank">Subscribe for the newsletter</a> to receive <strong>gifts</strong>, <strong>discount codes</strong>, information about <strong>updates</strong> and information about <strong>new ITPrism extensions</strong>.</p>
-	<p>Please, <a href="#" target="_blank">vote for the extension</a> on Joomla! Extensions Directory</p>
+	<p>Please, <a href="http://extensions.joomla.org/extensions/languages/language-edition/25806" target="_blank">vote for the extension</a> on Joomla! Extensions Directory</p>
 	]]></description>
+    
 	<files folder="packages">
 		<file type="component" 	id="com_itptransifex" >com_itptransifex.zip</file>
+        <file type="library"    id="lib_itptransifex" >lib_itptransifex.zip</file>
 	</files>
 
 	<scriptfile>install.php</scriptfile>

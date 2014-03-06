@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -65,3 +65,17 @@ defined('_JEXEC') or die;
         <?php echo JHtml::_('form.token'); ?>
     </div>
 </form>
+
+
+<div class="modal hide fade" id="js-resources-list-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3><?php echo JText::_("COM_ITPTRANSIFEX_RESOURCES");?></h3>
+    </div>
+    <div class="modal-body" id="js-resources-list-body">
+        
+    </div>
+    <div class="modal-footer">
+        <a href="javascript: void(0);" class="btn" id="js-resources-list-close-btn"><?php echo JText::_("JTOOLBAR_CLOSE");?></a>
+    </div>
+</div>

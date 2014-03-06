@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -104,8 +104,8 @@ class ItpTransifexModelProject extends JModelAdmin {
      * Prepare and sanitise the table prior to saving.
      * @since	1.6
      */
-    protected function prepareTable(&$table) {
-         
+    protected function prepareTable($table) {
+        
         // Fix magic qutoes
         if( get_magic_quotes_gpc() ) {
             $table->name            = stripcslashes($table->name);
@@ -131,10 +131,6 @@ class ItpTransifexModelProject extends JModelAdmin {
      */
     public function synchronize($ids, $options) {
     
-        $username = JArrayHelper::getValue($options, "username");
-        $password = JArrayHelper::getValue($options, "password");
-        $url      = JArrayHelper::getValue($options, "url");
-    
         $db    = $this->getDbo();
         $query = $db->getQuery(true);
         $query
@@ -145,45 +141,49 @@ class ItpTransifexModelProject extends JModelAdmin {
         $db->setQuery($query);
         $projects = $db->loadObjectList("alias");
     
-        $data = array();
-        $info = array();
-    
         if(!empty($projects)) {
+            
+            $data = array();
+            $info = array();
+            
+            $username = JArrayHelper::getValue($options, "username");
+            $password = JArrayHelper::getValue($options, "password");
+            $url      = JArrayHelper::getValue($options, "url");
+            
+            jimport("itprism.transifex.request");
+            
+            $headers = array(
+                "headers" => array(
+                    'Content-type: application/json',
+                    'X-HTTP-Method-Override: GET'
+                )
+            );
+            
             foreach($projects as $project) {
     
-                $projectUrl = $url."/".$project->alias."/";
-    
-                $ch         = curl_init();
-    
-                $headers = array();
-                $headers[] = 'Content-type: application/json';
-                $headers[] = 'X-HTTP-Method-Override: GET';
-    
-                curl_setopt($ch, CURLOPT_URL, $projectUrl);
-                curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 400);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $transifex = new ITPrismTransifexRequest($url);
+                
+                $transifex->setUsername($username);
+                $transifex->setPassword($password);
+                $transifex->enableAuthentication();
+                
+                $path     = "/".$project->alias."/";
+                
+                $response = $transifex->get($path, $headers);
     
                 // Get the data
-                $data[$project->alias] = curl_exec($ch);
-    
-                // Close the request
-                curl_close($ch);
+                $data[$project->alias] = $response;
     
             }
-        }
-    
-        if(!empty($data)) {
-    
-            $this->prepareProjectsData($projects, $data);
-            $this->updateProjectsData($projects);
-            $this->updateProjectsResources($projects, $options);
-    
+            
+            if(!empty($data)) {
+            
+                $this->prepareProjectsData($projects, $data);
+                $this->updateProjectsData($projects);
+                $this->updateProjectsResources($projects, $options);
+            
+            }
+            
         }
     
     }
@@ -196,12 +196,10 @@ class ItpTransifexModelProject extends JModelAdmin {
      */
     public function prepareProjectsData(&$projects, $data) {
     
-        foreach($data as $key => $value) {
+        foreach($data as $key => $item) {
     
-            $item     = json_decode($value, true);
-    
-            $projects[$key]->description = JArrayHelper::getValue($item, "description");
-            $projects[$key]->source_language_code = JArrayHelper::getValue($item, "source_language_code");
+            $projects[$key]->description          = $item->description;
+            $projects[$key]->source_language_code = $item->source_language_code;
     
         }
     }
@@ -211,7 +209,7 @@ class ItpTransifexModelProject extends JModelAdmin {
      *
      * @param array$projects
      */
-    public function updateProjectsData($projects) {
+    protected function updateProjectsData($projects) {
     
         $db    = $this->getDbo();
     
@@ -219,7 +217,7 @@ class ItpTransifexModelProject extends JModelAdmin {
     
             $query = $db->getQuery(true);
             $query
-                ->update("#__itptfx_projects")
+                ->update($db->quoteName("#__itptfx_projects"))
                 ->set($db->quoteName('description') . "=". $db->quote($project->description))
                 ->set($db->quoteName('source_language_code') . "=". $db->quote($project->source_language_code))
                 ->where($db->quoteName('id') ."=". $db->quote($project->id));
@@ -239,43 +237,39 @@ class ItpTransifexModelProject extends JModelAdmin {
      *
      * @todo Add functionality for deleting resources, if they are removed on Transifex.
      */
-    public function updateProjectsResources($data, $options) {
+    protected function updateProjectsResources($data, $options) {
     
         $username = JArrayHelper::getValue($options, "username");
         $password = JArrayHelper::getValue($options, "password");
         $url      = JArrayHelper::getValue($options, "url");
     
+        $headers = array(
+            "headers" => array(
+                'Content-type: application/json',
+                'X-HTTP-Method-Override: GET'
+            )
+        );
+        
         $resources = array();
     
         // Get the resources from Transifex.
         foreach($data as $alias => $itemData) {
     
-            $projectUrl = $url."/".$alias."/resources/";
-    
-            $ch         = curl_init();
-    
-            $headers = array();
-            $headers[] = 'Content-type: application/json';
-            $headers[] = 'X-HTTP-Method-Override: GET';
-    
-            curl_setopt($ch, CURLOPT_URL, $projectUrl);
-            curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 400);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
+            $transifex = new ITPrismTransifexRequest($url);
+            
+            $transifex->setUsername($username);
+            $transifex->setPassword($password);
+            $transifex->enableAuthentication();
+            
+            $path     = "/".$alias."/resources/";
+            
+            $response = $transifex->get($path, $headers);
+            
             // Get the data
-            $resources[$itemData->id] = curl_exec($ch);
-    
-            // Close the request
-            curl_close($ch);
+            $resources[$itemData->id] = $response;
     
         }
-    
+        
         // Store the data about the resources.
         if(!empty($resources)) {
     
@@ -328,13 +322,12 @@ class ItpTransifexModelProject extends JModelAdmin {
                 $query = $db->getQuery(true);
     
                 $query
-                ->insert($db->quoteName("#__itptfx_resources"))
-                ->set($db->quoteName('name')        ."=". $db->quote($item->name))
-                ->set($db->quoteName('category')    ."=". $db->quote($item->category))
-                ->set($db->quoteName('i18n_type')   ."=". $db->quote($item->i18n_type))
-                ->set($db->quoteName('alias')       ."=". $db->quote($item->slug))
-                ->set($db->quoteName('project_id')  ."=". $db->quote($projectId))
-                ->set($db->quoteName('source_language_code')  ."=". $db->quote($item->source_language_code));
+                    ->insert($db->quoteName("#__itptfx_resources"))
+                    ->set($db->quoteName('name')        ."=". $db->quote($item["name"]))
+                    ->set($db->quoteName('i18n_type')   ."=". $db->quote($item["i18n_type"]))
+                    ->set($db->quoteName('alias')       ."=". $db->quote($item["slug"]))
+                    ->set($db->quoteName('project_id')  ."=". $db->quote($projectId))
+                    ->set($db->quoteName('source_language_code')  ."=". $db->quote($item["source_language_code"]));
     
                 $db->setQuery($query);
                 $db->execute();
@@ -352,14 +345,16 @@ class ItpTransifexModelProject extends JModelAdmin {
     
                 $db    = $this->getDbo();
                 $query = $db->getQuery(true);
-    
+                
+                $langCode = (!empty($item["source_language_code"])) ? $db->quote($item["source_language_code"]) : "NULL";
+                $type     = (!empty($item["i18n_type"])) ? $db->quote($item["i18n_type"]) : "NULL";
+                
                 $query
-                ->update($db->quoteName("#__itptfx_resources"))
-                ->set($db->quoteName('source_language_code') ."=". $db->quote($item->source_language_code))
-                ->set($db->quoteName('name')        ."=". $db->quote($item->name))
-                ->set($db->quoteName('category')    ."=". $db->quote($item->category))
-                ->set($db->quoteName('i18n_type')   ."=". $db->quote($item->i18n_type))
-                ->where($db->quoteName('alias')     ."=". $db->quote($item->slug));
+                    ->update($db->quoteName("#__itptfx_resources"))
+                    ->set($db->quoteName('name')        ."=". $db->quote($item["name"]))
+                    ->set($db->quoteName('i18n_type')   ."=". $type)
+                    ->set($db->quoteName('source_language_code') ."=". $langCode)
+                    ->where($db->quoteName('alias')     ."=". $db->quote($item["slug"]));
     
                 $db->setQuery($query);
                 $db->execute();
@@ -379,9 +374,9 @@ class ItpTransifexModelProject extends JModelAdmin {
                 $query = $db->getQuery(true);
     
                 $query
-                ->update($db->quoteName("#__itptfx_resources"))
-                ->set($db->quoteName('published') ."=". $db->quote("-2"))
-                ->where($db->quoteName('alias')   ."=". $db->quote($item->alias));
+                    ->update($db->quoteName("#__itptfx_resources"))
+                    ->set($db->quoteName('published') ."=". $db->quote("-2"))
+                    ->where($db->quoteName('alias')   ."=". $db->quote($item->alias));
     
                 $db->setQuery($query);
                 $db->execute();
@@ -405,21 +400,48 @@ class ItpTransifexModelProject extends JModelAdmin {
         $update = array();
         $delete = array();
     
-        foreach($resources as $projectId => $resource) {
+        foreach($resources as $projectId => $items) {
     
-            $items = json_decode($resource);
-    
+            // Clear white spaces.
+            foreach($items as &$resource) {
+                foreach($resource as $key => $value) {
+                   
+                    if(is_scalar($value)) {
+                        $resource[$key] = JString::trim($value);
+                    }
+                }
+                
+            }
+            
             if(!isset($currentResources[$projectId])) { // Insert all items because it is a new project and it does not have items.
                 $insert[$projectId] = $items;
             } else { // Insert, update and delete items to existed project.
     
+                // Get the new resources.
+                foreach($items as $item) {
+                    
+                    $isNew = true;
+                    foreach($currentResources[$projectId] as $currentResource) {
+                        if( strcmp($item["slug"], $currentResource->alias) == 0 ) {
+                            $isNew = false;
+                            break;
+                        }
+                    }
+                    
+                    if($isNew) {
+                        $insert[$projectId][] = $item;
+                    }
+                    
+                }
+                
+                // Update current resources and remove missing ones.
                 foreach($currentResources[$projectId] as $currentResource) {
     
                     $deleteFlag = true;
                     foreach($items as $item) {
     
                         // If there is a resource, add it for updating.
-                        if( (strcmp($currentResource->alias, $item->slug) == 0 )) {
+                        if( (strcmp($currentResource->alias, $item["slug"]) == 0 )) {
                             $update[$projectId][] = $item;
                             $deleteFlag = false;
                         }
@@ -496,8 +518,6 @@ class ItpTransifexModelProject extends JModelAdmin {
                 
                 $db->setQuery($query);
                 $packagesIds = $db->loadColumn();
-                
-                dump($packagesIds);
                 
                 if(!$packagesIds) {
                     $packagesIds = array();

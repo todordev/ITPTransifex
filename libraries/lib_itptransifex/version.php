@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Libraries
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -22,7 +22,7 @@ class ItpTransifexVersion {
      * 
      * @var string
      */
-    public $product    = 'ITP Transifex';
+    public $product    = 'ITPTransifex';
     
     /**
      * Main Release Level
@@ -36,7 +36,7 @@ class ItpTransifexVersion {
      * 
      * @var integer
      */
-    public $devLevel  = '0';
+    public $devLevel  = '1';
     
     /**
      * Release Type
@@ -57,7 +57,7 @@ class ItpTransifexVersion {
      * 
      * @var string
      */
-    public $releaseDate= '05-October-2013';
+    public $releaseDate= '04 March, 2014';
     
     /**
      * License
@@ -71,21 +71,21 @@ class ItpTransifexVersion {
      * 
      * @var string
      */
-    public $copyright  = '&copy; 2013 ITPrism. All rights reserved.';
+    public $copyright  = '&copy; 2014 ITPrism. All rights reserved.';
     
     /**
      * URL
      * 
      * @var string
      */
-    public $url        = '<a href="#" target="_blank">ITPTransifex</a>';
+    public $url        = '<a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a>';
 
     /**
      * Backlink
      * 
      * @var string
      */
-    public $backlink   = '<div style="width:100%; text-align: left; font-size: xx-small; margin-top: 10px;"><a href="#" target="_blank">Joomla! ITPTransifex</a></div>';
+    public $backlink   = '<div style="width:100%; text-align: left; font-size: xx-small; margin-top: 10px;"><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">Joomla! ITPTransifex</a></div>';
     
     /**
      * Developer

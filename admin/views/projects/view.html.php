@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -37,9 +37,6 @@ class ItpTransifexViewProjects extends JViewLegacy {
         // Load the component parameters.
         $this->resources  = $model->countResources();
 
-        // HTML Helpers
-        JHtml::addIncludePath(ITPRISM_PATH_LIBRARY.'/ui/helpers');
-        
         // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
         
@@ -92,9 +89,9 @@ class ItpTransifexViewProjects extends JViewLegacy {
         JToolBarHelper::addNew('project.add');
         JToolBarHelper::editList('project.edit');
         JToolBarHelper::divider();
-		JToolBarHelper::custom('projects.update', "refresh", "", JText::_("COM_ITPTRANSIFEX_UPDATE"), false);
-        JToolBarHelper::divider();
         JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "projects.delete");
+        JToolBarHelper::divider();
+        JToolBarHelper::custom('projects.update', "refresh", "", JText::_("COM_ITPTRANSIFEX_UPDATE"), false);
         JToolBarHelper::divider();
         JToolBarHelper::custom('projects.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
         

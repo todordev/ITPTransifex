@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_packages` (
   `filename` varchar(128) NOT NULL,
   `description` text,
   `version` varchar(32) NOT NULL,
-  `lang_code` varchar(5) NOT NULL,
+  `language` varchar(5) NOT NULL,
+  `type` enum('component','module','plugin') NOT NULL,
   `hash` varchar(32) NOT NULL,
   `project_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `package_hash` (`hash`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__itptfx_packages_map` (
@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_resources` (
   `filename` varchar(64) DEFAULT NULL,
   `type` char(5) DEFAULT NULL,
   `i18n_type` varchar(64) DEFAULT NULL,
-  `category` varchar(64) DEFAULT NULL,
   `source_language_code` char(5) DEFAULT NULL,
   `published` tinyint(1) NOT NULL DEFAULT '1',
   `project_id` int(10) unsigned NOT NULL,

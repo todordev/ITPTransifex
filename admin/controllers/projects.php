@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -33,11 +33,8 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin {
         
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
         
-        $app = JFactory::getApplication();
-        /** @var $app JAdministrator **/
-        
         // Get form data 
-        $pks   = $app->input->post->get('cid', array(), 'array');
+        $pks   = $this->input->post->get('cid', array(), 'array');
         $model = $this->getModel();
         /** @var $model ItpTransifexModelProjects **/
         

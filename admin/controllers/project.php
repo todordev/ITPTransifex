@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -33,7 +33,8 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend {
     /**
      * Save an item
      */
-    public function save() {
+    public function save($key = null, $urlVar = null) {
+        
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
         
         $app = JFactory::getApplication();

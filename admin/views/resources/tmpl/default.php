@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -62,16 +62,7 @@ defined('_JEXEC') or die;
         <input type="hidden" name="task" value="" />
         <input type="hidden" name="filter_order" value="<?php echo $this->listOrder; ?>" id="filter_order" />
         <input type="hidden" name="filter_order_Dir" value="<?php echo $this->listDirn; ?>" />
-        <input type="hidden" name="project_id" value="<?php echo $this->projectId; ?>" id="js-project-id" />
         <?php echo JHtml::_('form.token'); ?>
-        
-        <input type="hidden" name="lang_code"     value="" id="js-langcode-target" />
-        <input type="hidden" name="version"       value="" id="js-version-target" />
-        <input type="hidden" name="description"   value="" id="js-desc-target" />
-        <input type="hidden" name="name"          value="" id="js-name-target" />
-        <input type="hidden" name="filename"      value="" id="js-filename-target" />
-        <input type="hidden" name="store_data"    value="" id="js-store-data-target" />
-        
     </div>
 </form>
 
@@ -85,64 +76,45 @@ defined('_JEXEC') or die;
     </div>
     <div class="modal-body">
         
-        <div class="row-fluid">
-            <div class="span8">
-                <div class="control-group">
-                    <div class="control-label"><label for="js-name-source"><?php echo JText::_("COM_ITPTRANSIFEX_NAME");?></label></div>
-        			<div class="controls">
-        			    <input type="text" name="name" value="" id="js-name-source" class="span10">  
-        			</div>
+        <form action="<?php echo JRoute::_('index.php?option=com_itptransifex'); ?>" method="post" name="packageForm" id="packageForm">
+        
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('name'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('filename'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('filename'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('language'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('language'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('type'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('type'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('version'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('version'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('description'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('description'); ?></div>
+                    </div>
                 </div>
                 
-                <div class="control-group">
-                    <div class="control-label"><label for="js-filename-source"><?php echo JText::_("COM_ITPTRANSIFEX_FILENAME");?></label></div>
-        			<div class="controls">
-        			    <input type="text" name="filename" value="" id="js-filename-source" class="span10">  
-        			</div>
-                </div>
-                
-                <div class="control-group">
-                    <div class="control-label"><label for="js-version-source"><?php echo JText::_("COM_ITPTRANSIFEX_VERSION");?></label></div>
-        			<div class="controls">
-        			    <input type="text" name="version" value="" id="js-version-source" class="span10">  
-        			</div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><label for="js-desc-source"><?php echo JText::_("COM_ITPTRANSIFEX_DESCRIPTION");?></label></div>
-        			<div class="controls">
-        			    <textarea name="description" id="js-desc-source" class="span10"></textarea>  
-        			</div>
-                </div>
-                        
-                <div class="control-group">
-        			<div class="controls">
-        			     <label for="js-store-data-source" class="checkbox">
-        			         <input name="store_data" type="checkbox" value="1" id="js-store-data-source" />  
-        			         <?php echo JText::_("COM_ITPTRANSIFEX_STORE_DATA");?>
-        			     </label>
-        			</div>
-                </div>
             </div>
         
-            <div class="span4">
-                <h4><?php echo JText::_("COM_ITPTRANSIFEX_LANGUAGE");?></h4>
-                <?php foreach($this->languages as $lagnauge) {?>
-                <label class="radio">
-                    <input type="radio" name="optionsRadios" value="<?php echo $this->escape($lagnauge->code);?>" class="js-languages">
-                    <?php echo $this->escape($lagnauge->name);?>
-                </label>
-                <?php }?>
-                
-                <button class="btn" id="js-btn-loaddata">
-                    <i class="icon-refresh"></i>
-                    <?php echo JText::_("COM_ITPTRANSIFEX_LOAD_DATA")?>
-                </button>
-                <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader-load-data"/>
-            </div>
-        </div>
-        
+            <input type="hidden" name="task" value="package.create" />
+            <input type="hidden" name="format" value="raw" />
+            <input type="hidden" name="project_id" value="<?php echo $this->projectId; ?>" />
+    </form>
     </div>
     <div class="modal-footer">
+        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader-load-data"/>
         <a href="#" class="btn btn-primary" id="js-btn-sp"><?php echo JText::_("COM_ITPTRANSIFEX_SUBMIT");?></a>
         <a href="#" class="btn" id="js-btn-cp-cancel"><?php echo JText::_("COM_ITPTRANSIFEX_CANCEL");?></a>
     </div>
