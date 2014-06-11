@@ -20,58 +20,61 @@ defined('JPATH_PLATFORM') or die;
  * @link         http://docs.joomla.org/JTableObserver
  * @since        3.1.2
  */
-class ItpTransifexObserverResource extends JTableObserver {
-    
+class ItpTransifexObserverResource extends JTableObserver
+{
+
     /**
-	 * The pattern for this table's TypeAlias
-	 *
-	 * @var    string
-	 * @since  3.1.2
-	 */
+     * The pattern for this table's TypeAlias
+     *
+     * @var    string
+     * @since  3.1.2
+     */
     protected $typeAliasPattern = null;
-  
+
     /**
-	 * Creates the associated observer instance and attaches it to the $observableObject
-	 * $typeAlias can be of the form "{variableName}.type", automatically replacing {variableName} with table-instance variables variableName
-	 *
-	 * @param   JObservableInterface  $observableObject  The subject object to be observed
-	 * @param   array                 $params            ( 'typeAlias' => $typeAlias )
-	 *
-	 * @return  UserIdeasObserverVote
-	 *
-	 * @since   3.1.2
-	 */
-    public static function createObserver(JObservableInterface $observableObject, $params = array()) {
+     * Creates the associated observer instance and attaches it to the $observableObject
+     * $typeAlias can be of the form "{variableName}.type", automatically replacing {variableName} with table-instance variables variableName
+     *
+     * @param   JObservableInterface $observableObject The subject object to be observed
+     * @param   array                $params           ( 'typeAlias' => $typeAlias )
+     *
+     * @return  UserIdeasObserverVote
+     *
+     * @since   3.1.2
+     */
+    public static function createObserver(JObservableInterface $observableObject, $params = array())
+    {
 
         $observer = new self($observableObject);
-        
+
         $observer->typeAliasPattern = JArrayHelper::getValue($params, 'typeAlias');
-        
+
         return $observer;
     }
 
     /**
-	 * Pre-processor for $table->delete($pk)
-	 *
-	 * @param   mixed  $pk  An optional primary key value to delete.  If not set the instance property value is used.
-	 *
-	 * @return  void
-	 *
-	 * @since   3.1.2
-	 * @throws  UnexpectedValueException
-	 */
-    public function onBeforeDelete($pk) {
-        
-        $db    = JFactory::getDbo();
-        
+     * Pre-processor for $table->delete($pk)
+     *
+     * @param   mixed $pk An optional primary key value to delete.  If not set the instance property value is used.
+     *
+     * @return  void
+     *
+     * @since   3.1.2
+     * @throws  UnexpectedValueException
+     */
+    public function onBeforeDelete($pk)
+    {
+
+        $db = JFactory::getDbo();
+
         $query = $db->getQuery(true);
         $query
             ->delete($db->quoteName("#__itptfx_packages_map"))
-            ->where("resource_id IN ( ". implode(",", $pk) . ")");
-        
+            ->where("resource_id IN ( " . implode(",", $pk) . ")");
+
         $db->setQuery($query);
         $db->execute();
-        
+
     }
 
 }

@@ -10,31 +10,26 @@
 // no direct access
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controller');
-
 /**
  * Default Controller
  *
- * @package		 ItpTransifex
- * @subpackage   Components
-  */
-class ItpTransifexController extends JControllerLegacy {
-    
-	public function display($cachable = false, $urlparams = array()) {
+ * @package         ItpTransifex
+ * @subpackage      Components
+ */
+class ItpTransifexController extends JControllerLegacy
+{
+    public function display($cachable = false, $urlparams = array())
+    {
+        $viewName = $this->input->getCmd('view', 'dashboard');
+        $this->input->set("view", $viewName);
 
-		$app = JFactory::getApplication();
-        /** @var $app JAdministrator **/
-        
-        $option   = $app->input->getCmd("option");
-        
+        $option = $this->input->getCmd("options", "com_itptransifex");
+
         $document = JFactory::getDocument();
-		/** @var $document JDocumentHtml **/
-        
-        $viewName      = $app->input->getCmd('view', 'dashboard');
-        $app->input->set("view", $viewName);
+        $document->addStyleSheet('../media/' . $option . '/css/admin/style.css');
 
         parent::display();
-        return $this;
-	}
 
+        return $this;
+    }
 }

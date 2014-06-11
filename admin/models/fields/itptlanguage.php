@@ -15,14 +15,15 @@ jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('list');
 
 /**
- * Form field class that loads languages as options, 
+ * Form field class that loads languages as options,
  * using code with 4 letters for ID.
  *
  * @package      ITPTransifex
  * @subpackage   Components
- * @since       1.6
+ * @since        1.6
  */
-class JFormFieldItptLanguage extends JFormFieldList {
+class JFormFieldItptLanguage extends JFormFieldList
+{
     /**
      * The form field type.
      *
@@ -30,24 +31,25 @@ class JFormFieldItptLanguage extends JFormFieldList {
      * @since   1.6
      */
     protected $type = 'itptlanguage';
-    
+
     /**
      * Method to get the field options.
      *
      * @return  array   The field option objects.
      * @since   1.6
      */
-    protected function getOptions(){
-        
+    protected function getOptions()
+    {
+
         jimport("itptransifex.languages");
         $languages = new ItpTransifexLanguages(JFactory::getDbo());
         $languages->load();
-        
+
         $options = $languages->toOptions();
-        
+
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $options);
-        
+
         return $options;
     }
 }

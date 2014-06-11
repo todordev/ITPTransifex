@@ -9,19 +9,20 @@
 	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
 	<packager>ITPrism</packager>
 	<packagerurl>http://itprism.com</packagerurl>
-	<version>1.1</version>
-	<creationDate>04 March, 2014</creationDate>
+	<version>1.2</version>
+	<creationDate>11 June, 2014</creationDate>
 	<description>ITP Transifex Library</description>
     
 	<files>    
-		<folder>language</folder>
-		
         <file>filters.php</file>
 		<file>index.html</file>
 		<file>init.php</file>
 		<file>languages.php</file>
 		<file>package.php</file>
+		<file>packages.php</file>
 		<file>project.php</file>
+		<file>projects.php</file>
+		<file>resource.php</file>
 		<file>resources.php</file>
 		<file>version.php</file>
 	</files>

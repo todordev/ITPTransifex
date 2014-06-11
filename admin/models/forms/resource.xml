@@ -1,64 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<fieldset>
+    <fieldset>
 
-		<field name="name" type="text"  
-			label="COM_ITPTRANSIFEX_NAME"
-            description="COM_ITPTRANSIFEX_RESOURCE_NAME_DESC" 
-			filter="trim" 
-            class="span6"  
-			required="true" />
+        <field name="name" type="text"
+               label="COM_ITPTRANSIFEX_NAME"
+               description="COM_ITPTRANSIFEX_RESOURCE_NAME_DESC"
+               filter="trim"
+               class="span6"
+               required="true"/>
 
         <field name="alias" type="text"
-	        label="COM_ITPTRANSIFEX_SLUG"
-	        description="COM_ITPTRANSIFEX_RESOURCE_SLUG_DESC"
-	        class="span6"
-            required="true"
-        />
-        
+               label="COM_ITPTRANSIFEX_SLUG"
+               description="COM_ITPTRANSIFEX_RESOURCE_SLUG_DESC"
+               class="span6"
+               required="true"
+                />
+
         <field name="filename" type="text"
-	        label="COM_ITPTRANSIFEX_FILENAME"
-	        description="COM_ITPTRANSIFEX_RESOURCE_FILENAME_DESC"
-	        class="span6"
-            required="true"
-        />
-        
+               label="COM_ITPTRANSIFEX_FILENAME"
+               description="COM_ITPTRANSIFEX_RESOURCE_FILENAME_DESC"
+               class="span6"
+               required="true"
+                />
+
         <field name="type" type="list"
-	        label="COM_ITPTRANSIFEX_TYPE"
-	        description="COM_ITPTRANSIFEX_RESOURCE_TYPE_DESC"
-            required="true"
-        >
+               label="COM_ITPTRANSIFEX_TYPE"
+               description="COM_ITPTRANSIFEX_RESOURCE_TYPE_DESC"
+               required="true"
+                >
             <option value="site">site</option>
             <option value="admin">admin</option>
         </field>
-        
-        <field name="id" type="text" 
-            label="JGLOBAL_FIELD_ID_LABEL"
-            description="JGLOBAL_FIELD_ID_DESC"
-            default="0"  
-            readonly="true" 
-        />
-        
-        <field name="source_language_code" type="text" 
-            label="COM_ITPTRANSIFEX_SOURCE_LANGUAGE_CODE" 
-            readonly="true" 
-        />
-        
-        <field name="i18n_type" type="text" 
-            label="COM_ITPTRANSIFEX_I18N_TYPE" 
-            readonly="true" 
-        />
-        
+
+        <field name="id" type="text"
+               label="JGLOBAL_FIELD_ID_LABEL"
+               description="JGLOBAL_FIELD_ID_DESC"
+               default="0"
+               readonly="true"
+                />
+
+        <field name="source_language_code" type="text"
+               label="COM_ITPTRANSIFEX_SOURCE_LANGUAGE_CODE"
+               readonly="true"
+                />
+
+        <field name="i18n_type" type="text"
+               label="COM_ITPTRANSIFEX_I18N_TYPE"
+               readonly="true"
+                />
+
         <field
-            name="published" type="list" 
-            label="JSTATUS"
-            description="COM_ITPTRANSIFEX_RESOURCE_STATE_DESC"
-            size="1"
-            default="1">
+                name="published" type="list"
+                label="JSTATUS"
+                description="COM_ITPTRANSIFEX_RESOURCE_STATE_DESC"
+                size="1"
+                default="1">
             <option value="0">JUNPUBLISHED</option>
             <option value="1">JPUBLISHED</option>
             <option value="-2">JTRASHED</option>
         </field>
-            
-	</fieldset>
+
+    </fieldset>
 </form>

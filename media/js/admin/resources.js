@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
     		} else {
     			jQuery('#js-cp-modal').modal('show');
     		}
-        	
+
     	// Submit form
         } else {
         	Joomla.submitform(task, document.getElementById('adminForm'));

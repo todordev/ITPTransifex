@@ -9,10 +9,12 @@
 
 defined('_JEXEC') or die;
 
-class ItpTransifexTableLanguage extends JTable {
-    
-	public function __construct($db) {
+class ItpTransifexTableLanguage extends JTable
+{
+
+    public function __construct($db)
+    {
         parent::__construct('#__itptfx_languages', 'id', $db);
     }
-    
+
 }

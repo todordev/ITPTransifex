@@ -10,14 +10,15 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_languages` (
 CREATE TABLE IF NOT EXISTS `#__itptfx_packages` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(128) NOT NULL,
+  `alias` varchar(64) DEFAULT NULL,
   `filename` varchar(128) NOT NULL,
   `description` text,
   `version` varchar(32) NOT NULL,
   `language` varchar(5) NOT NULL,
   `type` enum('component','module','plugin') NOT NULL,
-  `hash` varchar(32) NOT NULL,
   `project_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_pkg_alias` (`alias`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__itptfx_packages_map` (
@@ -33,7 +34,8 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_projects` (
   `description` text,
   `source_language_code` char(5) DEFAULT NULL,
   `filename` varchar(64) DEFAULT NULL COMMENT 'This is the file name of the package.',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_proj_alias` (`alias`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__itptfx_resources` (

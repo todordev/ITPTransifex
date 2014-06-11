@@ -9,10 +9,12 @@
 
 defined('_JEXEC') or die;
 
-class ItpTransifexTableResource extends JTable {
-    
-	public function __construct($db) {
+class ItpTransifexTableResource extends JTable
+{
+
+    public function __construct($db)
+    {
         parent::__construct('#__itptfx_resources', 'id', $db);
     }
-    
+
 }

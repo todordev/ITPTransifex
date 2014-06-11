@@ -16,10 +16,12 @@ defined('_JEXEC') or die;
         <?php foreach ($this->items as $i => $item) { ?>
         <tr>
             <td class="nowrap">
-                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&id=".(int)$this->packageId."&filter_search=id:".(int)$item["id"]);?>" >
+                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&id=".(int)$this->projectId."&filter_search=id:".(int)$item["id"]);?>" >
                     <?php echo $this->escape($item["name"]); ?>
                 </a>
-                <div class="small"><?php echo $this->escape($item["alias"]); ?></div>
+                <div class="small">
+                    <?php echo JText::sprintf("COM_ITPTRANSIFEX_ALIAS_S", $item["alias"]); ?>
+                </div>
             </td>
         </tr>
         <?php } ?>

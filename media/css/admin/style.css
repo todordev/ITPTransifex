@@ -1,9 +1,13 @@
 #js-cp-modal {
   	width: 600px !important;
   	left: 45% !important;
-  	height: 600px !important;
+  	height: 650px !important;
 }
 
 #js-cp-modal .modal-body {
-	max-height: 500px !important;
+	max-height: 580px !important;
+}
+
+#itptfx-btn-add {
+	margin: 10px 0;
 }

@@ -71,8 +71,7 @@ defined('_JEXEC') or die;
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3><?php echo JText::_("COM_ITPTRANSIFEX_PACKAGE_OPTIONS");?></h3>
-        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader"/>
-        
+
     </div>
     <div class="modal-body">
         
@@ -83,6 +82,10 @@ defined('_JEXEC') or die;
                     <div class="control-group">
                         <div class="control-label"><?php echo $this->form->getLabel('name'); ?></div>
         				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('alias'); ?></div>
+        				<div class="controls"><?php echo $this->form->getInput('alias'); ?></div>
                     </div>
                     <div class="control-group">
                         <div class="control-label"><?php echo $this->form->getLabel('filename'); ?></div>
@@ -114,7 +117,7 @@ defined('_JEXEC') or die;
     </form>
     </div>
     <div class="modal-footer">
-        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader-load-data"/>
+        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader" />
         <a href="#" class="btn btn-primary" id="js-btn-sp"><?php echo JText::_("COM_ITPTRANSIFEX_SUBMIT");?></a>
         <a href="#" class="btn" id="js-btn-cp-cancel"><?php echo JText::_("COM_ITPTRANSIFEX_CANCEL");?></a>
     </div>

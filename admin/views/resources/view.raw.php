@@ -10,28 +10,31 @@
 // No direct access
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.view');
-
-class ItpTransifexViewResources extends JViewLegacy {
-    
-    protected $packageId;
+class ItpTransifexViewResources extends JViewLegacy
+{
+    protected $projectId;
     protected $items;
-    
-    public function display($tpl = null){
-        
+
+    public function display($tpl = null)
+    {
         $app = JFactory::getApplication();
-        /** @var $app JAdministrator **/
-        
-        $this->packageId  = $app->input->get->get("package_id");
-        
+        /** @var $app JApplicationAdministrator */
+
+        $packageId = $app->input->get->get("package_id");
+
+        // Load resource
         jimport("itptransifex.resources");
-        $this->items      = new ItpTransifexResources(JFactory::getDbo());
-        
-        $this->items->loadByPackageId($this->packageId);
-        
+        $this->items = new ItpTransifexResources(JFactory::getDbo());
+        $this->items->loadByPackageId($packageId);
+
+        jimport("itptransifex.package");
+        $package = new ItpTransifexPackage(JFactory::getDbo());
+        $package->load($packageId);
+
+        $this->projectId = $package->getProjectId();
+
         $this->setLayout("preview");
-        
+
         parent::display($tpl);
     }
-    
 }

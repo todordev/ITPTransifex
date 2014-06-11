@@ -19,7 +19,9 @@ defined('_JEXEC') or die;
 			<?php echo JHtml::_('jgrid.published', $item->published, $i, 'resources.'); ?>
 		</td>
         <td class="nowrap">
-            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resource&layout=edit&id=".(int)$item->id);?>"><?php echo $this->escape($item->name); ?></a>
+            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resource&layout=edit&id=".(int)$item->id);?>">
+                <?php echo $this->escape($item->name); ?>
+            </a>
         </td>
         <td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->alias); ?>
@@ -33,7 +35,9 @@ defined('_JEXEC') or die;
 		<td class="nowrap center hidden-phone">
 		  <?php echo $this->escape($item->source_language_code); ?>
 		</td>
-        <td class="nowrap center hidden-phone"><?php echo $item->id;?></td>
+        <td class="nowrap center hidden-phone">
+            <?php echo $item->id;?>
+        </td>
 	</tr>
 <?php }?>
 	  

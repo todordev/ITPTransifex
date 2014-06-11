@@ -17,16 +17,17 @@ jimport('itprism.controller.admin');
  *
  * @package     ItpTransifex
  * @subpackage  Components
-  */
-class ItpTransifexControllerLanguages extends ITPrismControllerAdmin {
-
+ */
+class ItpTransifexControllerLanguages extends ITPrismControllerAdmin
+{
     /**
      * Proxy for getModel.
      * @since   1.6
      */
-    public function getModel($name = 'Language', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true)) {
+    public function getModel($name = 'Language', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
+    {
         $model = parent::getModel($name, $prefix, $config);
+
         return $model;
     }
-
 }

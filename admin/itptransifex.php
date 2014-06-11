@@ -13,9 +13,6 @@ defined('_JEXEC') or die;
 jimport("itprism.init");
 jimport("itptransifex.init");
 
-// Include dependencies
-jimport('joomla.application.component.controller');
-
 // Get an instance of the controller prefixed by HelloWorld
 $controller = JControllerLegacy::getInstance("ItpTransifex");
 

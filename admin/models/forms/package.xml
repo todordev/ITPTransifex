@@ -1,55 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<fieldset>
+    <fieldset>
 
-		<field name="name" type="text" class="span12"
-			label="COM_ITPTRANSIFEX_NAME"
-            description="COM_ITPTRANSIFEX_PACKAGE_NAME_DESC" 
-			filter="trim" 
-			required="true" />
+        <field name="name" type="text" class="span12"
+               label="COM_ITPTRANSIFEX_NAME"
+               description="COM_ITPTRANSIFEX_PACKAGE_NAME_DESC"
+               filter="trim"
+               required="true"/>
+
+        <field name="alias" type="text" class="span12"
+               label="COM_ITPTRANSIFEX_ALIAS"
+               description="COM_ITPTRANSIFEX_PACKAGE_ALIAS_DESC"
+               filter="trim"
+               />
 
         <field name="filename" type="text" class="span12"
-	        label="COM_ITPTRANSIFEX_FILENAME"
-	        description="COM_ITPTRANSIFEX_PACKAGE_FILENAME_DESC"
-            required="true"
-        />
-		
+               label="COM_ITPTRANSIFEX_FILENAME"
+               description="COM_ITPTRANSIFEX_PACKAGE_FILENAME_DESC"
+               required="true"
+                />
+
         <field name="language" type="itptlanguage"
-            label="COM_ITPTRANSIFEX_LANGUAGE"
-            description="COM_ITPTRANSIFEX_LANGUAGE_DESC"
-            required="true"
-        />
-        
+               label="COM_ITPTRANSIFEX_LANGUAGE"
+               description="COM_ITPTRANSIFEX_LANGUAGE_DESC"
+               required="true"
+                />
+
         <field name="type" type="list"
-            label="COM_ITPTRANSIFEX_TYPE"
-            description="COM_ITPTRANSIFEX_FIELD_PACKAGE_TYPE_DESC"
-            required="true"
-        >
+               label="COM_ITPTRANSIFEX_TYPE"
+               description="COM_ITPTRANSIFEX_FIELD_PACKAGE_TYPE_DESC"
+               required="true"
+                >
             <option value="component">COM_ITPTRANSIFEX_COMPONENT</option>
             <option value="module">COM_ITPTRANSIFEX_MODULE</option>
             <option value="plugin">COM_ITPTRANSIFEX_PLUGIN</option>
         </field>
-        
+
         <field name="version" type="text"
-            label="COM_ITPTRANSIFEX_VERSION"
-            description="COM_ITPTRANSIFEX_VERSION_DESC"
-        />
-        
-		<field name="id" type="text" 
-            label="JGLOBAL_FIELD_ID_LABEL"
-            description="JGLOBAL_FIELD_ID_DESC"
-            default="0"  
-            readonly="true" 
-        />
+               label="COM_ITPTRANSIFEX_VERSION"
+               description="COM_ITPTRANSIFEX_VERSION_DESC"
+                />
+
+        <field name="id" type="text"
+               label="JGLOBAL_FIELD_ID_LABEL"
+               description="JGLOBAL_FIELD_ID_DESC"
+               default="0"
+               readonly="true"
+                />
 
         <field name="description" type="textarea" class="span12"
-            label="COM_ITPTRANSIFEX_DESCRIPTION" 
-            description="COM_ITPTRANSIFEX_PACKAGE_DESCRIPTION_DESC"
-            rows="5" 
-        />
-           
-       <field name="hash" type="hidden" />
-       <field name="project_id" type="hidden" />
-         
-	</fieldset>
+               label="COM_ITPTRANSIFEX_DESCRIPTION"
+               description="COM_ITPTRANSIFEX_PACKAGE_DESCRIPTION_DESC"
+               rows="5"
+                />
+
+        <field name="project_id" type="hidden"/>
+
+    </fieldset>
 </form>

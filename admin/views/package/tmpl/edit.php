@@ -20,6 +20,10 @@ defined('_JEXEC') or die;
     				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
                 </div>
                 <div class="control-group">
+                    <div class="control-label"><?php echo $this->form->getLabel('alias'); ?></div>
+                    <div class="controls"><?php echo $this->form->getInput('alias'); ?></div>
+                </div>
+                <div class="control-group">
                     <div class="control-label"><?php echo $this->form->getLabel('filename'); ?></div>
     				<div class="controls"><?php echo $this->form->getInput('filename'); ?></div>
                 </div>
@@ -46,10 +50,65 @@ defined('_JEXEC') or die;
                 
             </fieldset>
         
-            <?php echo $this->form->getInput('hash'); ?>
             <?php echo $this->form->getInput('project_id'); ?>
             <input type="hidden" name="task" value="" />
             <?php echo JHtml::_('form.token'); ?>
         </form>
     </div>
 </div>
+
+<?php if ($this->item->id) { ?>
+<div class="row-fluid">
+
+    <div class="span6">
+        <h3>
+            <?php echo JText::_("COM_ITPTRANSIFEX_RESOURCES"); ?>
+            <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader"/>
+        </h3>
+
+        <button class="btn btn-success" id="itptfx-btn-add">
+            <i class="icon-plus"></i>
+            <?php echo JText::_("COM_ITPTRANSIFEX_ADD"); ?>
+        </button>
+
+        <div id="itptfx-add-resource" style="display: none;">
+            <form>
+                <input type="text" name="resource" value="" class="input-xxlarge" id="itptfx-resource-input" placeholder="<?php echo JText::_("COM_ITPTRANSIFEX_TYPE_RESOURCE_NAME"); ?>" />
+            </form>
+        </div>
+
+        <?php if(!empty($this->items)) {?>
+        <table class="table table-bordered" id="resources-list">
+            <thead>
+                <tr>
+                    <th><?php echo JText::_("COM_ITPTRANSIFEX_RESOURCE"); ?></th>
+                    <th><?php echo JText::_("COM_ITPTRANSIFEX_ACTION"); ?></th>
+                </tr>
+            </thead>
+            <tbody id="itptfx-resource-wrapper">
+            <?php foreach ($this->items as $resource) { ?>
+                <tr id="resource-id<?php echo $resource["id"];?>">
+                    <td class="nowrap">
+                        <?php echo $this->escape($resource["name"]); ?>
+                        <div class="small">
+                            <?php echo JText::sprintf("COM_ITPTRANSIFEX_ALIAS_S", $resource["alias"]); ?>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&task=package.removeResource&format=raw"); ?>"
+                           data-rid="<?php echo $resource["id"];?>"
+                           data-pid="<?php echo $this->item->id; ?>"
+                           class="btn btn-danger itptfx-btn-remove"
+                         >
+                            <i class="icon-trash"></i>
+                            <?php echo JText::_("COM_ITPTRANSIFEX_REMOVE"); ?>
+                        </a>
+                    </td>
+                </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+        <?php }?>
+    </div>
+</div>
+<?php } ?>

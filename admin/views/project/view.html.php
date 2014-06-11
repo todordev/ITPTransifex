@@ -10,79 +10,84 @@
 // no direct access
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.view');
+class ItpTransifexViewProject extends JViewLegacy
+{
+    /**
+     * @var JDocumentHtml
+     */
+    public $document;
 
-class ItpTransifexViewProject extends JViewLegacy {
-    
+    /**
+     * @var Joomla\Registry\Registry
+     */
     protected $state;
+
     protected $item;
     protected $form;
-    
+
     protected $documentTitle;
     protected $option;
-    
-    public function __construct($config) {
+
+    public function __construct($config)
+    {
         parent::__construct($config);
         $this->option = JFactory::getApplication()->input->get("option");
     }
-    
+
     /**
      * Display the view
      */
-    public function display($tpl = null){
-        
+    public function display($tpl = null)
+    {
         $this->item  = $this->get('Item');
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
-        
-        // Prepare actions, behaviors, scritps and document
+
+        // Prepare actions, behaviors, script and document
         $this->addToolbar();
         $this->setDocument();
-        
+
         parent::display($tpl);
     }
-    
+
     /**
      * Add the page title and toolbar.
      *
      * @since   1.6
      */
-    protected function addToolbar(){
-        
+    protected function addToolbar()
+    {
         JFactory::getApplication()->input->set('hidemainmenu', true);
         $isNew = ($this->item->id == 0);
-        
+
         $this->documentTitle = $isNew ? JText::_('COM_ITPTRANSIFEX_NEW_PROJECT')
-		                              : JText::_('COM_ITPTRANSIFEX_EDIT_PROJECT');
-        
+            : JText::_('COM_ITPTRANSIFEX_EDIT_PROJECT');
+
         JToolBarHelper::title($this->documentTitle);
-		                             
+
         JToolBarHelper::apply('project.apply');
         JToolBarHelper::save('project.save');
-    
-        if(!$isNew){
+
+        if (!$isNew) {
             JToolBarHelper::cancel('project.cancel', 'JTOOLBAR_CANCEL');
-        }else{
+        } else {
             JToolBarHelper::cancel('project.cancel', 'JTOOLBAR_CLOSE');
         }
-        
     }
-    
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() {
-	    
-		$this->document->setTitle($this->documentTitle);
-        
-		// Add scripts
-		JHtml::_('behavior.formvalidation');
-		JHtml::_('bootstrap.tooltip');
-		
-		$this->document->addScript(JURI::root() . 'media/'.$this->option.'/js/admin/'.strtolower($this->getName()).'.js');
-        
-	}
 
+    /**
+     * Method to set up the document properties
+     *
+     * @return void
+     */
+    protected function setDocument()
+    {
+        $this->document->setTitle($this->documentTitle);
+
+        // Add scripts
+        JHtml::_('behavior.formvalidation');
+        JHtml::_('bootstrap.tooltip');
+
+        $this->document->addScript(JURI::root() . 'media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
+    }
 }

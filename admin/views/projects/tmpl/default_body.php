@@ -11,17 +11,27 @@
 defined('_JEXEC') or die;
 ?>
 <?php foreach ($this->items as $i => $item) {
-    $resourceData = JArrayHelper::getValue($this->resources, $item->id, 0);
-    $numberOfResources = (!empty($resourceData)) ? $resourceData->number : 0;
+    $numberOfResources = (!isset($this->numberOfResources[$item->id])) ? 0 : $this->numberOfResources[$item->id]["number"];
+    $numberOfPackages = (!isset($this->numberOfPackages[$item->id])) ? 0 : $this->numberOfPackages[$item->id]["number"];
 ?>
 	<tr class="row<?php echo $i % 2; ?>">
         <td class="nowrap center hidden-phone">
             <?php echo JHtml::_('grid.id', $i, $item->id); ?>
         </td>
         <td class="nowrap">
-            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=project&layout=edit&id=".(int)$item->id);?>"><?php echo $this->escape($item->name); ?></a>
+            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=project&layout=edit&id=".(int)$item->id);?>">
+                <?php echo $this->escape($item->name); ?>
+            </a>
             <div class="small">
-            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&id=".(int)$item->id);?>"> <?php echo JText::sprintf("COM_ITPTRANSIFEX_RESOURCES_D", $numberOfResources)?></a>
+                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&id=".(int)$item->id);?>">
+                    <?php echo JText::sprintf("COM_ITPTRANSIFEX_RESOURCES_D", $numberOfResources)?>
+                </a>
+            </div>
+
+            <div class="small">
+                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=packages&filter_project=".(int)$item->id);?>">
+                    <?php echo JText::sprintf("COM_ITPTRANSIFEX_PACKAGES_D", $numberOfPackages)?>
+                </a>
             </div>
         </td>
 		<td class="nowrap hidden-phone">

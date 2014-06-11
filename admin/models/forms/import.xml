@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <fieldset>
+
+        <field name="data" type="file"
+               label="COM_ITPTRANSIFEX_FILE"
+               description="COM_ITPTRANSIFEX_FILE_DESC"
+               required="true"/>
+
+        <field name="override" type="checkbox"
+               label="COM_ITPTRANSIFEX_OVERRIDE"
+               description="COM_ITPTRANSIFEX_OVERRIDE_DESC"
+               filter="int"
+               value="1"
+               />
+
+    </fieldset>
+</form>
