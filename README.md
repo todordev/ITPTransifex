@@ -1,6 +1,6 @@
 ITPTransifex for Joomla! 
 ==========================
-( Version 1.2 )
+( Version 1.3 )
 --------------------------
 
 ITPTransifex is an extension that provides capability to manage language packages, which are published on Transifex.
@@ -8,13 +8,10 @@ ITPTransifex is an extension that provides capability to manage language package
 Changelog
 ---------
 
-###v1.2
-* Improved UX
-* Added functionality for exporting project packages as an archive and meta file.
-* Added functionality to download many packages at once.
-* Beautify the xml code of the manifest file.
+##Documentation
+You can find documentation on the following page.
 
-###v1.1
+[Documentation and FAQ] (http://itprism.com/help/117-transifex-language-manager-guide)
 
-* Changed the target of language files. Now, they will be installed in extensions folders.
-* Fixed some issues.
+##Download
+You can [download ITP Transifex package] (http://itprism.com/free-joomla-extensions/others/language-packages-manager) and from the website of ITPrism.

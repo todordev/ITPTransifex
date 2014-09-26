@@ -1,0 +1,1 @@
+ALTER TABLE `#__itptfx_packages` CHANGE `type` `type` ENUM( 'component', 'module', 'plugin', 'library' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;

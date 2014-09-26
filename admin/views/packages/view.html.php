@@ -26,6 +26,7 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $pagination;
 
     protected $numberOfResources;
+    protected $languages;
 
     protected $option;
 
@@ -51,6 +52,12 @@ class ItpTransifexViewPackages extends JViewLegacy
 
         // Get the number of project resources
         $this->numberOfResources = $this->getNumberOfResources($this->items);
+
+        jimport("itptransifex.languages");
+        $languages = new ItpTransifexLanguages(JFactory::getDbo());
+        $languages->load();
+
+        $this->languages = $languages->toOptions();
 
         // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
@@ -147,6 +154,19 @@ class ItpTransifexViewPackages extends JViewLegacy
         JToolBarHelper::divider();
 
         JToolBarHelper::custom("package.download", 'download', null, JText::_("COM_ITPTRANSIFEX_DOWNLOAD"));
+        JToolBarHelper::divider();
+
+        // Get the toolbar object instance
+        $bar = JToolBar::getInstance('toolbar');
+
+        $layoutData = array(
+            'title' => JText::_('JTOOLBAR_BATCH')
+        );
+
+        // Instantiate a new JLayoutFile instance and render the batch button
+        $layout = new JLayoutFile('joomla.toolbar.batch');
+        $html = $layout->render($layoutData);
+        $bar->appendButton('Custom', $html, 'batch');
 
         JToolBarHelper::divider();
         JToolBarHelper::custom('packages.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
@@ -161,12 +181,18 @@ class ItpTransifexViewPackages extends JViewLegacy
     {
         $this->document->setTitle(JText::_('COM_ITPTRANSIFEX_PACKAGES_MANAGER'));
 
+        // Load language string in JavaScript
+        JText::script('COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED');
+
         // Scripts
         JHtml::_('behavior.multiselect');
         JHtml::_('formbehavior.chosen', 'select');
         JHtml::_('bootstrap.tooltip');
+        JHtml::_('bootstrap.modal', 'collapseModal');
 
+        JHtml::_('itprism.ui.pnotify');
         JHtml::_('itprism.ui.joomla_list');
+        JHtml::_('itprism.ui.joomla_helper');
 
         $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
     }

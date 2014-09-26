@@ -38,6 +38,11 @@ class ItpTransifexPackage
      */
     protected $db;
 
+    /**
+     * Initialize the object.
+     *
+     * @param JDatabaseDriver $db
+     */
     public function __construct(JDatabaseDriver $db)
     {
         $this->db = $db;
@@ -81,11 +86,27 @@ class ItpTransifexPackage
 
     }
 
-    public function bind($data, $ignore = array())
+    /**
+     * Set data to object properties.
+     *
+     * <code>
+     * $data = array(
+     *  "name" => "CrowdFunding",
+     *  "alias" => "crowdfunding",
+     * );
+     *
+     * $package    = new ItpTransifexPackage(JFactory::getDbo());
+     * $package->bind($data);
+     * </code>
+     *
+     * @param array $data
+     * @param array $ignored
+     */
+    public function bind($data, $ignored = array())
     {
         foreach ($data as $key => $value) {
 
-            if (!in_array($key, $ignore)) {
+            if (!in_array($key, $ignored)) {
                 $this->$key = $value;
             }
 

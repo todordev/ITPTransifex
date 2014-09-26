@@ -256,4 +256,55 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
 
         JFactory::getApplication()->close();
     }
+
+    public function batch()
+    {
+        jimport("itprism.response.json");
+        $response = new ITPrismResponseJson();
+
+        // Get the input
+        $packagesIds  = $this->input->post->get('ids', array(), "array");
+        $language     = $this->input->post->get('language');
+
+        // Get the model
+        $model = $this->getModel();
+        /** @var $model ItpTransifexModelPackage */
+
+        // Check for selected packages.
+        if (!$packagesIds) {
+            $response
+                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED"))
+                ->failure();
+
+            echo $response;
+            JFactory::getApplication()->close();
+        }
+
+        // Check for valid language.
+        if (!$language) {
+            $response
+                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                ->setText(JText::_("COM_ITPTRANSIFEX_LANGUAGE_NOT_SELECTED"))
+                ->failure();
+
+            echo $response;
+            JFactory::getApplication()->close();
+        }
+
+        try {
+            $model->copyPackages($packagesIds, $language);
+        } catch (Exception $e) {
+            JLog::add($e->getMessage());
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
+        }
+
+        $response
+            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
+            ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_COPIED_SUCCESSFULLY"))
+            ->success();
+
+        echo $response;
+        JFactory::getApplication()->close();
+    }
 }

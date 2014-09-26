@@ -31,9 +31,10 @@
                description="COM_ITPTRANSIFEX_FIELD_PACKAGE_TYPE_DESC"
                required="true"
                 >
-            <option value="component">COM_ITPTRANSIFEX_COMPONENT</option>
-            <option value="module">COM_ITPTRANSIFEX_MODULE</option>
-            <option value="plugin">COM_ITPTRANSIFEX_PLUGIN</option>
+                <option value="component">COM_ITPTRANSIFEX_COMPONENT</option>
+                <option value="module">COM_ITPTRANSIFEX_MODULE</option>
+                <option value="plugin">COM_ITPTRANSIFEX_PLUGIN</option>
+                <option value="library">COM_ITPTRANSIFEX_LIBRARY</option>
         </field>
 
         <field name="version" type="text"

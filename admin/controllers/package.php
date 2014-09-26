@@ -53,7 +53,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
         /** @var $model ItpTransifexModelPackage */
 
         $form = $model->getForm($data, false);
-        /** @var $form JForm * */
+        /** @var $form JForm */
 
         if (!$form) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
@@ -111,6 +111,8 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
         $params         = JComponentHelper::getParams($this->option);
         /** @var  $params Joomla\Registry\Registry */
 
+        $includeLanguageName = $params->get("include_lang_name", 1);
+
         $serviceOptions = array(
             "username" => $params->get("username"),
             "password" => $params->get("password"),
@@ -125,9 +127,9 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
             $model->setTransifexOptions($serviceOptions);
 
             if (!is_null($packageId)) { // Create a file for one package.
-                $filePath = $model->preparePackage($packageId);
+                $filePath = $model->preparePackage($packageId, $includeLanguageName);
             } else { // Create a file that contains many packages.
-                $filePath = $model->prepareProjectPackage($ids);
+                $filePath = $model->prepareProjectPackage($ids, "UNZIPFIRST", $includeLanguageName);
             }
 
             if (!$filePath) {

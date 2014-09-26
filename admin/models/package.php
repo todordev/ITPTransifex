@@ -82,6 +82,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      */
     public function save($data)
     {
+
         $id        = JArrayHelper::getValue($data, "id", 0, "int");
         $name      = JString::trim(JArrayHelper::getValue($data, "name"));
         $alias     = JString::trim(JArrayHelper::getValue($data, "alias"));
@@ -195,7 +196,15 @@ class ItpTransifexModelPackage extends JModelAdmin
         $table->set("alias", JApplicationHelper::stringURLSafe($table->get("alias")));
     }
 
-    public function preparePackage($packageId)
+    /**
+     * Prepare a package - download all files, create a manifest file,...
+     *
+     * @param int $packageId
+     * @param bool $includeLanguageName Include or not language name to package name.
+     *
+     * @return string
+     */
+    public function preparePackage($packageId, $includeLanguageName = true)
     {
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
@@ -244,15 +253,19 @@ class ItpTransifexModelPackage extends JModelAdmin
         switch ($packageType) {
 
             case "component":
-                $packageFile = $this->prepareComponent($package, $resources, $packageFolder);
+                $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
                 break;
 
             case "module":
-                $packageFile = $this->prepareModule($package, $resources, $packageFolder);
+                $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
                 break;
 
             case "plugin":
-                $packageFile = $this->preparePlugin($package, $resources, $packageFolder);
+                $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
+                break;
+
+            case "library":
+                $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
                 break;
         }
 
@@ -261,12 +274,13 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
 
     /**
-     * @param  array $pacakgesIds
+     * @param  array $packagesIds
      * @param string $fileName
+     * @param bool $includeLanguageName
      *
      * @return string
      */
-    public function prepareProjectPackage(array $pacakgesIds, $fileName = "UNZIPFIRST")
+    public function prepareProjectPackage(array $packagesIds, $fileName = "UNZIPFIRST", $includeLanguageName = true)
     {
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
@@ -281,7 +295,7 @@ class ItpTransifexModelPackage extends JModelAdmin
         jimport("joomla.filesystem.path");
         jimport("joomla.filesystem.folder");
 
-        foreach ($pacakgesIds as $packageId) {
+        foreach ($packagesIds as $packageId) {
             
             // Get package.
             $package = new ItpTransifexPackage($db);
@@ -318,15 +332,19 @@ class ItpTransifexModelPackage extends JModelAdmin
             switch ($packageType) {
     
                 case "component":
-                    $packageFile = $this->prepareComponent($package, $resources, $packageFolder);
+                    $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
                     break;
     
                 case "module":
-                    $packageFile = $this->prepareModule($package, $resources, $packageFolder);
+                    $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
                     break;
     
                 case "plugin":
-                    $packageFile = $this->preparePlugin($package, $resources, $packageFolder);
+                    $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
+                    break;
+
+                case "library":
+                    $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
                     break;
             }
             
@@ -361,10 +379,11 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param ItpTransifexPackage $package
      * @param ItpTransifexResources $resources
      * @param string  $packageFolder
+     * @param bool  $includeLanguageName
      *
      * @return string
      */
-    protected function prepareComponent($package, $resources, $packageFolder)
+    protected function prepareComponent($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
         $packageName = $this->getPackageName($resources, "component");
@@ -410,9 +429,11 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         $date = new JDate();
 
+        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
+
         // Prepare options
         $options = array(
-            "name"                => $package->getName(),
+            "name"                => $name,
             "description"         => $package->getDescription(),
             "version"             => $package->getVersion(),
             "creation_date"       => $date->format("d F, Y"),
@@ -443,10 +464,11 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param ItpTransifexPackage $package
      * @param ItpTransifexResources $resources
      * @param string  $packageFolder
+     * @param bool  $includeLanguageName
      *
      * @return string
      */
-    protected function prepareModule($package, $resources, $packageFolder)
+    protected function prepareModule($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
         $packageName = $this->getPackageName($resources, "module");
@@ -464,8 +486,10 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         $date = new JDate();
 
+        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
+
         $options = array(
-            "name"              => $package->getName(),
+            "name"              => $name,
             "description"       => $package->getDescription(),
             "version"           => $package->getVersion(),
             "creation_date"     => $date->format("d F, Y"),
@@ -492,10 +516,11 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param ItpTransifexPackage $package
      * @param ItpTransifexResources $resources
      * @param string  $packageFolder
+     * @param bool  $includeLanguageName
      *
      * @return string
      */
-    protected function preparePlugin($package, $resources, $packageFolder)
+    protected function preparePlugin($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
         $packageNames = $this->getPackageName($resources, "plugin");
@@ -518,8 +543,10 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         $date = new JDate();
 
+        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
+
         $options = array(
-            "name"              => $package->getName(),
+            "name"              => $name,
             "description"       => $package->getDescription(),
             "version"           => $package->getVersion(),
             "creation_date"     => $date->format("d F, Y"),
@@ -540,6 +567,84 @@ class ItpTransifexModelPackage extends JModelAdmin
         $packageFile     = $this->createPackage($packageFileName, $packageFolder);
 
         return $packageFile;
+    }
+
+    /**
+     * Prepare a package for a library.
+     *
+     * @param ItpTransifexPackage $package
+     * @param ItpTransifexResources $resources
+     * @param string  $packageFolder
+     * @param bool  $includeLanguageName
+     *
+     * @return string
+     */
+    protected function prepareLibrary($package, $resources, $packageFolder, $includeLanguageName)
+    {
+        // Get the name of the extension folder from resource name.
+        $packageName = $this->getPackageName($resources, "library");
+
+        // Get package language code. Generate a language code with dash.
+        $langCode     = $package->getLanguage();
+        $langCodeDash = str_replace("_", "-", $langCode);
+
+        // Generate target folder of the language files.
+        $targetFolder = "libraries/" . substr($packageName, 4) . "/language/" . $langCodeDash;
+
+        // Prepare options
+        $manifestFileName = $langCodeDash . "." . $packageName;
+        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
+
+        $date = new JDate();
+
+        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
+
+        $options = array(
+            "name"              => $name,
+            "description"       => $package->getDescription(),
+            "version"           => $package->getVersion(),
+            "creation_date"     => $date->format("d F, Y"),
+            "target_folder"     => $targetFolder,
+            "lang_code"         => $langCode,
+            "lang_code_dash"    => $langCodeDash,
+            "manifest_filename" => $manifestFile,
+            "package_folder"    => $packageFolder
+        );
+
+        // Download files
+        $filesList = $this->downloadFiles($resources, $options);
+
+        // Generate manifest
+        $this->generateManifest($options, $filesList);
+
+        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
+        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
+
+        return $packageFile;
+    }
+
+    /**
+     * Generate a package name.
+     *
+     * @param ItpTransifexPackage $package
+     * @param string $langCode
+     * @param bool $includeLanguageName
+     *
+     * @return string
+     */
+    protected function generatePackageName($package, $langCode, $includeLanguageName)
+    {
+        if (!$includeLanguageName) {
+            $name = $package->getName();
+        } else {
+            jimport("itptransifex.language");
+            $language = new ItpTransifexLanguage(JFactory::getDbo());
+            $language->loadByCode($langCode);
+
+            $name = $package->getName() . " - ".$language->getName();
+        }
+
+        return $name;
     }
 
     /**
@@ -816,6 +921,9 @@ class ItpTransifexModelPackage extends JModelAdmin
             case "module":
                 break;
 
+            case "library":
+                break;
+
             case "plugin":
 
                 $fileNames    = explode("_", $fileName);
@@ -963,5 +1071,150 @@ class ItpTransifexModelPackage extends JModelAdmin
         }
 
         return (!$result) ? true : false;
+    }
+
+    public function copyPackages($packagesIds, $language)
+    {
+        jimport("itptransifex.packages");
+        jimport("itptransifex.package");
+        jimport("itptransifex.resources");
+        jimport("itptransifex.resource");
+        jimport("itprism.string");
+
+        $packages = new ItpTransifexPackages(JFactory::getDbo());
+        $packages->load($packagesIds);
+
+        // Check for existing packages.
+        if (count($packages) == 0) {
+            return;
+        }
+
+        $newLanguageCode = JString::strtolower($language);
+
+        foreach ($packages as $key => $package) {
+
+            $newAlias         = JString::substr($package["alias"], 0, -5);
+            $endString        = JString::substr($package["alias"], -5, 5);
+            $oldLanguageCode  = JString::strtolower($package["language"]);
+
+            // If the end of string does not match old language code, or
+            // the end of string match new language code,
+            // I am going to generate a new string.
+            if ((strcmp($endString, $oldLanguageCode) != 0) or (strcmp($endString, $newLanguageCode) == 0)) {
+                $hash = new ITPrismString();
+                $hash->generateRandomString(32);
+                $newAlias = $hash->__toString();
+            } else { // or I am going to add the new language code to the end of alias string.
+                $newAlias .= $newLanguageCode;
+            }
+
+            $package["alias"] = $newAlias;
+            $package["language"] = $language;
+
+            $packages[$key] = $package;
+
+        }
+
+        $this->preventDuplications($packages);
+        $this->createPackages($packages);
+
+    }
+
+    /**
+     * Check for existing packages with same aliases in database.
+     * If there are duplications, I am going to generate a new alias.
+     *
+     * @param ItpTransifexPackages $packages
+     */
+    protected function preventDuplications($packages)
+    {
+        $db    = $this->getDbo();
+
+        // Get aliases.
+        $aliases = array();
+        foreach ($packages as $package) {
+            $aliases[] = $db->quote($package["alias"]);
+        }
+
+        $query = $db->getQuery(true);
+
+        $query
+            ->select("a.alias")
+            ->from($db->quoteName("#__itptfx_packages", "a"))
+            ->where("a.alias IN (". implode(",", $aliases) . ")");
+
+        $db->setQuery($query);
+        $results = $db->loadColumn();
+
+        if (!empty($aliases)) {
+            foreach ($results as $alias) {
+
+                foreach ($packages as $key => $package) {
+                    if (strcmp($alias, $package["alias"]) == 0) {
+
+                        $hash = new ITPrismString();
+                        $hash->generateRandomString(32);
+                        $newAlias = $hash->__toString();
+
+                        $package["alias"] = $newAlias;
+
+                        $packages[$key] = $package;
+
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    /**
+     * Create new packages.
+     *
+     * @param ItpTransifexPackages $packages
+     */
+    protected function createPackages($packages)
+    {
+        foreach ($packages as $package) {
+
+            $packageId  = $package["id"];
+            unset($package["id"]);
+
+            // Get package resources.
+            $resources = new ItpTransifexResources(JFactory::getDbo());
+            $resources->loadByPackageId($packageId);
+
+            // Create a new package.
+            $p = new ItpTransifexPackage(JFactory::getDbo());
+            $p->bind($package);
+            $p->store();
+
+            $packageId = $p->getId();
+            $this->copyResources($packageId, $resources);
+
+        }
+    }
+
+    /**
+     * Copy all resources from a package to the new one.
+     *
+     * @param int $packageId
+     * @param ItpTransifexResources $resources
+     */
+    protected function copyResources($packageId, $resources)
+    {
+        $db    = $this->getDbo();
+
+        foreach ($resources as $resource) {
+            $query = $db->getQuery(true);
+
+            $query
+                ->insert($db->quoteName("#__itptfx_packages_map"))
+                ->set($db->quoteName("package_id")  ."=". (int)$packageId)
+                ->set($db->quoteName("resource_id") ."=". $resource["id"]);
+
+            $db->setQuery($query);
+            $db->execute();
+        }
     }
 }

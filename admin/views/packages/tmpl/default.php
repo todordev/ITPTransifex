@@ -93,3 +93,7 @@ defined('_JEXEC') or die;
            id="js-resources-list-close-btn"><?php echo JText::_("JTOOLBAR_CLOSE"); ?></a>
     </div>
 </div>
+
+
+<?php //Load the batch processing form. ?>
+<?php echo $this->loadTemplate('batch'); ?>

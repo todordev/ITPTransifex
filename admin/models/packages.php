@@ -31,6 +31,7 @@ class ItpTransifexModelPackages extends JModelList
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
+                'name', 'a.name',
                 'type', 'a.type',
                 'project_id', 'a.project_id',
                 'project', 'b.name',

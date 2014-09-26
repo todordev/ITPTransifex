@@ -67,6 +67,22 @@ class ItpTransifexProject
         }
     }
 
+    /**
+     * Set data to object properties.
+     *
+     * <code>
+     * $data = array(
+     *  "name" => "CrowdFunding",
+     *  "alias" => "crowdfunding",
+     * );
+     *
+     * $project    = new ItpTransifexProject(JFactory::getDbo());
+     * $project->bind($data);
+     * </code>
+     *
+     * @param array $data
+     * @param array $ignore
+     */
     public function bind($data, $ignore = array())
     {
         foreach ($data as $key => $value) {

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_packages` (
   `description` text,
   `version` varchar(32) NOT NULL,
   `language` varchar(5) NOT NULL,
-  `type` enum('component','module','plugin') NOT NULL,
+  `type` enum('component','module','plugin','library') NOT NULL,
   `project_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_pkg_alias` (`alias`)

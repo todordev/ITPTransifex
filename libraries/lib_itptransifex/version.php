@@ -36,7 +36,7 @@ class ItpTransifexVersion
      *
      * @var integer
      */
-    public $devLevel = '2';
+    public $devLevel = '3';
 
     /**
      * Release Type
@@ -57,7 +57,7 @@ class ItpTransifexVersion
      *
      * @var string
      */
-    public $releaseDate = '11 June, 2014';
+    public $releaseDate = '26 September, 2014';
 
     /**
      * License
