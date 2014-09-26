@@ -43,7 +43,7 @@
 		<mkdir dir="${cfg.pkgDir}/plugins" />
 	</target>
 
-	<!-- copy administration files of the componet -->
+	<!-- copy administration files of the component -->
 	<copy todir="${cfg.adminDestDir}">
 		<fileset dir="${cfg.adminSourceDir}/${cfg.comName}">
 			<exclude name="**/${cfg.pkgName}.xml" />
@@ -53,37 +53,38 @@
 		</fileset>
 	</copy>
 	
-	<!-- copy install helper of the componet -->
+	<!-- copy install helper of the component -->
 	<copy file="${cfg.adminSourceDir}/${cfg.comName}/helpers/install.php" todir="${cfg.adminDestDir}/helpers/" />
 
-	<!-- copy site files of the componet -->
+	<!-- copy site files of the component -->
 	<copy todir="${cfg.siteDestDir}">
 		<fileset dir="${cfg.siteSourceDir}/${cfg.comName}">
 			<include name="**/*" />
 		</fileset>
 	</copy>
 
-	<!-- copy media files of the componet -->
+	<!-- copy media files of the component -->
 	<copy todir="${cfg.mediaDestDir}">
 		<fileset dir="${cfg.mediaSourceDir}/${cfg.comName}">
 			<include name="**/*" />
 		</fileset>
 	</copy>
 
-	<!-- copy main files of the componet -->
+	<!-- copy main files of the component -->
     <copy file="${cfg.adminSourceDir}/${cfg.comName}/install.php" todir="${cfg.pkgDir}" />
     <copy file="${cfg.adminSourceDir}/${cfg.comName}/README.md" todir="${cfg.pkgDir}" />
+	<copy file="${cfg.adminSourceDir}/${cfg.comName}/CHANGELOG.md" todir="${cfg.pkgDir}" />
     <copy file="${cfg.adminSourceDir}/${cfg.comName}/${cfg.pkgName}.xml" todir="${cfg.pkgDir}" />
     <copy file="${cfg.adminSourceDir}/${cfg.comName}/${cfg.name}.xml" todir="${cfg.pkgDir}" />
 
-	<!-- copy library files of the componet -->
+	<!-- copy library files of the component -->
     <copy todir="${cfg.librariesDestDir}/lib_${cfg.name}">
         <fileset dir="${cfg.librariesSourceDir}/${cfg.name}">
             <include name="**/*" />
         </fileset>
     </copy>
     
-	<target name="build_component" depends="init" description="packages the finaly component file">
+	<target name="build_component" depends="init" description="packages the finally component file">
 		
 		<!-- build component -->
 		<zip destfile="${cfg.pkgDir}/packages/${cfg.comName}.zip" basedir="${cfg.pkgDir}" 
