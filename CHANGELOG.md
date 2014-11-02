@@ -1,6 +1,9 @@
 ITP Transifex Release Notes
 ==========================
 
+###v1.4
+* Fixed an issue of uploading a file.
+
 ###v1.3
 * Added option to make a copy of packages.
 * Added option to create language packages for a library.

@@ -10,8 +10,8 @@
 	<url>http://itprism.com</url>
 	<packager>Todor Iliev</packager>
 	<packagerurl>http://itprism.com</packagerurl>
-	<version>1.3</version>
-	<creationDate>26 September, 2014</creationDate>
+	<version>1.4</version>
+	<creationDate>02 November, 2014</creationDate>
 	<description><![CDATA[
 	<p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
     <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>

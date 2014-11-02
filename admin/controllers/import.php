@@ -79,8 +79,13 @@ class ItpTransifexControllerImport extends ITPrismControllerFormBackend
             jimport('itprism.file');
             jimport('itprism.file.uploader.local');
             jimport('itprism.file.validator.size');
+            jimport('itprism.file.validator.server');
 
-            $destination = JPath::clean($app->get("tmp_path")) . DIRECTORY_SEPARATOR . JFile::makeSafe($fileData['name']);
+            $uploadedFile = JArrayHelper::getValue($fileData, 'tmp_name');
+            $uploadedName = JArrayHelper::getValue($fileData, 'name');
+            $errorCode    = JArrayHelper::getValue($fileData, 'error');
+
+            $destination = JPath::clean($app->get("tmp_path")) . DIRECTORY_SEPARATOR . JFile::makeSafe($uploadedName);
 
             $file = new ITPrismFile();
 
@@ -93,15 +98,22 @@ class ItpTransifexControllerImport extends ITPrismControllerFormBackend
 
             $uploadMaxSize = $mediaParams->get("upload_maxsize") * $KB;
 
+            // Prepare size validator.
             $sizeValidator = new ITPrismFileValidatorSize($fileSize, $uploadMaxSize);
 
+            // Prepare server validator.
+            $serverValidator = new ITPrismFileValidatorServer($errorCode, array(UPLOAD_ERR_NO_FILE));
+
             $file->addValidator($sizeValidator);
+            $file->addValidator($serverValidator);
 
             // Validate the file
-            $file->validate();
+            if (!$file->isValid()) {
+                throw new RuntimeException($file->getError());
+            }
 
             // Prepare uploader object.
-            $uploader = new ITPrismFileUploaderLocal($fileData);
+            $uploader = new ITPrismFileUploaderLocal($uploadedFile);
             $uploader->setDestination($destination);
 
             // Upload the file
