@@ -1,6 +1,9 @@
 ITP Transifex Release Notes
 ==========================
 
+###v1.5
+* Improved usability by adding editable elements on the resource manager.
+
 ###v1.4
 * Fixed an issue of uploading a file.
 
@@ -16,6 +19,5 @@ ITP Transifex Release Notes
 * Beautify the xml code of the manifest file.
 
 ###v1.1
-
 * Changed the target of language files. Now, they will be installed in extensions folders.
 * Fixed some issues.

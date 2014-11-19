@@ -20,17 +20,21 @@ defined('_JEXEC') or die;
 		</td>
         <td class="nowrap">
             <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resource&layout=edit&id=".(int)$item->id);?>">
-                <?php echo $this->escape($item->name); ?>
+                <span id="js-resource-name-<?php echo $item->id; ?>"><?php echo $this->escape($item->name); ?></span>
             </a>
         </td>
         <td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->alias); ?>
 		</td>
 		<td class="nowrap hidden-phone">
-		    <?php echo $this->escape($item->filename); ?>
+		    <span class="js-editable-filename" data-pk="<?php echo $item->id; ?>">
+                <?php echo $this->escape($item->filename); ?>
+            </span>
 		</td>
 		<td class="nowrap center hidden-phone">
+            <span class="js-editable-type" data-pk="<?php echo $item->id; ?>">
 		    <?php echo $this->escape($item->type); ?>
+            </span>
 		</td>
 		<td class="nowrap center hidden-phone">
 		  <?php echo $this->escape($item->source_language_code); ?>

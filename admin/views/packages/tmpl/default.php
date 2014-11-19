@@ -10,8 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_itptransifex&view=packages'); ?>" method="post"
-      name="adminForm" id="adminForm">
+<form action="<?php echo JRoute::_('index.php?option=com_itptransifex&view=packages'); ?>" method="post" name="adminForm" id="adminForm">
     <?php if (!empty($this->sidebar)): ?>
     <div id="j-sidebar-container" class="span2">
         <?php echo $this->sidebar; ?>
@@ -72,7 +71,7 @@ defined('_JEXEC') or die;
             </table>
 
             <input type="hidden" name="boxchecked" value="0"/>
-            <input type="hidden" name="task" value=""/>
+            <input type="hidden" name="task" value="" id="js-form-task" />
             <input type="hidden" name="filter_order" value="<?php echo $this->listOrder; ?>" id="filter_order"/>
             <input type="hidden" name="filter_order_Dir" value="<?php echo $this->listDirn; ?>"/>
             <?php echo JHtml::_('form.token'); ?>

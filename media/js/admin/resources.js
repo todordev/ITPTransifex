@@ -140,5 +140,62 @@ jQuery(document).ready(function() {
 		return hasSelectedItems;
 		
     }
-	
+
+    // Editable filenames
+    var editableFilenameElemenats = jQuery('.js-editable-filename');
+    editableFilenameElemenats.editable({
+        url: 'index.php?option=com_itptransifex&task=resource.saveFilename',
+        type: 'text',
+        title: Joomla.JText._('COM_ITPTRANSIFEX_ENTER_FILENAME'),
+        emptytext: Joomla.JText._('COM_ITPTRANSIFEX_EMPTY'),
+        ajaxOptions: {
+            type: 'post',
+            dataType: 'text json'
+        },
+        params: {
+            format: "raw"
+        },
+        onblur: "cancel"
+    });
+
+    // Generate default value from resource name.
+    editableFilenameElemenats.on('shown', function(e, editable) {
+        if (editable) {
+
+            var value = editable.input.$input.val();
+
+            if (!value) {
+
+                var pk = editable.options.pk;
+                var resourceName = jQuery("#js-resource-name-"+pk).text();
+
+                var pattern = new RegExp("\.([a-z0-9_]+\.(sys\.ini|ini))");
+
+                var matches = pattern.exec(resourceName);
+
+                if (matches) {
+                    editable.input.$input.val(matches[1]);
+                }
+            }
+        }
+    });
+
+    // Editable types
+    jQuery('.js-editable-type').editable({
+        url: 'index.php?option=com_itptransifex&task=resource.saveType',
+        type: 'select',
+        source: [{value: "site", text: "site"}, {value: "admin", text: "admin"}],
+        prepend: Joomla.JText._('COM_ITPTRANSIFEX_NOT_SELECTED'),
+        title: Joomla.JText._('COM_ITPTRANSIFEX_SELECT_TYPE_EDITABLE'),
+        emptytext: Joomla.JText._('COM_ITPTRANSIFEX_EMPTY'),
+        ajaxOptions: {
+            type: 'post',
+            dataType: 'text json'
+        },
+        params: {
+            format: "raw"
+        },
+        onblur: "cancel"
+    });
+
 });

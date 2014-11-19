@@ -79,5 +79,13 @@ jQuery(document).ready(function() {
         });
 
     });
+
+    // Clear task after a time when download a package.
+    var downloadButton = jQuery("#toolbar-download").find("button");
+    downloadButton.on("click", function(){
+        window.setTimeout(function(){
+            jQuery("#js-form-task").val("");
+        }, 3000)
+    });
 	
 });

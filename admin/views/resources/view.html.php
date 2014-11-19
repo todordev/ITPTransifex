@@ -168,12 +168,17 @@ class ItpTransifexViewResources extends JViewLegacy
 
         // Load language string in JavaScript
         JText::script('COM_ITPTRANSIFEX_PLEASE_MAKE_A_SELECTION_FROM_THE_LIST');
+        JText::script('COM_ITPTRANSIFEX_ENTER_FILENAME');
+        JText::script('COM_ITPTRANSIFEX_EMPTY');
+        JText::script('COM_ITPTRANSIFEX_SELECT_TYPE_EDITABLE');
+        JText::script('COM_ITPTRANSIFEX_NOT_SELECTED');
 
         // Scripts
         JHtml::_('behavior.multiselect');
         JHtml::_('formbehavior.chosen', 'select');
         JHtml::_('bootstrap.tooltip');
         JHtml::_('itprism.ui.pnotify');
+        JHtml::_('itprism.ui.bootstrap_editable');
         JHtml::_('itprism.ui.joomla_helper');
         JHtml::_('itprism.ui.joomla_list');
 

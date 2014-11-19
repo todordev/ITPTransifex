@@ -44,7 +44,6 @@ class ItpTransifexModelResource extends JModelAdmin
      */
     public function getForm($data = array(), $loadData = true)
     {
-
         // Get the form.
         $form = $this->loadForm($this->option . '.resource', 'resource', array('control' => 'jform', 'load_data' => $loadData));
         if (empty($form)) {
@@ -90,7 +89,6 @@ class ItpTransifexModelResource extends JModelAdmin
 
         // Load a record from the database
         $row = $this->getTable();
-
         $row->load($id);
 
         $row->set("name", $name);
@@ -104,6 +102,46 @@ class ItpTransifexModelResource extends JModelAdmin
         $row->store(true);
 
         return $row->get("id");
+    }
+
+    /**
+     * Save the filename of the resource.
+     *
+     * @param   int  $id
+     * @param   string $filename
+     */
+    public function saveFilename($id, $filename)
+    {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+
+        $query
+            ->update($db->quoteName("#__itptfx_resources"))
+            ->set($db->quoteName("filename") . "=" .$db->quote($filename))
+            ->where($db->quoteName("id") ."=". (int)$id);
+
+        $db->setQuery($query);
+        $db->execute();
+    }
+
+    /**
+     * Save the type of the resource.
+     *
+     * @param   int  $id
+     * @param   string $type
+     */
+    public function saveType($id, $type)
+    {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+
+        $query
+            ->update($db->quoteName("#__itptfx_resources"))
+            ->set($db->quoteName("type") . "=" .$db->quote($type))
+            ->where($db->quoteName("id") ."=". (int)$id);
+
+        $db->setQuery($query);
+        $db->execute();
     }
 
     /**
