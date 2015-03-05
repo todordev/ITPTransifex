@@ -12,10 +12,35 @@
         <field name="author_email" type="text" class="span6" label="COM_ITPTRANSIFEX_AUTHOR_EMAIL" description="COM_ITPTRANSIFEX_AUTHOR_EMAIL_DESC" />
         <field name="copyright" type="text" class="span6" label="COM_ITPTRANSIFEX_COPYRIGHT" description="COM_ITPTRANSIFEX_COPYRIGHT_DESC" />
         <field name="site" type="text" class="span6" label="COM_ITPTRANSIFEX_SITE" description="COM_ITPTRANSIFEX_SITE_DESC" />
-        <field name="include_lang_name" type="radio" default="1" label="COM_CROWDFUNDING_INCLUDE_LANG_NAME" description="COM_CROWDFUNDING_INCLUDE_LANG_NAME_DESC" class="btn-group">
+        <field name="include_lang_name" type="radio" default="1" label="COM_ITPTRANSIFEX_INCLUDE_LANG_NAME" description="COM_ITPTRANSIFEX_INCLUDE_LANG_NAME_DESC" class="btn-group">
             <option value="0">JNO</option>
             <option value="1">JYES</option>
         </field>
     </fieldset>
+
+    <fieldset name="media" label="COM_ITPTRANSIFEX_MEDIA" description="COM_ITPTRANSIFEX_MEDIA_PARAMS">
+        <field name="images_directory" type="text" default="images/itptransifex" label="COM_ITPTRANSIFEX_IMAGES_DIRECTORY" description="COM_ITPTRANSIFEX_IMAGES_DIRECTORY_DESC" class="input-xxlarge"/>
+        <field name="image_width" type="text" default="200" label="COM_ITPTRANSIFEX_IMAGE_WIDTH" description="COM_ITPTRANSIFEX_IMAGE_WIDTH_DESC"/>
+        <field name="image_height" type="text" default="200" label="COM_ITPTRANSIFEX_IMAGE_HEIGHT" description="COM_ITPTRANSIFEX_IMAGE_HEIGHT_DESC"/>
+        <field name="image_resizing_scale" type="list" default="2" label="COM_ITPTRANSIFEX_IMAGES_SCALE" description="COM_ITPTRANSIFEX_IMAGES_SCALE_DESC" class="btn-group">
+            <option value="1">COM_ITPTRANSIFEX_FILL</option>
+            <option value="2">COM_ITPTRANSIFEX_INSIDE</option>
+            <option value="3">COM_ITPTRANSIFEX_OUTSIDE</option>
+            <option value="6">COM_ITPTRANSIFEX_FIT</option>
+        </field>
+    </fieldset>
     
+    <fieldset name="security" label="COM_ITPTRANSIFEX_SECURITY" description="COM_ITPTRANSIFEX_SECURITY_PARAMS">
+        <field name="enable_captcha" type="radio" default="0" label="COM_ITPTRANSIFEX_ENABLE_CAPTCHA" description="COM_ITPTRANSIFEX_INCLUDE_LANG_NAME_DESC" class="btn-group">
+            <option value="0">JNO</option>
+            <option value="1">JYES</option>
+        </field>
+        <field name="public_key" type="text" label="COM_ITPTRANSIFEX_CAPTCHA_PUBLIC_KEY" description="COM_ITPTRANSIFEX_CAPTCHA_PUBLIC_KEY_DESC" class="input-xxlarge"/>
+        <field name="private_key" type="text" label="COM_ITPTRANSIFEX_CAPTCHA_PRIVATE_KEY" description="COM_ITPTRANSIFEX_CAPTCHA_PUBLIC_KEY_DESC" class="input-xxlarge"/>
+    </fieldset>
+
+    <fieldset name="advanced" label="COM_ITPTRANSIFEX_ADVANCED">
+        <field name="archives_folder" type="text" default="tmp/archives" label="COM_ITPTRANSIFEX_ARCHIVES_FOLDER" description="COM_ITPTRANSIFEX_ARCHIVES_FOLDER_DESC" class="input-xxlarge"/>
+        <field name="cache_days" type="text" default="1" label="COM_ITPTRANSIFEX_CACHE_DAYS" description="COM_ITPTRANSIFEX_CACHE_DAYS_DESC"/>
+    </fieldset>
 </config>

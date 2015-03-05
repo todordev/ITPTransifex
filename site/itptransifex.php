@@ -10,6 +10,9 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-$controller = JControllerLegacy::getInstance('ITPTransifex');
+jimport("itprism.init");
+jimport("itptransifex.init");
+
+$controller = JControllerLegacy::getInstance('ItpTransifex');
 $controller->execute(JFactory::getApplication()->input->getCmd('task'));
 $controller->redirect();

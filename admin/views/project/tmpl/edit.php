@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -11,35 +11,39 @@
 defined('_JEXEC') or die;
 ?>
 <div class="row-fluid">
-	<div class="span6 form-horizontal">
-        <form  action="<?php echo JRoute::_('index.php?option=com_itptransifex&layout=edit'); ?>" method="post" name="adminForm" id="adminForm" class="form-validate" >
+	<div class="span8 form-horizontal">
+        <form  action="<?php echo JRoute::_('index.php?option=com_itptransifex&layout=edit'); ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
             <fieldset>
-                
-                <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('name'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('alias'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('alias'); ?></div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('filename'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('filename'); ?></div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('id'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('id'); ?></div>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('description'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('description'); ?></div>
-                </div>
-                
+
+                <?php echo $this->form->getControlGroup('name'); ?>
+                <?php echo $this->form->getControlGroup('alias'); ?>
+                <?php echo $this->form->getControlGroup('filename'); ?>
+                <?php echo $this->form->getControlGroup('link'); ?>
+                <?php echo $this->form->getControlGroup('id'); ?>
+                <?php echo $this->form->getControlGroup('description'); ?>
+                <?php echo $this->form->getControlGroup('image'); ?>
+                <?php echo $this->form->getControlGroup('published'); ?>
+
             </fieldset>
-        
+
             <input type="hidden" name="task" value="" />
             <?php echo JHtml::_('form.token'); ?>
         </form>
+    </div>
+
+    <div class="span4">
+        <?php if (!empty($this->item->image)) { ?>
+            <img src="<?php echo $this->imagesUrl . "/" . $this->item->image; ?>"/>
+
+            <div class="clearfix"></div>
+            <br/>
+            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&task=project.removeImage&id=" . (int)$this->item->id . "&" . JSession::getFormToken() . "=1"); ?>"
+               class="btn btn-danger">
+                <i class="icon-trash icon-white"></i>
+                <?php echo JText::_("COM_ITPTRANSIFEX_REMOVE_IMAGE"); ?>
+            </a>
+        <?php } else { ?>
+            <img src="../media/com_itptransifex/images/no_image.png"/>
+        <?php } ?>
     </div>
 </div>

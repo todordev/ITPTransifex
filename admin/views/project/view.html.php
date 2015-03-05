@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -22,8 +22,14 @@ class ItpTransifexViewProject extends JViewLegacy
      */
     protected $state;
 
+    /**
+     * @var Joomla\Registry\Registry
+     */
+    protected $params;
+
     protected $item;
     protected $form;
+    protected $imagesUrl;
 
     protected $documentTitle;
     protected $option;
@@ -42,6 +48,13 @@ class ItpTransifexViewProject extends JViewLegacy
         $this->item  = $this->get('Item');
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
+
+        // Prepare parameters
+        $this->params = $this->state->get("params");
+        /** @var $this->params Joomla\Registry\Registry */
+
+        $imagesFolder    = $this->params->get("images_directory", "images/itptransifex");
+        $this->imagesUrl = JUri::root() . $imagesFolder;
 
         // Prepare actions, behaviors, script and document
         $this->addToolbar();

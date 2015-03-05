@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -22,7 +22,7 @@ JFormHelper::loadFieldClass('list');
  * @subpackage   Components
  * @since        1.6
  */
-class JFormFieldItptLanguage extends JFormFieldList
+class JFormFieldTransifexProject extends JFormFieldList
 {
     /**
      * The form field type.
@@ -30,7 +30,7 @@ class JFormFieldItptLanguage extends JFormFieldList
      * @var     string
      * @since   1.6
      */
-    protected $type = 'itptlanguage';
+    protected $type = 'transifexproject';
 
     /**
      * Method to get the field options.
@@ -41,11 +41,11 @@ class JFormFieldItptLanguage extends JFormFieldList
     protected function getOptions()
     {
 
-        jimport("itptransifex.languages");
-        $languages = new ItpTransifexLanguages(JFactory::getDbo());
-        $languages->load();
+        jimport("itptransifex.projects");
+        $projects = new ItpTransifexProjects(JFactory::getDbo());
+        $projects->load();
 
-        $options = $languages->toOptions();
+        $options = $projects->toOptions();
 
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $options);

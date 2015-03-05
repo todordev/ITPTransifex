@@ -36,7 +36,7 @@ class ItpTransifexVersion
      *
      * @var integer
      */
-    public $devLevel = '5';
+    public $devLevel = '6';
 
     /**
      * Release Type
@@ -57,7 +57,7 @@ class ItpTransifexVersion
      *
      * @var string
      */
-    public $releaseDate = '19 November, 2014';
+    public $releaseDate = '04 March, 2015';
 
     /**
      * License
@@ -71,7 +71,7 @@ class ItpTransifexVersion
      *
      * @var string
      */
-    public $copyright = '&copy; 2014 ITPrism. All rights reserved.';
+    public $copyright = '&copy; 2015 ITPrism. All rights reserved.';
 
     /**
      * URL

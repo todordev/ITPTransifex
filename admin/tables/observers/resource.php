@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Component
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 defined('JPATH_PLATFORM') or die;
@@ -22,7 +22,6 @@ defined('JPATH_PLATFORM') or die;
  */
 class ItpTransifexObserverResource extends JTableObserver
 {
-
     /**
      * The pattern for this table's TypeAlias
      *
@@ -38,7 +37,7 @@ class ItpTransifexObserverResource extends JTableObserver
      * @param   JObservableInterface $observableObject The subject object to be observed
      * @param   array                $params           ( 'typeAlias' => $typeAlias )
      *
-     * @return  UserIdeasObserverVote
+     * @return  ItpTransifexObserverResource
      *
      * @since   3.1.2
      */
@@ -64,7 +63,6 @@ class ItpTransifexObserverResource extends JTableObserver
      */
     public function onBeforeDelete($pk)
     {
-
         $db = JFactory::getDbo();
 
         $query = $db->getQuery(true);
@@ -74,7 +72,5 @@ class ItpTransifexObserverResource extends JTableObserver
 
         $db->setQuery($query);
         $db->execute();
-
     }
-
 }

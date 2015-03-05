@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -32,6 +32,7 @@ class ItpTransifexModelProjects extends JModelList
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'name', 'a.name',
+                'ordering', 'a.ordering'
             );
         }
 
@@ -95,7 +96,7 @@ class ItpTransifexModelProjects extends JModelList
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.alias, a.filename'
+                'a.id, a.name, a.alias, a.filename, a.link, a.ordering, a.published'
             )
         );
 

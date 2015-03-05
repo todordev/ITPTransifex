@@ -23,6 +23,11 @@ class ItpTransifexProject
     protected $description;
     protected $source_language_code;
     protected $filename;
+    protected $image;
+    protected $link;
+    protected $published = 0;
+    protected $ordering = 0;
+    protected $last_update = "0000-00-00";
 
     protected $packages;
 
@@ -48,7 +53,11 @@ class ItpTransifexProject
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.alias, a.description, a.source_language_code, a.filename")
+            ->select(
+                "a.id, a.name, a.alias, a.description, a.source_language_code, " .
+                "a.filename, a.link, a.image, a.published, a.ordering, a.last_update, " .
+                $query->concatenate(array("a.id", "a.alias"), ":") . " AS slug"
+            )
             ->from($this->db->quoteName("#__itptfx_projects", "a"));
 
         if (!is_array($keys)) {
@@ -120,6 +129,7 @@ class ItpTransifexProject
         $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
         $filename   = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
         $language   = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
+        $image      = (!$this->image) ? "NULL" : $this->db->quote($this->image);
 
         $query = $this->db->getQuery(true);
 
@@ -130,6 +140,10 @@ class ItpTransifexProject
             ->set($this->db->quoteName("description") . "=" . $description)
             ->set($this->db->quoteName("source_language_code") . "=" . $language)
             ->set($this->db->quoteName("filename") . "=" . $filename)
+            ->set($this->db->quoteName("image") . "=" . $image)
+            ->set($this->db->quoteName("ordering") . "=" . (int)$this->ordering)
+            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
+            ->set($this->db->quoteName("last_update") . "=" . $this->db->quote($this->last_update))
             ->where($this->db->quoteName("id") ."=". (int)$this->id);
 
         $this->db->setQuery($query);
@@ -141,6 +155,7 @@ class ItpTransifexProject
         $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
         $filename   = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
         $language   = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
+        $image      = (!$this->image) ? "NULL" : $this->db->quote($this->image);
 
         $query = $this->db->getQuery(true);
 
@@ -150,7 +165,11 @@ class ItpTransifexProject
             ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
             ->set($this->db->quoteName("description") . "=" . $description)
             ->set($this->db->quoteName("source_language_code") . "=" . $language)
-            ->set($this->db->quoteName("filename") . "=" . $filename);
+            ->set($this->db->quoteName("filename") . "=" . $filename)
+            ->set($this->db->quoteName("image") . "=" . $image)
+            ->set($this->db->quoteName("ordering") . "=" . (int)$this->ordering)
+            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
+            ->set($this->db->quoteName("last_update") . "=" . $this->db->quote($this->last_update));
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -173,6 +192,11 @@ class ItpTransifexProject
         return $this->alias;
     }
 
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
     public function getDescription()
     {
         return $this->description;
@@ -186,6 +210,16 @@ class ItpTransifexProject
     public function getFilename()
     {
         return $this->filename;
+    }
+
+    public function getLink()
+    {
+        return $this->link;
+    }
+
+    public function getImage()
+    {
+        return $this->image;
     }
 
     /**
@@ -262,5 +296,10 @@ class ItpTransifexProject
         }
 
         return $this->packages;
+    }
+
+    public function isPublished()
+    {
+        return (!$this->published) ? false : true;
     }
 }

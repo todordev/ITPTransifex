@@ -45,12 +45,13 @@ jQuery(document).ready(function() {
             return;
         }
 
-        var url      = jQuery("#js-itptfx-batch-form").attr("action");
+        // Submit the form.
+        var $batchForm = jQuery("#js-itptfx-batch-form");
 
-        var formData = {
-            ids: ids,
-            language: jQuery("#language").val()
-        };
+        var url        = $batchForm.attr("action");
+        var formData   = $batchForm.serializeArray();
+
+        formData.push({name: 'ids', value: ids});
 
         jQuery.ajax({
             type: "POST",
@@ -62,19 +63,20 @@ jQuery(document).ready(function() {
             }
         }).done(function(response){
 
-            jQuery("#js-batch-ajaxloader").hide();
-            jQuery('#collapseModal').modal('hide');
+            /*jQuery("#js-batch-ajaxloader").hide();
+            jQuery('#collapseModal').modal('hide');*/
 
             if(!response.success) {
                 ITPrismUIHelper.displayMessageFailure(response.title, response.text);
             } else {
                 ITPrismUIHelper.displayMessageSuccess(response.title, response.text);
-            }
 
-            // Reload the page.
-            setTimeout(function(){
-                window.location.replace("index.php?option=com_itptransifex&view=packages");
-            }, 2000);
+                // Reload the page.
+                setTimeout(function(){
+                    window.location.replace("index.php?option=com_itptransifex&view=packages");
+                }, 2000);
+
+            }
 
         });
 
@@ -87,5 +89,14 @@ jQuery(document).ready(function() {
             jQuery("#js-form-task").val("");
         }, 3000)
     });
-	
+
+    // Check the radio button for new version on focus.
+    jQuery("#new_version").on('focus', function(){
+        jQuery("#new_version_radio").prop("checked", true);
+    });
+
+    // Check the radio button for new version on focus.
+    jQuery("#search_string, #replace_string").on('focus', function(){
+        jQuery("#replace_text_radio").prop("checked", true);
+    });
 });

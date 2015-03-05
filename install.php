@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -11,11 +11,10 @@
 defined('_JEXEC') or die;
 
 /**
- * Install script file of the component
+ * Install script file of the component.
  */
 class pkg_itpTransifexInstallerScript
 {
-
     /**
      * Method to install the component.
      *
@@ -59,7 +58,6 @@ class pkg_itpTransifexInstallerScript
      */
     public function postflight($type, $parent)
     {
-
         if (!defined("ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR")) {
             define("ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR", JPATH_ADMINISTRATOR . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . "com_itptransifex");
         }
@@ -67,12 +65,48 @@ class pkg_itpTransifexInstallerScript
         // Register Install Helper
         JLoader::register("ItpTransifexInstallHelper", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "helpers" . DIRECTORY_SEPARATOR . "install.php");
 
+        jimport('joomla.filesystem.path');
+        jimport('joomla.filesystem.folder');
+        jimport('joomla.filesystem.file');
+
+        $params             = JComponentHelper::getParams("com_itptransifex");
+        /** @var $params Joomla\Registry\Registry */
+
+        // Prepare images folders.
+        $imagesFolder = JFolder::makeSafe($params->get("images_directory", "images/itptransifex"));
+
+        // Create images folder.
+        $imagesPath   = JPath::clean(JPATH_SITE . DIRECTORY_SEPARATOR . $imagesFolder);
+        if (!is_dir($imagesPath)) {
+            ItpTransifexInstallHelper::createFolder($imagesPath);
+        }
+
         // Start table with the information
         ItpTransifexInstallHelper::startTable();
 
         // Requirements
         ItpTransifexInstallHelper::addRowHeading(JText::_("COM_ITPTRANSIFEX_MINIMUM_REQUIREMENTS"));
 
+        // Display result about verification for existing folder
+        $title = JText::_("COM_ITPTRANSIFEX_IMAGE_FOLDER");
+        $info  = $imagesFolder;
+        if (!is_dir($imagesPath)) {
+            $result = array("type" => "important", "text" => JText::_("JNO"));
+        } else {
+            $result = array("type" => "success", "text" => JText::_("JYES"));
+        }
+        ItpTransifexInstallHelper::addRow($title, $result, $info);
+
+        // Display result about verification for writable folder
+        $title = JText::_("COM_ITPTRANSIFEX_WRITABLE_FOLDER");
+        $info  = $imagesFolder;
+        if (!is_writable($imagesPath)) {
+            $result = array("type" => "important", "text" => JText::_("JNO"));
+        } else {
+            $result = array("type" => "success", "text" => JText::_("JYES"));
+        }
+        ItpTransifexInstallHelper::addRow($title, $result, $info);
+        
         // Display result about verification for GD library
         $title = JText::_("COM_ITPTRANSIFEX_GD_LIBRARY");
         $info  = "";

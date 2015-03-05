@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -67,11 +67,24 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend
         // Check for validation errors.
         if ($validData === false) {
             $this->displayNotice($form->getErrors(), $redirectOptions);
-
             return;
         }
 
         try {
+
+            // Get image
+            $files = $this->input->files->get('jform', array(), 'array');
+            $image = JArrayHelper::getValue($files, "image");
+
+            // Upload image
+            if (!empty($image['name'])) {
+
+                $imageName = $model->uploadImage($image);
+                if (!empty($imageName)) {
+                    $validData["image"] = $imageName;
+                }
+
+            }
 
             $itemId = $model->save($validData);
 
@@ -83,5 +96,49 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend
         }
 
         $this->displayMessage(JText::_('COM_ITPTRANSIFEX_PROJECT_SAVED'), $redirectOptions);
+    }
+
+    /**
+     * Delete image
+     */
+    public function removeImage()
+    {
+        // Check for request forgeries.
+        JSession::checkToken("get") or jexit(JText::_('JINVALID_TOKEN'));
+
+        // Get item id
+        $itemId    = $this->input->get->getInt("id");
+
+        $redirectOptions = array(
+            "view" => "projects",
+        );
+
+        // Check for registered user
+        if (!$itemId) {
+            $this->displayNotice(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_IMAGE'), $redirectOptions);
+            return;
+        }
+
+        try {
+
+            jimport('joomla.filesystem.folder');
+            jimport('joomla.filesystem.file');
+            jimport('joomla.filesystem.path');
+
+            $model = $this->getModel();
+            $model->removeImage($itemId);
+
+        } catch (Exception $e) {
+            JLog::add($e->getMessage());
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
+        }
+
+        $redirectOptions = array(
+            "view"   => "project",
+            "layout" => "edit",
+            "id"     => $itemId
+        );
+
+        $this->displayMessage(JText::_('COM_ITPTRANSIFEX_IMAGE_DELETED'), $redirectOptions);
     }
 }

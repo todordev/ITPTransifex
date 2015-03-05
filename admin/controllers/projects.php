@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -75,19 +75,23 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin
     }
 
     /**
-     * Remove records which have been connected with a project.
+     * Function that allows child controller access to model data
+     * after the item has been deleted.
      *
-     * @param ItpTransifexModelProject $model
-     * @param array        $cid
+     * @param   ItpTransifexModelProject  $model  The data model object.
+     * @param   mixed       $id     The validated data.
      *
+     * @return  void
+     *
+     * @since   12.2
      * @throws Exception
      */
-    protected function postDeleteHook(ItpTransifexModelProject $model, $cid = null)
+    protected function postDeleteHook(JModelLegacy $model, $id = null)
     {
         try {
 
-            $model->removePackages($cid);
-            $model->removeResources($cid);
+            $model->removePackages($id);
+            $model->removeResources($id);
 
         } catch (Exception $e) {
             JLog::add($e->getMessage());

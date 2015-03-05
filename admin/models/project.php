@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -81,11 +81,13 @@ class ItpTransifexModelProject extends JModelAdmin
     public function save($data)
     {
 
-        $id       = JArrayHelper::getValue($data, "id");
-        $name     = JArrayHelper::getValue($data, "name");
-        $alias    = JArrayHelper::getValue($data, "alias");
-        $filename = JArrayHelper::getValue($data, "filename");
-        $desc     = JArrayHelper::getValue($data, "description");
+        $id         = JArrayHelper::getValue($data, "id");
+        $name       = JArrayHelper::getValue($data, "name");
+        $alias      = JArrayHelper::getValue($data, "alias");
+        $filename   = JArrayHelper::getValue($data, "filename");
+        $desc       = JArrayHelper::getValue($data, "description");
+        $link       = JArrayHelper::getValue($data, "link");
+        $published  = JArrayHelper::getValue($data, "published");
 
         // Load a record from the database
         $row = $this->getTable();
@@ -95,7 +97,10 @@ class ItpTransifexModelProject extends JModelAdmin
         $row->set("alias", $alias);
         $row->set("filename", $filename);
         $row->set("description", $desc);
+        $row->set("link", $link);
+        $row->set("published", $published);
 
+        $this->prepareImage($row, $data);
         $this->prepareTable($row);
 
         $row->store(true);
@@ -109,23 +114,223 @@ class ItpTransifexModelProject extends JModelAdmin
      */
     protected function prepareTable($table)
     {
+        // get maximum order number
+        if (!$table->get("id")) {
+
+            // Set ordering to the last item if not set
+            if (!$table->get("ordering")) {
+                $db    = $this->getDbo();
+                $query = $db->getQuery(true);
+                $query
+                    ->select("MAX(ordering)")
+                    ->from("#__itptfx_projects");
+
+                $db->setQuery($query, 0, 1);
+                $max = $db->loadResult();
+
+                $table->set("ordering", $max + 1);
+            }
+        }
+
         // Fix magic quotes
         if (get_magic_quotes_gpc()) {
             $table->set("name", stripcslashes($table->get("name")));
             $table->set("description", stripcslashes($table->get("description")));
         }
 
-        if ($table->get("filename")) {
+        if (!$table->get("filename")) {
             $table->set("filename", null);
         }
 
-        if ($table->get("description")) {
+        if (!$table->get("description")) {
             $table->set("description", null);
         }
-
     }
 
+    /**
+     * Prepare project image before saving.
+     *
+     * @param   object $table
+     * @param   array  $data
+     *
+     * @throws Exception
+     *
+     * @since    1.6
+     */
+    protected function prepareImage($table, $data)
+    {
+        // Prepare pitch image.
+        if (!empty($data["image"])) {
 
+            // Delete old image if I upload a new one
+            if (!empty($table->image)) {
+
+                $params       = JComponentHelper::getParams($this->option);
+                $imagesFolder = $params->get("images_directory", "images/itptransifex");
+
+                // Remove an image from the filesystem
+                $image = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $imagesFolder . DIRECTORY_SEPARATOR . $table->image);
+
+                if (JFile::exists($image)) {
+                    JFile::delete($image);
+                }
+            }
+
+            $table->set("image", $data["image"]);
+        }
+    }
+
+    /**
+     * Upload an image.
+     *
+     * @param  array $image
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    public function uploadImage($image)
+    {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationSite */
+
+        $uploadedFile = JArrayHelper::getValue($image, 'tmp_name');
+        $uploadedName = JArrayHelper::getValue($image, 'name');
+        $errorCode    = JArrayHelper::getValue($image, 'error');
+
+        // Load parameters.
+        $params     = JComponentHelper::getParams($this->option);
+        /** @var  $params Joomla\Registry\Registry */
+
+        $destFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get("images_directory", "images/itptransifex"));
+
+        $tmpFolder = $app->get("tmp_path");
+
+        // Joomla! media extension parameters
+        $mediaParams = JComponentHelper::getParams("com_media");
+        /** @var  $mediaParams Joomla\Registry\Registry */
+
+        jimport("itprism.file");
+        jimport("itprism.file.uploader.local");
+        jimport("itprism.file.validator.size");
+        jimport("itprism.file.validator.image");
+        jimport("itprism.file.validator.server");
+
+        $file = new ITPrismFile();
+
+        // Prepare size validator.
+        $KB            = 1024 * 1024;
+        $fileSize      = (int)$app->input->server->get('CONTENT_LENGTH');
+        $uploadMaxSize = $mediaParams->get("upload_maxsize") * $KB;
+
+        $sizeValidator = new ITPrismFileValidatorSize($fileSize, $uploadMaxSize);
+
+        // Prepare server validator.
+        $serverValidator = new ITPrismFileValidatorServer($errorCode, array(UPLOAD_ERR_NO_FILE));
+
+        // Prepare image validator.
+        $imageValidator = new ITPrismFileValidatorImage($uploadedFile, $uploadedName);
+
+        // Get allowed mime types from media manager options
+        $mimeTypes = explode(",", $mediaParams->get("upload_mime"));
+        $imageValidator->setMimeTypes($mimeTypes);
+
+        // Get allowed image extensions from media manager options
+        $imageExtensions = explode(",", $mediaParams->get("image_extensions"));
+        $imageValidator->setImageExtensions($imageExtensions);
+
+        $file
+            ->addValidator($sizeValidator)
+            ->addValidator($imageValidator)
+            ->addValidator($serverValidator);
+
+        // Validate the file
+        if (!$file->isValid()) {
+            throw new RuntimeException($file->getError());
+        }
+
+        // Generate temporary file name
+        $ext = JString::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
+
+        jimport("itprism.string");
+        $generatedName = new ITPrismString();
+        $generatedName->generateRandomString(16);
+
+        $tmpDestFile = $tmpFolder . DIRECTORY_SEPARATOR . $generatedName . "." . $ext;
+
+        // Prepare uploader object.
+        $uploader = new ITPrismFileUploaderLocal($uploadedFile);
+        $uploader->setDestination($tmpDestFile);
+
+        // Upload temporary file
+        $file->setUploader($uploader);
+
+        $file->upload();
+
+        // Get file
+        $tmpDestFile = $file->getFile();
+
+        if (!is_file($tmpDestFile)) {
+            throw new Exception('COM_ITPTRANSIFEX_ERROR_FILE_CANT_BE_UPLOADED');
+        }
+
+        // Resize image
+        $image = new JImage();
+        $image->loadFile($tmpDestFile);
+        if (!$image->isLoaded()) {
+            throw new Exception(JText::sprintf('COM_ITPTRANSIFEX_ERROR_FILE_NOT_FOUND', $tmpDestFile));
+        }
+
+        $imageName = $generatedName . ".png";
+        $imageFile = JPath::clean($destFolder . DIRECTORY_SEPARATOR . $imageName);
+
+        // Create main image
+        $width  = $params->get("image_width", 200);
+        $height = $params->get("image_height", 200);
+        $scale  = $params->get("image_resizing_scale", 2);
+
+        $image->resize($width, $height, false, $scale);
+        $image->toFile($imageFile, IMAGETYPE_PNG);
+
+        // Remove the temporary
+        if (is_file($tmpDestFile)) {
+            JFile::delete($tmpDestFile);
+        }
+
+        return $imageName;
+    }
+
+    /**
+     * Delete image.
+     *
+     * @param integer $id Item id
+     */
+    public function removeImage($id)
+    {
+        // Load category data
+        $row = $this->getTable();
+        $row->load($id);
+
+        // Delete old image if I upload the new one
+        if (!empty($row->image)) {
+
+            $params       = JComponentHelper::getParams($this->option);
+            /** @var  $params Joomla\Registry\Registry */
+
+            $imagesFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get("images_directory", "images/itptransifex"));
+
+            // Remove an image from the filesystem.
+            $image = $imagesFolder . DIRECTORY_SEPARATOR . $row->image;
+
+            if (JFile::exists($image)) {
+                JFile::delete($image);
+            }
+        }
+
+        $row->set("image", null);
+        $row->store(true);
+    }
+    
     /**
      * This method loads a data about Project from Transifex.
      *
@@ -496,7 +701,6 @@ class ItpTransifexModelProject extends JModelAdmin
      */
     public function removePackages($cid)
     {
-
         if (!empty($cid)) {
 
             $db = $this->getDbo();
@@ -543,6 +747,5 @@ class ItpTransifexModelProject extends JModelAdmin
 
             }
         }
-
     }
 }

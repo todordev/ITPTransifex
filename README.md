@@ -1,6 +1,6 @@
 ITPTransifex for Joomla! 
 ==========================
-( Version 1.5 )
+( Version 1.6 )
 --------------------------
 
 ITPTransifex is an extension that provides capability to manage language packages, which are published on Transifex.

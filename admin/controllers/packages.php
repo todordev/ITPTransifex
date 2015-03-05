@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -85,7 +85,7 @@ class ItpTransifexControllerPackages extends ITPrismControllerAdmin
      *
      * @throws Exception
      */
-    protected function postDeleteHook(ItpTransifexModelPackage $model, $cid = null)
+    protected function postDeleteHook(JModelLegacy $model, $cid = null)
     {
         try {
             $model->removeResourcesFromMap($cid);

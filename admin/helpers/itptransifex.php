@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -12,17 +12,15 @@ defined('_JEXEC') or die;
 
 class ItpTransifexHelper
 {
-
     /**
      * Configure the Linkbar.
      *
-     * @param    string    The name of the active view.
+     * @param    string  $vName  The name of the active view.
      *
      * @since    1.6
      */
     public static function addSubmenu($vName = 'dashboard')
     {
-
         JHtmlSidebar::addEntry(
             JText::_('COM_ITPTRANSIFEX_DASHBOARD'),
             'index.php?option=com_itptransifex&view=dashboard',
@@ -58,5 +56,38 @@ class ItpTransifexHelper
             'index.php?option=com_itptransifex&view=export',
             $vName == 'export'
         );
+    }
+
+    public static function validateCaptcha($secret, $response)
+    {
+        $params = array(
+            "secret" => $secret,
+            "response" => $response
+        );
+
+        $postData = "";
+        foreach ($params as $k => $v) {
+            $postData .= $k . '='.$v.'&';
+        }
+        rtrim($postData, '&');
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_POST, count($postData));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+        $response = curl_exec($ch);
+        
+        curl_close($ch);
+
+        $response = json_decode($response, true);
+
+        return (!$response['success']) ? false : true;
     }
 }

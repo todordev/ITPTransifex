@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -17,10 +17,10 @@ defined('_JEXEC') or die;
 	<th class="title" >
 	     <?php echo JHtml::_('grid.sort',  'COM_ITPTRANSIFEX_NAME', 'a.name', $this->listDirn, $this->listOrder); ?>
 	</th>
-	<th width="20%" class="nowrap center hidden-phone">
+	<th width="10%" class="nowrap hidden-phone">
 	    <?php echo JText::_("COM_ITPTRANSIFEX_LOCALE_CODE"); ?>
 	</th>
-	<th width="20%" class="nowrap center hidden-phone">
+	<th width="10%" class="nowrap center hidden-phone">
 	    <?php echo JText::_("COM_ITPTRANSIFEX_SHORT_CODE"); ?>
 	</th>
     <th width="1%" class="nowrap center hidden-phone">

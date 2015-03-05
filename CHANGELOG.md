@@ -1,6 +1,12 @@
 ITP Transifex Release Notes
 ==========================
 
+###v1.6
+* Added ordering to for the projects.
+* Added functionality to upload image for a project.
+* Added link to a page of a project.
+* Added new batch actions - to change version and to replace text.
+
 ###v1.5
 * Improved usability by adding editable elements on the resource manager.
 

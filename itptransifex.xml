@@ -4,10 +4,10 @@
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
 	<authorUrl>http://itprism.com</authorUrl>
-	<copyright>Copyright (C) 2014 Todor Iliev ( ITPrism.com )</copyright>
+	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com )</copyright>
 	<license>http://www.gnu.org/copyleft/gpl.html</license>
-	<version>1.5</version>
-	<creationDate>19 November, 2014</creationDate>
+	<version>1.6</version>
+	<creationDate>04 March, 2015</creationDate>
 	<description><![CDATA[
     <p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
     <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
@@ -49,6 +49,7 @@
         <folder>language</folder>
         <folder>models</folder>
         <folder>views</folder>
+
 		<filename>controller.php</filename>
 		<filename>index.html</filename>
 		<filename>router.php</filename>
@@ -63,11 +64,11 @@
 			<folder>controllers</folder>
 			<folder>helpers</folder>
 			<folder>language</folder>
-			<folder>libraries</folder>
 			<folder>models</folder>
 			<folder>sql</folder>
             <folder>tables</folder>
 			<folder>views</folder>
+
             <filename>config.xml</filename>		
 			<filename>controller.php</filename>
 			<filename>index.html</filename>

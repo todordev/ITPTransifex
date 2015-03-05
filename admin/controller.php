@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -26,7 +26,7 @@ class ItpTransifexController extends JControllerLegacy
         $option = $this->input->getCmd("options", "com_itptransifex");
 
         $document = JFactory::getDocument();
-        $document->addStyleSheet('../media/' . $option . '/css/admin/style.css');
+        $document->addStyleSheet('../media/' . $option . '/css/backend.style.css');
 
         parent::display();
 

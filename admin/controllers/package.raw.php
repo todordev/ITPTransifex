@@ -259,12 +259,16 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
 
     public function batch()
     {
+        JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
         jimport("itprism.response.json");
         $response = new ITPrismResponseJson();
 
         // Get the input
-        $packagesIds  = $this->input->post->get('ids', array(), "array");
-        $language     = $this->input->post->get('language');
+        $packagesIds  = $this->input->post->getString('ids');
+        $packagesIds  = explode(",", $packagesIds);
+
+        $action       = $this->input->post->get('action');
 
         // Get the model
         $model = $this->getModel();
@@ -281,28 +285,84 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
             JFactory::getApplication()->close();
         }
 
-        // Check for valid language.
-        if (!$language) {
-            $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_LANGUAGE_NOT_SELECTED"))
-                ->failure();
-
-            echo $response;
-            JFactory::getApplication()->close();
-        }
 
         try {
-            $model->copyPackages($packagesIds, $language);
+
+            switch ($action) {
+                case "copy":
+
+                    $language     = $this->input->post->get('language');
+
+                    // Check for valid language.
+                    if (!$language) {
+                        $response
+                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                            ->setText(JText::_("COM_ITPTRANSIFEX_LANGUAGE_NOT_SELECTED"))
+                            ->failure();
+
+                        echo $response;
+                        JFactory::getApplication()->close();
+                    }
+
+                    $model->copyPackages($packagesIds, $language);
+
+                    $response
+                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
+                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_COPIED_SUCCESSFULLY"))
+                        ->success();
+
+                    break;
+
+                case "replace_string":
+
+                    $search     = $this->input->post->getString('search_string');
+                    $replace    = $this->input->post->getString('replace_string');
+
+                    if (!$search or !$replace) {
+                        $response
+                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                            ->setText(JText::_("COM_ITPTRANSIFEX_SEARCH_REPLACE_MISSING"))
+                            ->failure();
+
+                        echo $response;
+                        JFactory::getApplication()->close();
+                    }
+
+                    $model->replaceText($packagesIds, $search, $replace);
+
+                    $response
+                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
+                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_REPLACED_TEXT_SUCCESSFULLY"))
+                        ->success();
+
+                    break;
+
+                case "change_version":
+                    $newVersion = $this->input->post->get('version', 0, "float");
+
+                    if (!$newVersion) {
+                        $response
+                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                            ->setText(JText::_("COM_ITPTRANSIFEX_VERSION_NOT_SPECIFIED"))
+                            ->failure();
+
+                        echo $response;
+                        JFactory::getApplication()->close();
+                    }
+
+                    $model->changeVersion($packagesIds, $newVersion);
+
+                    $response
+                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
+                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_VERSION_CHANGED_SUCCESSFULLY"))
+                        ->success();
+                    break;
+            }
+
         } catch (Exception $e) {
             JLog::add($e->getMessage());
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
-
-        $response
-            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_COPIED_SUCCESSFULLY"))
-            ->success();
 
         echo $response;
         JFactory::getApplication()->close();

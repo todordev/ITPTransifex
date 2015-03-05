@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -96,6 +96,11 @@ class ItpTransifexViewProjects extends JViewLegacy
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
         $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
 
+        if ($this->saveOrder) {
+            $this->saveOrderingUrl = 'index.php?option=' . $this->option . '&task=' . $this->getName() . '.saveOrderAjax&format=raw';
+            JHtml::_('sortablelist.sortable', $this->getName() . 'List', 'adminForm', strtolower($this->listDirn), $this->saveOrderingUrl);
+        }
+
         $this->sortFields = array(
             'a.name' => JText::_('COM_ITPTRANSIFEX_NAME'),
             'a.id'   => JText::_('JGRID_HEADING_ID')
@@ -121,6 +126,9 @@ class ItpTransifexViewProjects extends JViewLegacy
         JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_PROJECTS_MANAGER'));
         JToolBarHelper::addNew('project.add');
         JToolBarHelper::editList('project.edit');
+        JToolbarHelper::divider();
+        JToolbarHelper::publishList("projects.publish");
+        JToolbarHelper::unpublishList("projects.unpublish");
         JToolBarHelper::divider();
         JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "projects.delete");
         JToolBarHelper::divider();

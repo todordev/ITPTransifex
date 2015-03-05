@@ -23,16 +23,17 @@ if (!defined("ITPTRANSIFEX_PATH_LIBRARY")) {
 }
 
 // Register Component libraries
-JLoader::register("ItpTransifexVersion", ITPTRANSIFEX_PATH_LIBRARY . DIRECTORY_SEPARATOR . "version.php");
+JLoader::register("ItpTransifexVersion", ITPTRANSIFEX_PATH_LIBRARY . "/version.php");
+JLoader::register("ItpTransifexLanguages", ITPTRANSIFEX_PATH_LIBRARY . "/languages.php");
 
 // Register helpers
 JLoader::register("ItpTransifexHelper", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "helpers" . DIRECTORY_SEPARATOR . "itptransifex.php");
+JLoader::register("ItpTransifexHelperRoute", ITPTRANSIFEX_PATH_COMPONENT_SITE . "/helpers/route.php");
 
 // Load observers
-JLoader::register(
-    "ItpTransifexObserverResource",
-    ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "tables" . DIRECTORY_SEPARATOR . "observers" . DIRECTORY_SEPARATOR . "resource.php"
-);
+JLoader::register("ItpTransifexObserverResource", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . "/tables/observers/resource.php");
+JLoader::register("ItpTransifexObserverProject", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . "/tables/observers/project.php");
 
 // Register Observers
 JObserverMapper::addObserverClassToClass('ItpTransifexObserverResource', 'ItpTransifexTableResource', array('typeAlias' => 'com_itptransifex.resource'));
+JObserverMapper::addObserverClassToClass('ItpTransifexObserverProject', 'ItpTransifexTableProject', array('typeAlias' => 'com_itptransifex.project'));

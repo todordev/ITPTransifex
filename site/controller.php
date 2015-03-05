@@ -10,8 +10,10 @@
 // No direct access
 defined('_JEXEC') or die;
 
-class SocialCommunityController extends JControllerLegacy
+class ItpTransifexController extends JControllerLegacy
 {
+    protected $cacheableViews = array("projects", "project");
+
     /**
      * Method to display a view.
      *
@@ -23,13 +25,21 @@ class SocialCommunityController extends JControllerLegacy
      */
     public function display($cachable = false, $urlparams = array())
     {
-        $cachable = true;
-
         // Set the default view name and format from the Request.
         // Note we are using catid to avoid collisions with the router and the return page.
         // Frontend is a bit messier than the backend.
         $viewName = $this->input->getCmd('view', '');
         $this->input->set('view', $viewName);
+
+        $option = $this->input->getCmd("options", "com_itptransifex");
+
+        $document = JFactory::getDocument();
+        $document->addStyleSheet('../media/' . $option . '/css/frontend.style.css');
+
+        // Cache some views.
+        if (in_array($viewName, $this->cacheableViews)) {
+            $cachable = true;
+        }
 
         $safeurlparams = array(
             'id'               => 'INT',

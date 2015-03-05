@@ -37,8 +37,12 @@ class ItpTransifexLanguages implements Iterator, Countable, ArrayAccess
 
     public function load($ids = array())
     {
-        // Load project data
-        $query = $this->getQuery();
+        $query = $this->db->getQuery(true);
+
+        $query
+            ->select('a.id, a.name, a.code, a.short_code')
+            ->from($this->db->quoteName('#__itptfx_languages', 'a'))
+            ->order("a.name ASC");
 
         if (!empty($ids)) {
             JArrayHelper::toInteger($ids);
@@ -53,40 +57,6 @@ class ItpTransifexLanguages implements Iterator, Countable, ArrayAccess
         }
 
         $this->items = $results;
-    }
-
-    public function loadByCode($ids = array())
-    {
-        $query = $this->getQuery();
-
-        if (!empty($ids)) {
-            foreach ($ids as $key => $value) {
-                $ids[$key] = $this->db->quote($value);
-            }
-            $query->where("a.code IN ( " . implode(",", $ids) . " )");
-        }
-
-        $this->db->setQuery($query);
-        $results = $this->db->loadAssocList();
-
-        if (!$results) {
-            $results = array();
-        }
-
-        $this->items = $results;
-    }
-
-    protected function getQuery()
-    {
-        // Load project data
-        $query = $this->db->getQuery(true);
-
-        $query
-            ->select('a.id, a.name, a.code, a.short_code')
-            ->from($this->db->quoteName('#__itptfx_languages', 'a'))
-            ->order("a.name ASC");
-
-        return $query;
     }
 
     public function rewind()
@@ -155,5 +125,16 @@ class ItpTransifexLanguages implements Iterator, Countable, ArrayAccess
         }
 
         return $options;
+    }
+
+    public function getKeys()
+    {
+        $keys = array();
+
+        foreach ($this->items as $item) {
+            $keys[] = $item["id"];
+        }
+
+        return $keys;
     }
 }

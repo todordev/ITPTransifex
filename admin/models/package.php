@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Components
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
@@ -240,10 +240,6 @@ class ItpTransifexModelPackage extends JModelAdmin
         // Create folder
         JFolder::create($packageFolder);
 
-        // Get package.
-        $package = new ItpTransifexPackage($db);
-        $package->load($packageId);
-
         // Get project resources
         $published = 1;
         $resources = $package->getResources($published);
@@ -318,10 +314,6 @@ class ItpTransifexModelPackage extends JModelAdmin
     
             // Create folder
             JFolder::create($packageFolder);
-    
-            // Get package.
-            $package = new ItpTransifexPackage($db);
-            $package->load($packageId);
     
             // Get project resources
             $published = 1;
@@ -689,7 +681,6 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     protected function downloadComponentFiles($resources, $options)
     {
-
         jimport("itprism.transifex.request");
 
         $sourceAdminLangFolder = JArrayHelper::getValue($options, "source_admin_folder");
@@ -1073,7 +1064,7 @@ class ItpTransifexModelPackage extends JModelAdmin
         return (!$result) ? true : false;
     }
 
-    public function copyPackages($packagesIds, $language)
+    public function copyPackages(array $packagesIds, $language)
     {
         jimport("itptransifex.packages");
         jimport("itptransifex.package");
@@ -1196,7 +1187,7 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
 
     /**
-     * Copy all resources from a package to the new one.
+     * Copy all resources from a package to a new one.
      *
      * @param int $packageId
      * @param ItpTransifexResources $resources
@@ -1212,6 +1203,42 @@ class ItpTransifexModelPackage extends JModelAdmin
                 ->insert($db->quoteName("#__itptfx_packages_map"))
                 ->set($db->quoteName("package_id")  ."=". (int)$packageId)
                 ->set($db->quoteName("resource_id") ."=". $resource["id"]);
+
+            $db->setQuery($query);
+            $db->execute();
+        }
+    }
+
+    public function changeVersion(array $packagesIds, $newVersion)
+    {
+        JArrayHelper::toInteger($packagesIds);
+
+        if (!empty($packagesIds)) {
+            $db = $this->getDbo();
+
+            $query = $db->getQuery(true);
+            $query
+                ->update($db->quoteName("#__itptfx_packages"))
+                ->set($db->quoteName("version") . " = " . (float)$newVersion)
+                ->where($db->quoteName("id") . " IN (" . implode(",", $packagesIds) . ")");
+
+            $db->setQuery($query);
+            $db->execute();
+        }
+    }
+
+    public function replaceText(array $packagesIds, $search, $replace)
+    {
+        JArrayHelper::toInteger($packagesIds);
+
+        if (!empty($packagesIds) and !empty($search) and !empty($replace)) {
+            $db = $this->getDbo();
+
+            $query = $db->getQuery(true);
+            $query
+                ->update($db->quoteName("#__itptfx_packages"))
+                ->set($db->quoteName("description") . " = REPLACE(" . $db->quoteName("description") .", ".$db->quote($search).", ".$db->quote($replace).")")
+                ->where($db->quoteName("id") . " IN (" . implode(",", $packagesIds) . ")");
 
             $db->setQuery($query);
             $db->execute();

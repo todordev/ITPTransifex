@@ -83,17 +83,17 @@ class ItpTransifexProjects implements Iterator, Countable, ArrayAccess
     public function load($ids = array())
     {
         JArrayHelper::toInteger($ids);
-        if (!$ids) {
-            return;
-        }
 
         // Load project data
         $query = $this->db->getQuery(true);
 
         $query
             ->select("a.id, a.name, a.alias, a.description, a.source_language_code, a.filename")
-            ->from($this->db->quoteName("#__itptfx_projects", "a"))
-            ->where("a.id IN ( " . implode(",", $ids) . " )");
+            ->from($this->db->quoteName("#__itptfx_projects", "a"));
+
+        if (!empty($ids)) {
+            $query->where("a.id IN ( " . implode(",", $ids) . " )");
+        }
 
         $this->db->setQuery($query);
         $results = $this->db->loadAssocList();
@@ -260,5 +260,19 @@ class ItpTransifexProjects implements Iterator, Countable, ArrayAccess
         }
 
         return $results;
+    }
+
+    public function toOptions()
+    {
+        $options = array();
+
+        foreach ($this->items as $item) {
+            $options[] = array(
+                "text"  => $item["name"],
+                "value" => $item["id"]
+            );
+        }
+
+        return $options;
     }
 }

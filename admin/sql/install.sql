@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_packages` (
   `version` varchar(32) NOT NULL,
   `language` varchar(5) NOT NULL,
   `type` enum('component','module','plugin','library') NOT NULL,
-  `project_id` int(10) unsigned NOT NULL,
+  `project_id` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_pkg_alias` (`alias`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -28,12 +28,17 @@ CREATE TABLE IF NOT EXISTS `#__itptfx_packages_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__itptfx_projects` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `description` text,
   `source_language_code` char(5) DEFAULT NULL,
   `filename` varchar(64) DEFAULT NULL COMMENT 'This is the file name of the package.',
+  `image` varchar(24) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `ordering` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `published` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `last_update` date NOT NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_proj_alias` (`alias`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

@@ -5,15 +5,17 @@
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
     <authorUrl>http://itprism.com</authorUrl>
-	<copyright>Copyright (C) 2014 Todor Iliev ( ITPrism.com ). All rights reserved.</copyright>
+	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com ). All rights reserved.</copyright>
 	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
 	<packager>ITPrism</packager>
 	<packagerurl>http://itprism.com</packagerurl>
-	<version>1.5</version>
-	<creationDate>19 November, 2014</creationDate>
+	<version>1.6</version>
+	<creationDate>04 March, 2015</creationDate>
 	<description>ITP Transifex Library</description>
     
-	<files>    
+	<files>
+        <folder>package</folder>
+
         <file>filters.php</file>
 		<file>index.html</file>
 		<file>init.php</file>
