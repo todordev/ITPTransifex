@@ -13,40 +13,35 @@ defined('_JEXEC') or die;
 $itemSpan = (!empty($this->numberInRow)) ? round(12 / $this->numberInRow) : 4;
 ?>
 <?php if (!empty($this->items)) { ?>
-<div id="cf-categories-grid">
-    <ul class="thumbnails">
-        <?php foreach ($this->items as $item) { ?>
+<div class="row">
+    <?php foreach ($this->items as $item) { if (!empty($item->image)) {
+        $image = $this->imageFolder."/".basename($item->image);
+    }?>
+    <div class="col-sm-6 col-md-<?php echo $itemSpan; ?>">
+        <div class="thumbnail itptfx-project-grid">
 
-        <li class="span<?php echo $itemSpan; ?>">
-            <div class="thumbnail cf-category">
-                <a href="<?php echo JRoute::_(ItpTransifexHelperRoute::getCategoryRoute($item->slug)); ?>">
-                    <?php if (!empty($item->image_link)) { ?>
-                        <img src="<?php echo $item->image_link; ?>" alt="<?php echo $this->escape($item->title); ?>" />
-                    <?php } else { ?>
-                        <img src="<?php echo "media/com_crowdfunding/images/no_image.png"; ?>"
-                             alt="<?php echo $this->escape($item->title); ?>" width="200"
-                             height="200" />
-                    <?php } ?>
-                </a>
+            <a href="<?php echo JRoute::_(ItpTransifexHelperRoute::getProjectRoute($item->slug)); ?>">
+                <?php if (!empty($item->image)) { ?>
+                    <img src="<?php echo $image; ?>" alt="<?php echo $this->escape($item->name); ?>" width="<?php echo $this->params->get("image_width", "200"); ?>" height="<?php echo $this->params->get("image_height", "200"); ?>" class="center-block"/>
+                <?php } else { ?>
+                    <img src="<?php echo "media/com_itptransifex/images/no_image.png"; ?>"
+                         alt="<?php echo $this->escape($item->name); ?>" width="200"
+                         height="200" class="center-block"/>
+                <?php } ?>
+            </a>
 
-                <div class="caption height-150px absolute-bottom">
-                    <h3>
-                        <a href="<?php echo JRoute::_(ItpTransifexHelperRoute::getCategoryRoute($item->slug)); ?>">
-                            <?php echo $this->escape($item->title); ?>
-                        </a>
-                        <?php
-                        if ($this->displayProjectsNumber) {
-                            $number = (!isset($this->projectsNumber[$item->id])) ? 0 : $this->projectsNumber[$item->id]["number"];
-                            echo "( ".$number. " )";
-                        } ?>
-                    </h3>
-                    <?php if ($this->params->get("categories_display_description", true)) { ?>
-                        <p><?php echo JHtmlString::truncate($item->description, $this->descriptionLength, true, false); ?></p>
-                    <?php } ?>
-                </div>
+            <div class="caption height-200px absolute-bottom">
+                <h3>
+                    <a href="<?php echo JRoute::_(ItpTransifexHelperRoute::getProjectRoute($item->slug)); ?>">
+                        <?php echo $this->escape($item->name); ?>
+                    </a>
+                </h3>
+                <?php if ($this->params->get("display_description", 1)) { ?>
+                    <p><?php echo JHtmlString::truncate($item->description, $this->params->get("description_length", 255), true, false); ?></p>
+                <?php } ?>
             </div>
-        </li>
-        <?php } ?>
-    </ul>
+        </div>
+    </div>
+    <?php } ?>
 </div>
 <?php } ?>

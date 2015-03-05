@@ -120,6 +120,9 @@ class ItpTransifexViewPackages extends JViewLegacy
      */
     protected function prepareDocument()
     {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationSite */
+
         // Prepare page suffix
         $this->pageclass_sfx = htmlspecialchars($this->params->get('pageclass_sfx'));
 
@@ -138,6 +141,17 @@ class ItpTransifexViewPackages extends JViewLegacy
         if ($this->params->get('menu-meta_keywords')) {
             $this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
         }
+
+        // Breadcrumb
+        $pathway           = $app->getPathWay();
+
+        // Project name
+        $projectBreadcrumb = JHtmlString::truncate($this->project->getName(), 64);
+        $projectLink = ItpTransifexHelperRoute::getProjectRoute($this->project->getSlug());
+        $pathway->addItem($projectBreadcrumb, $projectLink);
+
+        $languageBreadcrumb = JHtmlString::truncate($this->language->getName(), 64);
+        $pathway->addItem($languageBreadcrumb, '');
 
         JHtml::_('behavior.core');
         JHtml::_('bootstrap.framework');

@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 
 class ItpTransifexController extends JControllerLegacy
 {
-    protected $cacheableViews = array("projects", "project");
+    protected $cacheableViews = array("projects");
 
     /**
      * Method to display a view.

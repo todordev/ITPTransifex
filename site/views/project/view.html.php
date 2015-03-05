@@ -38,6 +38,7 @@ class ItpTransifexViewProject extends JViewLegacy
     protected $packagesNumber;
     protected $layoutData;
     protected $layoutsBasePath;
+    protected $imageFolder;
 
     protected $option;
 
@@ -108,6 +109,9 @@ class ItpTransifexViewProject extends JViewLegacy
      */
     protected function prepareDocument()
     {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationSite */
+
         // Prepare page suffix
         $this->pageclass_sfx = htmlspecialchars($this->params->get('pageclass_sfx'));
 
@@ -126,6 +130,11 @@ class ItpTransifexViewProject extends JViewLegacy
         if ($this->params->get('menu-meta_keywords')) {
             $this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
         }
+
+        // Breadcrumb
+        $pathway           = $app->getPathWay();
+        $currentBreadcrumb = JHtmlString::truncate($this->project->getName(), 64);
+        $pathway->addItem($currentBreadcrumb, '');
 
         JHtml::_('behavior.core');
         JHtml::_('bootstrap.framework');
