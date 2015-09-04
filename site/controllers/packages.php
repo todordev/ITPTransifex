@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.default');
 
 /**
  * ItpTransifex packages controller
@@ -18,7 +16,7 @@ jimport('itprism.controller.default');
  * @package     ItpTransifex
  * @subpackage  Components
  */
-class ItpTransifexControllerPackages extends ITPrismControllerDefault
+class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
 {
     /**
      * Method to get a model object, loading it if required.
@@ -47,8 +45,7 @@ class ItpTransifexControllerPackages extends ITPrismControllerDefault
         $packageId  = $this->input->post->getUint("package_id");
 
         // Get project.
-        jimport("itptransifex.project");
-        $project = new ItpTransifexProject(JFactory::getDbo());
+        $project = new Transifex\Project(JFactory::getDbo());
         $project->load($projectId);
 
         // Check for validation errors.
@@ -56,9 +53,8 @@ class ItpTransifexControllerPackages extends ITPrismControllerDefault
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT'));
         }
 
-        // Get project.
-        jimport("itptransifex.package");
-        $package = new ItpTransifexPackage(JFactory::getDbo());
+        // Get package.
+        $package = new Transifex\Package(JFactory::getDbo());
         $package->load($packageId);
 
         // Check for validation errors.
@@ -109,8 +105,7 @@ class ItpTransifexControllerPackages extends ITPrismControllerDefault
 
         try {
 
-            jimport("itptransifex.package.builder");
-            $packageBuilder = new ItpTransifexPackageBuilder(JFactory::getDbo(), $project);
+            $packageBuilder = new Transifex\Package\Builder(JFactory::getDbo(), $project);
             $packageBuilder->setOptions($options);
 
             $filePath = $packageBuilder->build($package);
@@ -123,21 +118,21 @@ class ItpTransifexControllerPackages extends ITPrismControllerDefault
         $fileSize = filesize($filePath);
         $fileName = basename($filePath);
 
-        JResponse::setHeader('Content-Type', 'application/octet-stream', true);
-        JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
-        JResponse::setHeader('Content-Transfer-Encoding', 'binary', true);
-        JResponse::setHeader('Pragma', 'no-cache', true);
-        JResponse::setHeader('Expires', '0', true);
-        JResponse::setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
-        JResponse::setHeader('Content-Length', $fileSize, true);
+        $app->setHeader('Content-Type', 'application/octet-stream', true);
+        $app->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
+        $app->setHeader('Content-Transfer-Encoding', 'binary', true);
+        $app->setHeader('Pragma', 'no-cache', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
+        $app->setHeader('Content-Length', $fileSize, true);
 
         $doc = JFactory::getDocument();
         $doc->setMimeEncoding('application/octet-stream');
 
-        JResponse::sendHeaders();
+        $app->sendHeaders();
 
         echo file_get_contents($filePath);
 
-        JFactory::getApplication()->close();
+        $app->close();
     }
 }

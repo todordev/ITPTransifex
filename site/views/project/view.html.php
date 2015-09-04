@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -31,7 +31,7 @@ class ItpTransifexViewProject extends JViewLegacy
     protected $pagination = null;
 
     /**
-     * @var ItpTransifexProject
+     * @var Transifex\Project
      */
     protected $project;
 
@@ -64,8 +64,7 @@ class ItpTransifexViewProject extends JViewLegacy
         }
 
         // Load project data.
-        jimport("itptransifex.project");
-        $this->project = new ItpTransifexProject(JFactory::getDbo());
+        $this->project = new Transifex\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));

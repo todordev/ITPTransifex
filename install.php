@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -65,11 +65,10 @@ class pkg_itpTransifexInstallerScript
         // Register Install Helper
         JLoader::register("ItpTransifexInstallHelper", ITPTRANSIFEX_PATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "helpers" . DIRECTORY_SEPARATOR . "install.php");
 
-        jimport('joomla.filesystem.path');
-        jimport('joomla.filesystem.folder');
-        jimport('joomla.filesystem.file');
+        jimport('Prism.init');
+        jimport('Transifex.init');
 
-        $params             = JComponentHelper::getParams("com_itptransifex");
+        $params = JComponentHelper::getParams("com_itptransifex");
         /** @var $params Joomla\Registry\Registry */
 
         // Prepare images folders.
@@ -150,7 +149,7 @@ class pkg_itpTransifexInstallerScript
         }
         ItpTransifexInstallHelper::addRow($title, $result, $info);
 
-        // Display result about verification FileInfo
+        // Display result about verification PHP version.
         $title = JText::_("COM_ITPTRANSIFEX_PHP_VERSION");
         $info  = "";
         if (version_compare(PHP_VERSION, '5.3.0') < 0) {
@@ -161,11 +160,10 @@ class pkg_itpTransifexInstallerScript
         ItpTransifexInstallHelper::addRow($title, $result, $info);
 
         // Display result about verification of installed ITPrism Library
-        jimport("itprism.version");
-        $title = JText::_("COM_ITPTRANSIFEX_ITPRISM_LIBRARY");
+        $title = JText::_("COM_ITPTRANSIFEX_PRISM_LIBRARY");
         $info  = "";
-        if (!class_exists("ITPrismVersion")) {
-            $info   = JText::_("COM_ITPTRANSIFEX_ITPRISM_LIBRARY_DOWNLOAD");
+        if (!class_exists("Prism\\Version")) {
+            $info   = JText::_("COM_ITPTRANSIFEX_PRISM_LIBRARY_DOWNLOAD");
             $result = array("type" => "important", "text" => JText::_("JNO"));
         } else {
             $result = array("type" => "success", "text" => JText::_("JYES"));
@@ -176,5 +174,18 @@ class pkg_itpTransifexInstallerScript
         ItpTransifexInstallHelper::endTable();
 
         echo JText::sprintf("COM_ITPTRANSIFEX_MESSAGE_REVIEW_SAVE_SETTINGS", JRoute::_("index.php?option=com_itptransifex"));
+
+        if (!class_exists("Prism\\Version")) {
+            echo JText::_("COM_ITPTRANSIFEX_MESSAGE_INSTALL_PRISM_LIBRARY");
+        } else {
+
+            if (class_exists("Transifex\\Version")) {
+                $prismVersion     = new Prism\Version();
+                $componentVersion = new Transifex\Version();
+                if (version_compare($prismVersion->getShortVersion(), $componentVersion->requiredPrismVersion, "<")) {
+                    echo JText::_("COM_ITPTRANSIFEX_MESSAGE_INSTALL_PRISM_LIBRARY");
+                }
+            }
+        }
     }
 }

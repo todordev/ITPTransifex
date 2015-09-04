@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.admin');
 
 /**
  * ItpTransifex Resource controller
@@ -36,8 +34,7 @@ class ItpTransifexControllerResource extends JControllerLegacy
      */
     public function saveFilename()
     {
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         // Get form data
         $itemId    = $this->input->getInt('pk');
@@ -91,8 +88,7 @@ class ItpTransifexControllerResource extends JControllerLegacy
      */
     public function saveType()
     {
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         // Get form data
         $itemId  = $this->input->getInt('pk');

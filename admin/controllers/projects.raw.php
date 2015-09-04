@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -45,16 +45,15 @@ class ItpTransifexControllerProjects extends JControllerAdmin
      */
     public function saveOrderAjax()
     {
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         // Get the input
         $pks   = $this->input->post->get('cid', array(), 'array');
         $order = $this->input->post->get('order', array(), 'array');
 
         // Sanitize the input
-        JArrayHelper::toInteger($pks);
-        JArrayHelper::toInteger($order);
+        Joomla\Utilities\ArrayHelper::toInteger($pks);
+        Joomla\Utilities\ArrayHelper::toInteger($order);
 
         // Get the model
         $model = $this->getModel();

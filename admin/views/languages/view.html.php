@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -47,12 +47,6 @@ class ItpTransifexViewLanguages extends JViewLegacy
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
-        // Add submenu
-        ItpTransifexHelper::addSubmenu($this->getName());
-
-        // HTML Helpers
-        JHtml::addIncludePath(ITPRISM_PATH_LIBRARY . '/ui/helpers');
-
         // Prepare sorting data
         $this->prepareSorting();
 
@@ -85,6 +79,8 @@ class ItpTransifexViewLanguages extends JViewLegacy
      */
     protected function addSidebar()
     {
+        // Add submenu
+        ItpTransifexHelper::addSubmenu($this->getName());
         $this->sidebar = JHtmlSidebar::render();
     }
 
@@ -119,8 +115,8 @@ class ItpTransifexViewLanguages extends JViewLegacy
         JHtml::_('formbehavior.chosen', 'select');
         JHtml::_('bootstrap.tooltip');
 
-        JHtml::_('itprism.ui.joomla_list');
+        JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
     }
 }

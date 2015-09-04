@@ -76,14 +76,14 @@ jQuery(document).ready(function() {
 				
 				if(!response.success) {
 					
-					ITPrismUIHelper.displayMessageFailure(response.title, response.text);
+					PrismUIHelper.displayMessageFailure(response.title, response.text);
 				
 				} else {
 					
 					// Reset form data
 					resetProjectForm();
 					
-					ITPrismUIHelper.displayMessageSuccess(response.title, response.text);
+					PrismUIHelper.displayMessageSuccess(response.title, response.text);
 					
 				}
 				

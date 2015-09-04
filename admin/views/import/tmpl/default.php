@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
@@ -23,8 +23,8 @@ defined('_JEXEC') or die;
 
                         <div class="fileupload fileupload-new" data-provides="fileupload">
                         <span class="btn btn-file">
-                            <span class="fileupload-new"><?php echo JText::_("COM_ITPTRANSIFEX_SELECT_FILE"); ?></span>
-                            <span class="fileupload-exists"><?php echo JText::_("COM_ITPTRANSIFEX_CHANGE"); ?></span>
+                            <span class="fileupload-new"><i class="icon-folder-open"></i> <?php echo JText::_("COM_ITPTRANSIFEX_SELECT_FILE"); ?></span>
+                            <span class="fileupload-exists"><i class="icon-edit"></i> <?php echo JText::_("COM_ITPTRANSIFEX_CHANGE"); ?></span>
                             <?php echo $this->form->getInput('data'); ?>
                         </span>
                             <span class="fileupload-preview"></span>

@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.admin');
 
 /**
  * ItpTransifex Resources Controller
@@ -18,16 +16,11 @@ jimport('itprism.controller.admin');
  * @package     ItpTransifex
  * @subpackage  Components
  */
-class ItpTransifexControllerResources extends ITPrismControllerAdmin
+class ItpTransifexControllerResources extends Prism\Controller\Admin
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Resource', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
 
@@ -36,19 +29,19 @@ class ItpTransifexControllerResources extends ITPrismControllerAdmin
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
         $app = JFactory::getApplication();
-        /** @var $app JApplicationAdministrator * */
+        /** @var $app JApplicationAdministrator */
 
         // Get form data
         $pks = $app->input->post->get('cid', array(), 'array');
 
         $model = $this->getModel();
-        /** @var $model ItpTransifexModelResource * */
+        /** @var $model ItpTransifexModelResource */
 
         $redirectOptions = array(
             "view" => $this->view_list
         );
 
-        JArrayHelper::toInteger($pks);
+        Joomla\Utilities\ArrayHelper::toInteger($pks);
 
         // Check for validation errors.
         if (empty($pks)) {
@@ -71,11 +64,8 @@ class ItpTransifexControllerResources extends ITPrismControllerAdmin
             $model->synchronize($pks, $options);
 
         } catch (RuntimeException $e) {
-
             $this->displayWarning($e->getMessage(), $redirectOptions);
-
             return;
-
         } catch (Exception $e) {
             JLog::add($e->getMessage());
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));

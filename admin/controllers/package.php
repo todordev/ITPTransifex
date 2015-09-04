@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.form.backend');
 
 /**
  * ItpTransifex package controller class.
@@ -19,22 +17,14 @@ jimport('itprism.controller.form.backend');
  * @subpackage    Components
  * @since         1.6
  */
-class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
+class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Package', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
-
-    /**
-     * Save an item
-     */
+    
     public function save($key = null, $urlVar = null)
     {
         $app = JFactory::getApplication();
@@ -42,7 +32,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = JArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
 
         $redirectOptions = array(
             "task" => $this->getTask(),
@@ -90,7 +80,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
 
         $ids = $app->input->get("cid", array(), "array");
 
-        JArrayHelper::toInteger($ids);
+        Joomla\Utilities\ArrayHelper::toInteger($ids);
         $ids = array_filter($ids);
 
         if (!$ids) {
@@ -144,26 +134,29 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
         $fileSize = filesize($filePath);
         $fileName = basename($filePath);
 
-        JResponse::setHeader('Content-Type', 'application/octet-stream', true);
-        JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
-        JResponse::setHeader('Content-Transfer-Encoding', 'binary', true);
-        JResponse::setHeader('Pragma', 'no-cache', true);
-        JResponse::setHeader('Expires', '0', true);
-        JResponse::setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
-        JResponse::setHeader('Content-Length', $fileSize, true);
+        $app->setHeader('Content-Type', 'application/octet-stream', true);
+        $app->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
+        $app->setHeader('Content-Transfer-Encoding', 'binary', true);
+        $app->setHeader('Pragma', 'no-cache', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
+        $app->setHeader('Content-Length', $fileSize, true);
 
         $doc = JFactory::getDocument();
         $doc->setMimeEncoding('application/octet-stream');
 
-        JResponse::sendHeaders();
+        $app->sendHeaders();
 
         echo file_get_contents($filePath);
 
-        JFactory::getApplication()->close();
+        $app->close();
     }
 
     public function downloadProject()
     {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationAdministrator */
+
         $projectId= $this->input->getInt("id");
         $language = $this->input->getCmd("language");
 
@@ -192,8 +185,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
             $model->setTransifexOptions($serviceOptions);
 
             // Get project.
-            jimport("itptransifex.project");
-            $project    = new ItpTransifexProject(JFactory::getDbo());
+            $project    = new Transifex\Project(JFactory::getDbo());
             $project->load($projectId);
 
             // Get packages.
@@ -226,21 +218,21 @@ class ItpTransifexControllerPackage extends ITPrismControllerFormBackend
         $fileSize = filesize($filePath);
         $fileName = basename($filePath);
 
-        JResponse::setHeader('Content-Type', 'application/octet-stream', true);
-        JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
-        JResponse::setHeader('Content-Transfer-Encoding', 'binary', true);
-        JResponse::setHeader('Pragma', 'no-cache', true);
-        JResponse::setHeader('Expires', '0', true);
-        JResponse::setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
-        JResponse::setHeader('Content-Length', $fileSize, true);
+        $app->setHeader('Content-Type', 'application/octet-stream', true);
+        $app->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
+        $app->setHeader('Content-Transfer-Encoding', 'binary', true);
+        $app->setHeader('Pragma', 'no-cache', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename=' . $fileName, true);
+        $app->setHeader('Content-Length', $fileSize, true);
 
         $doc = JFactory::getDocument();
         $doc->setMimeEncoding('application/octet-stream');
 
-        JResponse::sendHeaders();
+        $app->sendHeaders();
 
         echo file_get_contents($filePath);
 
-        JFactory::getApplication()->close();
+        $app->close();
     }
 }

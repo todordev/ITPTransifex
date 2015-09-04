@@ -4,12 +4,12 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2014 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
-jimport("itptransifex.init");
+jimport("Transifex.init");
 
 /**
  * Method to build Route
@@ -178,7 +178,7 @@ function ItpTransifexParseRoute($segments)
 
         // We check to see if an alias is given.  If not, we assume it is a package,
         // because the project always have alias.
-        if (5 == JString::strlen($segments[0])) {
+        if (5 == Joomla\String\String::strlen($segments[0])) {
             $language = ItpTransifexHelperRoute::getLanguage($segments[0]);
 
             if (!empty($language) and isset($item->query["id"])) {

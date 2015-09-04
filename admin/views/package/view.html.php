@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -35,19 +35,18 @@ class ItpTransifexViewPackage extends JViewLegacy
         $this->option = JFactory::getApplication()->input->get("option");
     }
 
-    /**
-     * Display the view
-     */
     public function display($tpl = null)
     {
         $this->item  = $this->get('Item');
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
 
-        jimport("itptransifex.resources");
-        $this->items = new ItpTransifexResources(JFactory::getDbo());
+        $this->items = new Transifex\Resources(JFactory::getDbo());
 
-        $this->items->loadByPackageId($this->item->id);
+        $options = array(
+            "package_id" => $this->item->id
+        );
+        $this->items->load($options);
 
         // Prepare actions, behaviors, scripts and document
         $this->addToolbar();
@@ -98,9 +97,9 @@ class ItpTransifexViewPackage extends JViewLegacy
         JHtml::_('behavior.formvalidation');
         JHtml::_('bootstrap.tooltip');
 
-        JHtml::_('itprism.ui.pnotify');
-        JHtml::_('itprism.ui.joomla_helper');
-        JHtml::_('itprism.ui.bootstrap_typeahead');
+        JHtml::_('Prism.ui.pnotify');
+        JHtml::_('Prism.ui.joomlaHelper');
+        JHtml::_('Prism.ui.bootstrap2Typeahead');
 
         $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }

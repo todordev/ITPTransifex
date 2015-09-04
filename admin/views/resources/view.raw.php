@@ -4,7 +4,7 @@
  * @subpackage   Component
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
@@ -22,13 +22,14 @@ class ItpTransifexViewResources extends JViewLegacy
 
         $packageId = $app->input->get->get("package_id");
 
-        // Load resource
-        jimport("itptransifex.resources");
-        $this->items = new ItpTransifexResources(JFactory::getDbo());
-        $this->items->loadByPackageId($packageId);
+        // Load resource.
+        $options = array(
+            "package_id" => $packageId
+        );
+        $this->items = new Transifex\Resources(JFactory::getDbo());
+        $this->items->load($options);
 
-        jimport("itptransifex.package");
-        $package = new ItpTransifexPackage(JFactory::getDbo());
+        $package = new Transifex\Package(JFactory::getDbo());
         $package->load($packageId);
 
         $this->projectId = $package->getProjectId();

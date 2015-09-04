@@ -1,6 +1,10 @@
 ITP Transifex Release Notes
 ==========================
 
+###v2.0
+* Improved the library.
+* Edited to use Prism library.
+
 ###v1.6
 * Added ordering to for the projects.
 * Added functionality to upload image for a project.

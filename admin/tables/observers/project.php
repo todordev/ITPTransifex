@@ -4,7 +4,7 @@
  * @subpackage   Component
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 defined('JPATH_PLATFORM') or die;
 
@@ -46,7 +46,7 @@ class ItpTransifexObserverProject extends JTableObserver
 
         $observer = new self($observableObject);
 
-        $observer->typeAliasPattern = JArrayHelper::getValue($params, 'typeAlias');
+        $observer->typeAliasPattern = Joomla\Utilities\ArrayHelper::getValue($params, 'typeAlias');
 
         return $observer;
     }
@@ -63,7 +63,7 @@ class ItpTransifexObserverProject extends JTableObserver
      */
     public function onBeforeDelete($pk)
     {
-        JArrayHelper::toInteger($pk);
+        Joomla\Utilities\ArrayHelper::toInteger($pk);
 
         // Delete old image if I upload a new one
         if (!empty($pk) and $this->table->get("image")) {

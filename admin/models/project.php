@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -18,6 +18,9 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexModelProject extends JModelAdmin
 {
+    protected $sitePrefixes = array("site", "module", "library");
+    protected $adminPrefixes = array("admin", "plugin");
+
     /**
      * Returns a reference to the a Table object, always creating it.
      *
@@ -80,14 +83,13 @@ class ItpTransifexModelProject extends JModelAdmin
      */
     public function save($data)
     {
-
-        $id         = JArrayHelper::getValue($data, "id");
-        $name       = JArrayHelper::getValue($data, "name");
-        $alias      = JArrayHelper::getValue($data, "alias");
-        $filename   = JArrayHelper::getValue($data, "filename");
-        $desc       = JArrayHelper::getValue($data, "description");
-        $link       = JArrayHelper::getValue($data, "link");
-        $published  = JArrayHelper::getValue($data, "published");
+        $id         = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $name       = Joomla\Utilities\ArrayHelper::getValue($data, "name");
+        $alias      = Joomla\Utilities\ArrayHelper::getValue($data, "alias");
+        $filename   = Joomla\Utilities\ArrayHelper::getValue($data, "filename");
+        $desc       = Joomla\Utilities\ArrayHelper::getValue($data, "description");
+        $link       = Joomla\Utilities\ArrayHelper::getValue($data, "link");
+        $published  = Joomla\Utilities\ArrayHelper::getValue($data, "published");
 
         // Load a record from the database
         $row = $this->getTable();
@@ -108,10 +110,6 @@ class ItpTransifexModelProject extends JModelAdmin
         return $row->get("id");
     }
 
-    /**
-     * Prepare and sanitise the table prior to saving.
-     * @since    1.6
-     */
     protected function prepareTable($table)
     {
         // get maximum order number
@@ -123,7 +121,7 @@ class ItpTransifexModelProject extends JModelAdmin
                 $query = $db->getQuery(true);
                 $query
                     ->select("MAX(ordering)")
-                    ->from("#__itptfx_projects");
+                    ->from($db->quoteName("#__itptfx_projects"));
 
                 $db->setQuery($query, 0, 1);
                 $max = $db->loadResult();
@@ -194,9 +192,9 @@ class ItpTransifexModelProject extends JModelAdmin
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
 
-        $uploadedFile = JArrayHelper::getValue($image, 'tmp_name');
-        $uploadedName = JArrayHelper::getValue($image, 'name');
-        $errorCode    = JArrayHelper::getValue($image, 'error');
+        $uploadedFile = Joomla\Utilities\ArrayHelper::getValue($image, 'tmp_name');
+        $uploadedName = Joomla\Utilities\ArrayHelper::getValue($image, 'name');
+        $errorCode    = Joomla\Utilities\ArrayHelper::getValue($image, 'error');
 
         // Load parameters.
         $params     = JComponentHelper::getParams($this->option);
@@ -210,26 +208,20 @@ class ItpTransifexModelProject extends JModelAdmin
         $mediaParams = JComponentHelper::getParams("com_media");
         /** @var  $mediaParams Joomla\Registry\Registry */
 
-        jimport("itprism.file");
-        jimport("itprism.file.uploader.local");
-        jimport("itprism.file.validator.size");
-        jimport("itprism.file.validator.image");
-        jimport("itprism.file.validator.server");
-
-        $file = new ITPrismFile();
+        $file = new Prism\File\File();
 
         // Prepare size validator.
         $KB            = 1024 * 1024;
         $fileSize      = (int)$app->input->server->get('CONTENT_LENGTH');
         $uploadMaxSize = $mediaParams->get("upload_maxsize") * $KB;
 
-        $sizeValidator = new ITPrismFileValidatorSize($fileSize, $uploadMaxSize);
+        $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
 
         // Prepare server validator.
-        $serverValidator = new ITPrismFileValidatorServer($errorCode, array(UPLOAD_ERR_NO_FILE));
+        $serverValidator = new Prism\File\Validator\Server($errorCode, array(UPLOAD_ERR_NO_FILE));
 
         // Prepare image validator.
-        $imageValidator = new ITPrismFileValidatorImage($uploadedFile, $uploadedName);
+        $imageValidator = new Prism\File\Validator\Image($uploadedFile, $uploadedName);
 
         // Get allowed mime types from media manager options
         $mimeTypes = explode(",", $mediaParams->get("upload_mime"));
@@ -250,16 +242,15 @@ class ItpTransifexModelProject extends JModelAdmin
         }
 
         // Generate temporary file name
-        $ext = JString::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
+        $ext = Joomla\String\String::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
 
-        jimport("itprism.string");
-        $generatedName = new ITPrismString();
+        $generatedName = new Prism\String();
         $generatedName->generateRandomString(16);
 
         $tmpDestFile = $tmpFolder . DIRECTORY_SEPARATOR . $generatedName . "." . $ext;
 
         // Prepare uploader object.
-        $uploader = new ITPrismFileUploaderLocal($uploadedFile);
+        $uploader = new Prism\File\Uploader\Local($uploadedFile);
         $uploader->setDestination($tmpDestFile);
 
         // Upload temporary file
@@ -293,7 +284,7 @@ class ItpTransifexModelProject extends JModelAdmin
         $image->toFile($imageFile, IMAGETYPE_PNG);
 
         // Remove the temporary
-        if (is_file($tmpDestFile)) {
+        if (JFile::exists($tmpDestFile)) {
             JFile::delete($tmpDestFile);
         }
 
@@ -353,11 +344,9 @@ class ItpTransifexModelProject extends JModelAdmin
 
             $data = array();
 
-            $username = JArrayHelper::getValue($options, "username");
-            $password = JArrayHelper::getValue($options, "password");
-            $url      = JArrayHelper::getValue($options, "url");
-
-            jimport("itprism.transifex.request");
+            $username = Joomla\Utilities\ArrayHelper::getValue($options, "username");
+            $password = Joomla\Utilities\ArrayHelper::getValue($options, "password");
+            $url      = Joomla\Utilities\ArrayHelper::getValue($options, "url");
 
             $headers = array(
                 "headers" => array(
@@ -368,7 +357,7 @@ class ItpTransifexModelProject extends JModelAdmin
 
             foreach ($projects as $project) {
 
-                $transifex = new ITPrismTransifexRequest($url);
+                $transifex = new Prism\Transifex\Request($url);
 
                 $transifex->setUsername($username);
                 $transifex->setPassword($password);
@@ -380,15 +369,12 @@ class ItpTransifexModelProject extends JModelAdmin
 
                 // Get the data
                 $data[$project->alias] = $response;
-
             }
 
             if (!empty($data)) {
-
                 $this->prepareProjectsData($projects, $data);
                 $this->updateProjectsData($projects);
                 $this->updateProjectsResources($projects, $options);
-
             }
         }
     }
@@ -439,9 +425,9 @@ class ItpTransifexModelProject extends JModelAdmin
      */
     protected function updateProjectsResources($data, $options)
     {
-        $username = JArrayHelper::getValue($options, "username");
-        $password = JArrayHelper::getValue($options, "password");
-        $url      = JArrayHelper::getValue($options, "url");
+        $username = Joomla\Utilities\ArrayHelper::getValue($options, "username");
+        $password = Joomla\Utilities\ArrayHelper::getValue($options, "password");
+        $url      = Joomla\Utilities\ArrayHelper::getValue($options, "url");
 
         $headers = array(
             "headers" => array(
@@ -455,7 +441,7 @@ class ItpTransifexModelProject extends JModelAdmin
         // Get the resources from Transifex.
         foreach ($data as $alias => $itemData) {
 
-            $transifex = new ITPrismTransifexRequest($url);
+            $transifex = new Prism\Transifex\Request($url);
 
             $transifex->setUsername($username);
             $transifex->setPassword($password);
@@ -516,6 +502,8 @@ class ItpTransifexModelProject extends JModelAdmin
 
             foreach ($value as $item) {
 
+                $prasedSlug = $this->parseSlug($item["slug"]);
+
                 $db    = $this->getDbo();
                 $query = $db->getQuery(true);
 
@@ -525,6 +513,8 @@ class ItpTransifexModelProject extends JModelAdmin
                     ->set($db->quoteName('i18n_type') . "=" . $db->quote($item["i18n_type"]))
                     ->set($db->quoteName('alias') . "=" . $db->quote($item["slug"]))
                     ->set($db->quoteName('project_id') . "=" . $db->quote($projectId))
+                    ->set($db->quoteName('filename') . "=" . $db->quote($prasedSlug['filename']))
+                    ->set($db->quoteName('type') . "=" . $db->quote($prasedSlug["type"]))
                     ->set($db->quoteName('source_language_code') . "=" . $db->quote($item["source_language_code"]));
 
                 $db->setQuery($query);
@@ -583,7 +573,7 @@ class ItpTransifexModelProject extends JModelAdmin
     }
 
     /**
-     * Separate resource such as are new for isnerting,
+     * Separate resource such as are new for inserting,
      * old which will be deleted and those that will be updated.
      *
      * @param array $resources
@@ -604,7 +594,7 @@ class ItpTransifexModelProject extends JModelAdmin
                 foreach ($resource as $key => $value) {
 
                     if (is_scalar($value)) {
-                        $resource[$key] = JString::trim($value);
+                        $resource[$key] = Joomla\String\String::trim($value);
                     }
                 }
 
@@ -721,7 +711,7 @@ class ItpTransifexModelProject extends JModelAdmin
                     $packagesIds = array();
                 }
 
-                JArrayHelper::toInteger($packagesIds);
+                Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
 
                 if (!empty($packagesIds)) {
 
@@ -747,5 +737,32 @@ class ItpTransifexModelProject extends JModelAdmin
 
             }
         }
+    }
+
+    protected function parseSlug($slug)
+    {
+        $result = array(
+            "type" => null,
+            "filename" => null
+        );
+
+        $slugParts = explode("-", $slug);
+
+        // Prepare type.
+        if (in_array($slugParts[0], $this->sitePrefixes)) {
+            $result["type"] = "site";
+        } elseif (in_array($slugParts[0], $this->adminPrefixes)) {
+            $result["type"] = "admin";
+        }
+
+        // Generate default file name.
+        $suffix = substr($slugParts[1], -4, 4);
+        if (strcmp("_sys", $suffix) != 0) {
+            $result["filename"] = $slugParts[1].".ini";
+        } else {
+            $result["filename"] = substr($slugParts[1], 0, -4) .".sys.ini";
+        }
+
+        return $result;
     }
 }

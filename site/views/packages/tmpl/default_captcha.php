@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -45,8 +45,14 @@ $this->document->addScriptDeclaration($js);
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="js-modal-btn-download"><?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?></button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="js-modal-btn-close"><?php echo JText::_("COM_ITPTRANSIFEX_CLOSE"); ?></button>
+                <button type="button" class="btn btn-primary" id="js-modal-btn-download">
+                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                    <?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?>
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="js-modal-btn-close">
+                    <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+                    <?php echo JText::_("COM_ITPTRANSIFEX_CLOSE"); ?>
+                </button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

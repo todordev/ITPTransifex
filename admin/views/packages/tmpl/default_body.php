@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -46,7 +46,7 @@ defined('_JEXEC') or die;
         <td class="nowrap center hidden-phone">
             <?php echo $this->escape($item->language); ?>
         </td>
-        <td class="nowrap center hidden-phone">
+        <td class="nowrap hidden-phone">
             <?php echo $this->escape($item->type); ?>
         </td>
         <td class="nowrap hidden-phone">

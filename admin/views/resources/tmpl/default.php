@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -66,59 +66,6 @@ defined('_JEXEC') or die;
     </div>
 </form>
 
-<div class="modal hide fade" id="js-cp-modal">
-
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3><?php echo JText::_("COM_ITPTRANSIFEX_PACKAGE_OPTIONS");?></h3>
-
-    </div>
-    <div class="modal-body">
-        
-        <form action="<?php echo JRoute::_('index.php?option=com_itptransifex'); ?>" method="post" name="packageForm" id="packageForm">
-        
-            <div class="row-fluid">
-                <div class="span12">
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('name'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('alias'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('alias'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('filename'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('filename'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('language'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('language'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('type'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('type'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('version'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('version'); ?></div>
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label"><?php echo $this->form->getLabel('description'); ?></div>
-        				<div class="controls"><?php echo $this->form->getInput('description'); ?></div>
-                    </div>
-                </div>
-                
-            </div>
-        
-            <input type="hidden" name="task" value="package.create" />
-            <input type="hidden" name="format" value="raw" />
-            <input type="hidden" name="project_id" value="<?php echo $this->projectId; ?>" />
-    </form>
-    </div>
-    <div class="modal-footer">
-        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader" />
-        <a href="#" class="btn btn-primary" id="js-btn-sp"><?php echo JText::_("COM_ITPTRANSIFEX_SUBMIT");?></a>
-        <a href="#" class="btn" id="js-btn-cp-cancel"><?php echo JText::_("COM_ITPTRANSIFEX_CANCEL");?></a>
-    </div>
-</div>
+<?php
+//Load the batch processing form.
+echo $this->loadTemplate('modal');

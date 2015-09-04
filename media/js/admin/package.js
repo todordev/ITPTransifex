@@ -37,12 +37,12 @@ jQuery(document).ready(function() {
 
                     if(!response.success) {
 
-                        ITPrismUIHelper.displayMessageFailure(response.title, response.text);
+                        PrismUIHelper.displayMessageFailure(response.title, response.text);
 
                     } else {
 
                         jQuery("#resource-id"+resourceId).remove();
-                        ITPrismUIHelper.displayMessageSuccess(response.title, response.text);
+                        PrismUIHelper.displayMessageSuccess(response.title, response.text);
 
                     }
 
@@ -57,7 +57,6 @@ jQuery(document).ready(function() {
         event.preventDefault();
 
         jQuery("#itptfx-add-resource").show();
-
     });
 
 
@@ -102,7 +101,7 @@ jQuery(document).ready(function() {
                     jQuery("#js-ajaxloader").hide();
 
                     if(!response) {
-                        ITPrismUIHelper.displayMessageFailure(Joomla.JText._('COM_ITPTRANSIFEX_FAIL'), Joomla.JText._('COM_ITPTRANSIFEX_ERROR_CANNOT_ADD_RESOURCE'));
+                        PrismUIHelper.displayMessageFailure(Joomla.JText._('COM_ITPTRANSIFEX_FAIL'), Joomla.JText._('COM_ITPTRANSIFEX_ERROR_CANNOT_ADD_RESOURCE'));
                     } else {
                         jQuery("#itptfx-resource-wrapper").append(response);
                     }

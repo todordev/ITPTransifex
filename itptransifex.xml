@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="3.3" method="upgrade">
+<extension type="component" version="3.4" method="upgrade">
 	<name>COM_ITPTRANSIFEX</name>
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
 	<authorUrl>http://itprism.com</authorUrl>
 	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com )</copyright>
-	<license>http://www.gnu.org/copyleft/gpl.html</license>
-	<version>1.6</version>
-	<creationDate>04 March, 2015</creationDate>
+	<license>http://www.gnu.org/licenses/gpl-3.0.en.html</license>
+	<version>2.0</version>
+	<creationDate>02 September, 2015</creationDate>
 	<description><![CDATA[
     <p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
     <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
-    <p>Invest in the extension and help for its improvement. You can <a href="http://itprism.com/sponsorship" target="_blank">sponsor the extension via SMS, PayPal or Bitcoin</a>.</p>
     <p><a href="http://itprism.com/" target="_blank">Subscribe for the newsletter</a> to receive <strong>gifts</strong>, <strong>discount codes</strong>, information about <strong>updates</strong> and information about <strong>new ITPrism extensions</strong>.</p>
-    <p>Please, <a href="http://extensions.joomla.org/extensions/languages/language-edition/25806">vote for the extension</a> on Joomla! Extensions Directory</p>
+    <p>Please, <a href="http://extensions.joomla.org/extensions/extension/languages/language-edition/itp-transifex">vote for the extension</a> on Joomla! Extensions Directory</p>
     ]]></description>
 
 	<install>
@@ -35,8 +34,6 @@
 	</update>
 	
 	<media destination="com_itptransifex" folder="media">
-		<filename>index.html</filename>
-        
 		<folder>css</folder>
 		<folder>images</folder>
 		<folder>js</folder>		
@@ -51,7 +48,6 @@
         <folder>views</folder>
 
 		<filename>controller.php</filename>
-		<filename>index.html</filename>
 		<filename>router.php</filename>
 		<filename>itptransifex.php</filename>
 	</files>
@@ -72,7 +68,6 @@
 
             <filename>config.xml</filename>		
 			<filename>controller.php</filename>
-			<filename>index.html</filename>
 			<filename>itptransifex.php</filename>
 		</files>
 		

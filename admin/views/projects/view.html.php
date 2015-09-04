@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -57,23 +57,17 @@ class ItpTransifexViewProjects extends JViewLegacy
             $ids[] = $item->id;
         }
 
-
         // Get the number of project resources
-        jimport("itptransifex.projects");
-        $projects = new ItpTransifexProjects(JFactory::getDbo());
+        $projects = new Transifex\Projects(JFactory::getDbo());
         $this->numberOfResources = $projects->getNumberOfResources($ids);
 
         // Get number of packages.
         $this->numberOfPackages = $projects->getNumberOfPackages($ids);
 
-        jimport("itptransifex.languages");
-        $languages = new ItpTransifexLanguages(JFactory::getDbo());
+        $languages = new Transifex\Languages(JFactory::getDbo());
         $languages->load();
 
-        $this->languages = $languages->toOptions();
-
-        // Add submenu
-        ItpTransifexHelper::addSubmenu($this->getName());
+        $this->languages = $languages->toOptions("code", "name");
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -112,6 +106,8 @@ class ItpTransifexViewProjects extends JViewLegacy
      */
     protected function addSidebar()
     {
+        // Add submenu
+        ItpTransifexHelper::addSubmenu($this->getName());
         $this->sidebar = JHtmlSidebar::render();
     }
 
@@ -158,8 +154,8 @@ class ItpTransifexViewProjects extends JViewLegacy
         JHtml::_('formbehavior.chosen', '#sortTable, #directionTable, #limit');
         JHtml::_('bootstrap.tooltip');
 
-        JHtml::_('itprism.ui.joomla_list');
+        JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
     }
 }

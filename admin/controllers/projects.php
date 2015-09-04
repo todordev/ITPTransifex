@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.admin');
 
 /**
  * ItpTransifex Projects Controller
@@ -18,16 +16,11 @@ jimport('itprism.controller.admin');
  * @package     ItpTransifex
  * @subpackage  Components
  */
-class ItpTransifexControllerProjects extends ITPrismControllerAdmin
+class ItpTransifexControllerProjects extends Prism\Controller\Admin
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
 
@@ -44,7 +37,7 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin
             "view" => $this->view_list
         );
 
-        JArrayHelper::toInteger($pks);
+        Joomla\Utilities\ArrayHelper::toInteger($pks);
 
         // Check for validation errors.
         if (empty($pks)) {
@@ -97,6 +90,5 @@ class ItpTransifexControllerProjects extends ITPrismControllerAdmin
             JLog::add($e->getMessage());
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
-
     }
 }

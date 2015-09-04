@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -110,7 +110,7 @@ class ItpTransifexModelProject extends JModelList
             )
         );
         $query->from($db->quoteName('#__itptfx_languages', 'a'));
-        $query->where("a.code IN (" .$subQuery->__toString(). ")");
+        $query->where("a.code IN (" .$subQuery. ")");
 
         // Add the list ordering clause.
         $orderString = $this->getOrderString();

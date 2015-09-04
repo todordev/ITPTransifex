@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -66,7 +66,7 @@ defined('_JEXEC') or die;
             <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader"/>
         </h3>
 
-        <button class="btn btn-success" id="itptfx-btn-add">
+        <button class="btn btn-success mtp-10" id="itptfx-btn-add">
             <i class="icon-plus"></i>
             <?php echo JText::_("COM_ITPTRANSIFEX_ADD"); ?>
         </button>

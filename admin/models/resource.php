@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -80,12 +80,12 @@ class ItpTransifexModelResource extends JModelAdmin
      */
     public function save($data)
     {
-        $id        = JArrayHelper::getValue($data, "id");
-        $name      = JArrayHelper::getValue($data, "name");
-        $alias     = JArrayHelper::getValue($data, "alias");
-        $filename  = JArrayHelper::getValue($data, "filename");
-        $type      = JArrayHelper::getValue($data, "type");
-        $published = JArrayHelper::getValue($data, "published");
+        $id        = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $name      = Joomla\Utilities\ArrayHelper::getValue($data, "name");
+        $alias     = Joomla\Utilities\ArrayHelper::getValue($data, "alias");
+        $filename  = Joomla\Utilities\ArrayHelper::getValue($data, "filename");
+        $type      = Joomla\Utilities\ArrayHelper::getValue($data, "type");
+        $published = Joomla\Utilities\ArrayHelper::getValue($data, "published");
 
         // Load a record from the database
         $row = $this->getTable();
@@ -144,10 +144,6 @@ class ItpTransifexModelResource extends JModelAdmin
         $db->execute();
     }
 
-    /**
-     * Prepare and sanitise the table prior to saving.
-     * @since    1.6
-     */
     protected function prepareTable($table)
     {
         // Fix magic quotes
@@ -177,10 +173,9 @@ class ItpTransifexModelResource extends JModelAdmin
 
         if (!empty($resources)) {
 
-            $transifexUrl = JArrayHelper::getValue($options, "url");
+            $transifexUrl = Joomla\Utilities\ArrayHelper::getValue($options, "url");
 
-            jimport("itprism.transifex.request");
-            $transifex = new ITPrismTransifexRequest($transifexUrl);
+            $transifex = new Prism\Transifex\Request($transifexUrl);
 
             $transifex->setUsername($options["username"]);
             $transifex->setPassword($options["password"]);

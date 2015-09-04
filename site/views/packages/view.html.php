@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -28,7 +28,7 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $params;
 
     /**
-     * @var ItpTransifexProject
+     * @var Transifex\Project
      */
     protected $project;
 
@@ -42,7 +42,7 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $layoutData;
 
     /**
-     * @var ItpTransifexLanguage
+     * @var Transifex\Language
      */
     protected $language;
 
@@ -75,17 +75,18 @@ class ItpTransifexViewPackages extends JViewLegacy
         }
 
         // Load project data.
-        jimport("itptransifex.project");
-        $this->project = new ItpTransifexProject(JFactory::getDbo());
+        $this->project = new Transifex\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
         }
 
         // Load project data.
-        jimport("itptransifex.language");
-        $this->language = new ItpTransifexLanguage(JFactory::getDbo());
-        $this->language->loadByCode($languageCode);
+        $keys = array(
+            "code" => $languageCode
+        );
+        $this->language = new Transifex\Language(JFactory::getDbo());
+        $this->language->load($keys);
         if (!$this->language->getId()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE"));
         }

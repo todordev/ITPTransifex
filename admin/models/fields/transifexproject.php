@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 defined('JPATH_PLATFORM') or die;
@@ -40,9 +40,7 @@ class JFormFieldTransifexProject extends JFormFieldList
      */
     protected function getOptions()
     {
-
-        jimport("itptransifex.projects");
-        $projects = new ItpTransifexProjects(JFactory::getDbo());
+        $projects = new Transifex\Projects(JFactory::getDbo());
         $projects->load();
 
         $options = $projects->toOptions();

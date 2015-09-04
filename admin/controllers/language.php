@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.form.backend');
 
 /**
  * ItpTransifex language controller class.
@@ -19,22 +17,14 @@ jimport('itprism.controller.form.backend');
  * @subpackage   Components
  * @since        1.6
  */
-class ItpTransifexControllerLanguage extends ITPrismControllerFormBackend
+class ItpTransifexControllerLanguage extends Prism\Controller\Form\Backend
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Language', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
-
-    /**
-     * Save an item
-     */
+    
     public function save($key = null, $urlVar = null)
     {
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
@@ -44,7 +34,7 @@ class ItpTransifexControllerLanguage extends ITPrismControllerFormBackend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = JArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
 
         $redirectOptions = array(
             "task" => $this->getTask(),
@@ -52,7 +42,7 @@ class ItpTransifexControllerLanguage extends ITPrismControllerFormBackend
         );
 
         $model = $this->getModel();
-        /** @var $model ItpTransifexModelLanguage * */
+        /** @var $model ItpTransifexModelLanguage */
 
         $form = $model->getForm($data, false);
         /** @var $form JForm * */
@@ -78,6 +68,7 @@ class ItpTransifexControllerLanguage extends ITPrismControllerFormBackend
             $redirectOptions["id"] = $itemId;
 
         } catch (Exception $e) {
+
             JLog::add($e->getMessage());
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }

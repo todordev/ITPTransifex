@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -94,8 +94,7 @@ class ItpTransifexModelImport extends JModelForm
             );
 
             // Get a project by its alias.
-            jimport("itptransifex.project");
-            $project = new ItpTransifexProject(JFactory::getDbo());
+            $project = new Transifex\Project(JFactory::getDbo());
             $project->load($keys);
 
             // Create a project.
@@ -125,31 +124,30 @@ class ItpTransifexModelImport extends JModelForm
 
     protected function importPackages($content, $projectId, $override = false)
     {
-        jimport("itptransifex.package");
         $db = JFactory::getDbo();
 
         $packagesMap = array();
         // Generate data for importing.
         foreach ($content->package as $item) {
 
-            $alias = JString::trim($item->alias);
+            $alias = Joomla\String\String::trim($item->alias);
             if (!$alias) {
                 continue;
             }
 
             $keys = array("alias" => $alias);
-            $package = new ItpTransifexPackage($db);
+            $package = new Transifex\Package($db);
             $package->load($keys);
 
             if (!$package->getId() or ($package->getId() and $override)) {
 
-                $package->setName(JString::trim($item->name));
+                $package->setName(Joomla\String\String::trim($item->name));
                 $package->setAlias($alias);
-                $package->setDescription(JString::trim($item->description));
-                $package->setFileName(JString::trim($item->filename));
-                $package->setVersion(JString::trim($item->version));
-                $package->setLanguage(JString::trim($item->language));
-                $package->setType(JString::trim($item->type));
+                $package->setDescription(Joomla\String\String::trim($item->description));
+                $package->setFileName(Joomla\String\String::trim($item->filename));
+                $package->setVersion(Joomla\String\String::trim($item->version));
+                $package->setLanguage(Joomla\String\String::trim($item->language));
+                $package->setType(Joomla\String\String::trim($item->type));
                 $package->setProjectId($projectId);
 
                 $package->store();
@@ -167,37 +165,37 @@ class ItpTransifexModelImport extends JModelForm
 
     protected function importResources($content, $projectId, $packagesMap, $override = false)
     {
-        jimport("itptransifex.resource");
-
         $db = JFactory::getDbo();
 
         // Generate data for importing.
         foreach ($content->resource as $item) {
 
-            $alias        = JString::trim($item->alias);
-            $packageAlias = JString::trim($item->package_alias);
+            $alias        = Joomla\String\String::trim($item->alias);
+            $packageAlias = Joomla\String\String::trim($item->package_alias);
             if ((!$alias or !$packageAlias) or !isset($packagesMap[$packageAlias])) {
                 continue;
             }
 
             $keys = array("alias" => $alias);
-            $resource = new ItpTransifexResource($db);
+            $resource = new Transifex\Resource($db);
             $resource->load($keys);
 
+            // Create new resource.
             if (!$resource->getId() or ($resource->getId() and $override)) {
 
-                $resource->setName(JString::trim($item->name));
+                $resource->setName(Joomla\String\String::trim($item->name));
                 $resource->setAlias($alias);
-                $resource->setFileName(JString::trim($item->filename));
-                $resource->setType(JString::trim($item->type));
-                $resource->setI18nType(JString::trim($item->i18n_type));
-                $resource->setSourceLanguageCode(JString::trim($item->source_language_code));
-                $resource->setState(JString::trim($item->published));
+                $resource->setFileName(Joomla\String\String::trim($item->filename));
+                $resource->setType(Joomla\String\String::trim($item->type));
+                $resource->setI18nType(Joomla\String\String::trim($item->i18n_type));
+                $resource->setSourceLanguageCode(Joomla\String\String::trim($item->source_language_code));
+                $resource->setState(Joomla\String\String::trim($item->published));
                 $resource->setProjectId($projectId);
 
                 $resource->store();
-                $packagesMap[$packageAlias]["resources"][] = $resource->getId();
             }
+
+            $packagesMap[$packageAlias]["resources"][] = $resource->getId();
         }
 
         return $packagesMap;
@@ -209,9 +207,8 @@ class ItpTransifexModelImport extends JModelForm
 
         foreach ($packagesMap as $map) {
 
-            $packageId = JArrayHelper::getValue($map, "package_id", 0, "int");
-            $resources = JArrayHelper::getValue($map, "resources", array(), "array");
-
+            $packageId = Joomla\Utilities\ArrayHelper::getValue($map, "package_id", 0, "int");
+            $resources = Joomla\Utilities\ArrayHelper::getValue($map, "resources", array(), "array");
             
             if (!$packageId or !$resources) {
                 continue;

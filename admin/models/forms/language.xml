@@ -11,13 +11,15 @@
         <field name="code" type="text"
                label="COM_ITPTRANSIFEX_LOCALE_CODE"
                description="COM_ITPTRANSIFEX_LOCALE_CODE_DESC"
+               hint="en_GB"
                filter="trim"
                required="true"
                 />
 
         <field name="short_code" type="text"
-               label="COM_ITPTRANSIFEX_SHORT_CODE"
-               description="COM_ITPTRANSIFEX_SHORT_CODE_DESC"
+               label="COM_ITPTRANSIFEX_COUNTRY_CODE"
+               description="COM_ITPTRANSIFEX_COUNTRY_CODE_DESC"
+               hint="en"
                filter="trim"
                 />
 

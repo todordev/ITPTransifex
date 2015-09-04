@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -37,12 +37,7 @@ class ItpTransifexModelResources extends JModelList
 
         parent::__construct($config);
     }
-
-    /**
-     * Method to auto-populate the model state.
-     * Note. Calling getState in this method will result in recursion.
-     * @since   1.6
-     */
+    
     protected function populateState($ordering = null, $direction = null)
     {
         // List state information.
@@ -128,7 +123,7 @@ class ItpTransifexModelResources extends JModelList
         $published = $this->getState('filter.state');
         if (is_numeric($published)) {
             $query->where('a.published = ' . (int)$published);
-        } elseif ($published === '') {
+        } elseif (is_null($published)) {
             $query->where('(a.published IN (0, 1))');
         }
 

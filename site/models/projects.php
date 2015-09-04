@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -35,13 +35,6 @@ class ItpTransifexModelProjects extends JModelList
         parent::__construct($config);
     }
 
-    /**
-     * Method to auto-populate the model state.
-     *
-     * Note. Calling getState in this method will result in recursion.
-     *
-     * @since   1.6
-     */
     protected function populateState($ordering = null, $direction = null)
     {
         // List state information.
@@ -142,11 +135,10 @@ class ItpTransifexModelProjects extends JModelList
         if (!in_array($orderDirn, $allowedDirns)) {
             $orderDirn = "ASC";
         } else {
-            $orderDirn = JString::strtoupper($orderDirn);
+            $orderDirn = Joomla\String\String::strtoupper($orderDirn);
         }
 
         switch ($order) {
-
             case "ordering":
                 $orderCol = "a.ordering";
                 break;
@@ -154,7 +146,6 @@ class ItpTransifexModelProjects extends JModelList
             default: // Name
                 $orderCol = "a.name";
                 break;
-
         }
 
         $orderString = $orderCol . ' ' . $orderDirn;

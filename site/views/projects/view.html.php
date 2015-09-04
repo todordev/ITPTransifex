@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -43,6 +43,9 @@ class ItpTransifexViewProjects extends JViewLegacy
 
     protected $pageclass_sfx;
 
+    protected $imageWidth = "";
+    protected $imageHeight = "";
+
     public function __construct($config)
     {
         parent::__construct($config);
@@ -74,9 +77,6 @@ class ItpTransifexViewProjects extends JViewLegacy
         // Get params
         $this->params = $this->state->get("params");
         /** @var  $params Joomla\Registry\Registry */
-
-        $this->imageWidth = "";
-        $this->imageWidth = "";
 
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));

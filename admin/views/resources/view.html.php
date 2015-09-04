@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -31,7 +31,7 @@ class ItpTransifexViewResources extends JViewLegacy
     protected $projectId;
 
     /**
-     * @var ItpTransifexProject
+     * @var Transifex\Project
      */
     protected $project;
 
@@ -59,15 +59,11 @@ class ItpTransifexViewResources extends JViewLegacy
 
         $this->projectId = $this->state->get("project_id");
 
-        jimport("itptransifex.project");
-        $this->project = new ItpTransifexProject(JFactory::getDbo());
+        $this->project = new Transifex\Project(JFactory::getDbo());
         $this->project->load($this->projectId);
 
         $model      = JModelLegacy::getInstance("Package", "ItpTransifexModel", $config = array('ignore_request' => true));
         $this->form = $model->getForm();
-
-        // Add submenu
-        ItpTransifexHelper::addSubmenu("resources");
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -106,6 +102,9 @@ class ItpTransifexViewResources extends JViewLegacy
      */
     protected function addSidebar()
     {
+        // Add submenu
+        ItpTransifexHelper::addSubmenu("resources");
+
         JHtmlSidebar::setAction('index.php?option=' . $this->option . '&view=' . $this->getName());
 
         JHtmlSidebar::addFilter(
@@ -126,7 +125,6 @@ class ItpTransifexViewResources extends JViewLegacy
         );
 
         $this->sidebar = JHtmlSidebar::render();
-
     }
 
     /**
@@ -177,11 +175,12 @@ class ItpTransifexViewResources extends JViewLegacy
         JHtml::_('behavior.multiselect');
         JHtml::_('formbehavior.chosen', 'select');
         JHtml::_('bootstrap.tooltip');
-        JHtml::_('itprism.ui.pnotify');
-        JHtml::_('itprism.ui.bootstrap_editable');
-        JHtml::_('itprism.ui.joomla_helper');
-        JHtml::_('itprism.ui.joomla_list');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        JHtml::_('Prism.ui.pnotify');
+        JHtml::_('Prism.ui.bootstrap2Editable');
+        JHtml::_('Prism.ui.joomlaHelper');
+        JHtml::_('Prism.ui.joomlaList');
+
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
     }
 }

@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<extension type="package" version="3.3" method="upgrade">
+<extension type="package" version="3.4" method="upgrade">
 	<name>ITP Transifex Packages</name>
 	<packagename>itptransifex</packagename>
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
 	<authorUrl>http://itprism.com</authorUrl>
 	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com )</copyright>
-	<license>http://www.gnu.org/copyleft/gpl.html</license>
+	<license>http://www.gnu.org/licenses/gpl-3.0.en.html</license>
 	<url>http://itprism.com</url>
 	<packager>Todor Iliev</packager>
 	<packagerurl>http://itprism.com</packagerurl>
-	<version>1.6</version>
-	<creationDate>04 March, 2015</creationDate>
+	<version>2.0</version>
+	<creationDate>02 September, 2015</creationDate>
 	<description><![CDATA[
 	<p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
     <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
-	<p>Invest in the extension and help for its improvement. You can <a href="http://itprism.com/sponsorship" target="_blank">sponsor the extension via SMS, PayPal or Bitcoin</a>.</p>
 	<p><a href="http://itprism.com/" target="_blank">Subscribe for the newsletter</a> to receive <strong>gifts</strong>, <strong>discount codes</strong>, information about <strong>updates</strong> and information about <strong>new ITPrism extensions</strong>.</p>
-	<p>Please, <a href="http://extensions.joomla.org/extensions/languages/language-edition/25806" target="_blank">vote for the extension</a> on Joomla! Extensions Directory</p>
+	<p>Please, <a href="http://extensions.joomla.org/extensions/extension/languages/language-edition/itp-transifex" target="_blank">vote for the extension</a> on Joomla! Extensions Directory</p>
 	]]></description>
     
 	<files folder="packages">
 		<file type="component" 	id="com_itptransifex" >com_itptransifex.zip</file>
-        <file type="library"    id="lib_itptransifex" >lib_itptransifex.zip</file>
+        <file type="library"    id="lib_transifex" >lib_transifex.zip</file>
 	</files>
 
 	<scriptfile>install.php</scriptfile>
+
+    <updateservers>
+        <server type="extension" priority="1" name="ITP Transifex ( from CDN )">http://cdn.itprism.com/updates/itptransifex.xml</server>
+    </updateservers>
 </extension>

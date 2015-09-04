@@ -41,7 +41,7 @@ jQuery(document).ready(function() {
 
         if (ids.length == 0) {
             jQuery('#collapseModal').modal('hide');
-            ITPrismUIHelper.displayMessageFailure(Joomla.JText._('COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED'));
+            PrismUIHelper.displayMessageFailure(Joomla.JText._('COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED'));
             return;
         }
 
@@ -60,16 +60,14 @@ jQuery(document).ready(function() {
             dataType: "text json",
             beforeSend: function() {
                 jQuery("#js-batch-ajaxloader").show();
+                jQuery("#js-itptfx-btn-batch").prop("disabled", true);
             }
         }).done(function(response){
 
-            /*jQuery("#js-batch-ajaxloader").hide();
-            jQuery('#collapseModal').modal('hide');*/
-
             if(!response.success) {
-                ITPrismUIHelper.displayMessageFailure(response.title, response.text);
+                PrismUIHelper.displayMessageFailure(response.title, response.text);
             } else {
-                ITPrismUIHelper.displayMessageSuccess(response.title, response.text);
+                PrismUIHelper.displayMessageSuccess(response.title, response.text);
 
                 // Reload the page.
                 setTimeout(function(){

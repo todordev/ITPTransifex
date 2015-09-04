@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.form.backend');
 
 /**
  * ItpTransifex project controller class.
@@ -19,22 +17,14 @@ jimport('itprism.controller.form.backend');
  * @subpackage   Components
  * @since        1.6
  */
-class ItpTransifexControllerProject extends ITPrismControllerFormBackend
+class ItpTransifexControllerProject extends Prism\Controller\Form\Backend
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
 
-    /**
-     * Save an item
-     */
     public function save($key = null, $urlVar = null)
     {
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
@@ -44,7 +34,7 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = JArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
 
         $redirectOptions = array(
             "task" => $this->getTask(),
@@ -74,7 +64,7 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend
 
             // Get image
             $files = $this->input->files->get('jform', array(), 'array');
-            $image = JArrayHelper::getValue($files, "image");
+            $image = Joomla\Utilities\ArrayHelper::getValue($files, "image");
 
             // Upload image
             if (!empty($image['name'])) {
@@ -120,10 +110,6 @@ class ItpTransifexControllerProject extends ITPrismControllerFormBackend
         }
 
         try {
-
-            jimport('joomla.filesystem.folder');
-            jimport('joomla.filesystem.file');
-            jimport('joomla.filesystem.path');
 
             $model = $this->getModel();
             $model->removeImage($itemId);

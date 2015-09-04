@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -44,8 +44,6 @@ class ItpTransifexModelLanguage extends JModelAdmin
      */
     public function getForm($data = array(), $loadData = true)
     {
-
-        // Get the form.
         $form = $this->loadForm($this->option . '.language', 'language', array('control' => 'jform', 'load_data' => $loadData));
         if (empty($form)) {
             return false;
@@ -81,11 +79,10 @@ class ItpTransifexModelLanguage extends JModelAdmin
      */
     public function save($data)
     {
-
-        $id        = JArrayHelper::getValue($data, "id");
-        $name      = JArrayHelper::getValue($data, "name");
-        $code      = JArrayHelper::getValue($data, "code");
-        $shortCode = JString::strtolower(JArrayHelper::getValue($data, "short_code"));
+        $id        = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $name      = Joomla\Utilities\ArrayHelper::getValue($data, "name");
+        $code      = Joomla\Utilities\ArrayHelper::getValue($data, "code");
+        $shortCode = Joomla\String\String::strtolower(Joomla\Utilities\ArrayHelper::getValue($data, "short_code"));
 
         // Load a record from the database
         $row = $this->getTable();

@@ -4,13 +4,13 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
 defined('_JEXEC') or die;
 
-jimport("itptransifex.init");
+jimport("Transifex.init");
 
 /**
  * Component Route Helper that help to find a menu item.
@@ -32,6 +32,11 @@ abstract class ItpTransifexHelperRoute
 
     /**
      * This method route item in the view "packages".
+     *
+     * @param string $slug
+     * @param string $lang
+     *
+     * @return string
      */
     public static function getPackagesRoute($slug, $lang)
     {
@@ -42,7 +47,7 @@ abstract class ItpTransifexHelperRoute
          * we will get that menu item ( Itemid ).
          *
          * # categories view
-         * If miss a menu item with view "category" we continue with searchin but now for view "categories".
+         * If miss a menu item with view "category" we continue with searching but now for view "categories".
          * It is assumed view "categories" will be in the first level of the menu.
          * The view "categories" won't contain category ID so it has to contain 0 for ID key.
          */

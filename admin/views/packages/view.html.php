@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -53,14 +53,10 @@ class ItpTransifexViewPackages extends JViewLegacy
         // Get the number of project resources
         $this->numberOfResources = $this->getNumberOfResources($this->items);
 
-        jimport("itptransifex.languages");
-        $languages = new ItpTransifexLanguages(JFactory::getDbo());
+        $languages = new Transifex\Languages(JFactory::getDbo());
         $languages->load();
 
-        $this->languages = $languages->toOptions();
-
-        // Add submenu
-        ItpTransifexHelper::addSubmenu($this->getName());
+        $this->languages = $languages->toOptions("code", "name");
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -80,8 +76,7 @@ class ItpTransifexViewPackages extends JViewLegacy
             $ids[] = $item->id;
         }
 
-        jimport("itptransifex.packages");
-        $packages = new ItpTransifexPackages(JFactory::getDbo());
+        $packages = new Transifex\Packages(JFactory::getDbo());
         return $packages->getNumberOfResources($ids);
     }
 
@@ -113,10 +108,12 @@ class ItpTransifexViewPackages extends JViewLegacy
      */
     protected function addSidebar()
     {
+        // Add submenu
+        ItpTransifexHelper::addSubmenu($this->getName());
+
         JHtmlSidebar::setAction('index.php?option=' . $this->option . '&view=' . $this->getName());
 
-        jimport("itptransifex.filters");
-        $fitlers = new ItpTransifexFilters(JFactory::getDbo());
+        $fitlers = new Transifex\Filters(JFactory::getDbo());
 
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_PROJECT'),
@@ -190,10 +187,10 @@ class ItpTransifexViewPackages extends JViewLegacy
         JHtml::_('bootstrap.tooltip');
         JHtml::_('bootstrap.modal', 'collapseModal');
 
-        JHtml::_('itprism.ui.pnotify');
-        JHtml::_('itprism.ui.joomla_list');
-        JHtml::_('itprism.ui.joomla_helper');
+        JHtml::_('Prism.ui.pnotify');
+        JHtml::_('Prism.ui.joomlaList');
+        JHtml::_('Prism.ui.joomlaHelper');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
     }
 }

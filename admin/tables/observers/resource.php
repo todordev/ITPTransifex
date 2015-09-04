@@ -4,7 +4,7 @@
  * @subpackage   Component
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 defined('JPATH_PLATFORM') or die;
 
@@ -46,7 +46,7 @@ class ItpTransifexObserverResource extends JTableObserver
 
         $observer = new self($observableObject);
 
-        $observer->typeAliasPattern = JArrayHelper::getValue($params, 'typeAlias');
+        $observer->typeAliasPattern = Joomla\Utilities\ArrayHelper::getValue($params, 'typeAlias');
 
         return $observer;
     }
@@ -63,14 +63,20 @@ class ItpTransifexObserverResource extends JTableObserver
      */
     public function onBeforeDelete($pk)
     {
-        $db = JFactory::getDbo();
+        if (is_array($pk)) {
+            Joomla\Utilities\ArrayHelper::toInteger($pk);
+        }
 
-        $query = $db->getQuery(true);
-        $query
-            ->delete($db->quoteName("#__itptfx_packages_map"))
-            ->where("resource_id IN ( " . implode(",", $pk) . ")");
+        if (is_array($pk) and !empty($pk)) {
+            $db = JFactory::getDbo();
 
-        $db->setQuery($query);
-        $db->execute();
+            $query = $db->getQuery(true);
+            $query
+                ->delete($db->quoteName("#__itptfx_packages_map"))
+                ->where($db->quoteName("resource_id") . " IN ( " . implode(",", $pk) . ")");
+
+            $db->setQuery($query);
+            $db->execute();
+        }
     }
 }

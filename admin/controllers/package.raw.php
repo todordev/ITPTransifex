@@ -4,13 +4,11 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2013 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // No direct access
 defined('_JEXEC') or die;
-
-jimport('itprism.controller.admin');
 
 /**
  * ItpTransifex package controller
@@ -18,7 +16,7 @@ jimport('itprism.controller.admin');
  * @package     ItpTransifex
  * @subpackage  Components
  */
-class ItpTransifexControllerPackage extends ITPrismControllerAdmin
+class ItpTransifexControllerPackage extends Prism\Controller\Admin
 {
     /**
      * Proxy for getModel.
@@ -36,8 +34,10 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
      */
     public function create()
     {
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationAdministrator */
+
+        $response = new Prism\Response\Json();
 
         // Get form data
         $projectId    = $this->input->getInt('project_id');
@@ -47,7 +47,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
         $model = $this->getModel();
         /** @var $model ItpTransifexModelPackage */
 
-        JArrayHelper::toInteger($resourcesIDs);
+        Joomla\Utilities\ArrayHelper::toInteger($resourcesIDs);
 
         // Check for validation errors.
         if (!$resourcesIDs) {
@@ -63,7 +63,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
         }
 
         $form = $model->getForm($data, false);
-        /** @var $form JForm * */
+        /** @var $form JForm */
 
         if (!$form) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
@@ -96,6 +96,10 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
 
         try {
 
+            // Set the language code to the session.
+            // I will use it as default value of the field "language" in the form.
+            $app->setUserState("package.language", $validData["language"]);
+
             $validData["project_id"] = $projectId;
 
             $packageId = $model->save($validData);
@@ -120,7 +124,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
             ->success();
 
         echo $response;
-        JFactory::getApplication()->close();
+        $app->close();
 
     }
 
@@ -129,8 +133,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
      */
     public function removeResource()
     {
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         $packageId    = $this->input->getInt('pid');
         $resourceId   = $this->input->getInt('rid');
@@ -180,8 +183,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
         // Get the input
         $query = $this->input->get->get('query', "", 'string');
 
-        jimport('itprism.response.json');
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         // Get the model
         $model = $this->getModel();
@@ -225,8 +227,7 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
-        jimport("itptransifex.resource");
-        $resource = new ItpTransifexResource(JFactory::getDbo());
+        $resource = new Transifex\Resource(JFactory::getDbo());
         $resource->load($resourceId);
 
         if ($success and $resource->getId()) {
@@ -261,12 +262,13 @@ class ItpTransifexControllerPackage extends ITPrismControllerAdmin
     {
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-        jimport("itprism.response.json");
-        $response = new ITPrismResponseJson();
+        $response = new Prism\Response\Json();
 
         // Get the input
         $packagesIds  = $this->input->post->getString('ids');
         $packagesIds  = explode(",", $packagesIds);
+        $packagesIds  = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+        $packagesIds  = array_filter($packagesIds);
 
         $action       = $this->input->post->get('action');
 

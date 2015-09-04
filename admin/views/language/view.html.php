@@ -4,7 +4,7 @@
  * @subpackage   Components
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
- * @license      http://www.gnu.org/copyleft/gpl.html GNU/GPL
+ * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 // no direct access
@@ -33,9 +33,6 @@ class ItpTransifexViewLanguage extends JViewLegacy
         $this->option = JFactory::getApplication()->input->get("option");
     }
 
-    /**
-     * Display the view
-     */
     public function display($tpl = null)
     {
         $this->item  = $this->get('Item');
@@ -59,8 +56,7 @@ class ItpTransifexViewLanguage extends JViewLegacy
         JFactory::getApplication()->input->set('hidemainmenu', true);
         $isNew = ($this->item->id == 0);
 
-        $this->documentTitle = $isNew ? JText::_('COM_ITPTRANSIFEX_NEW_LANGUAGE')
-            : JText::_('COM_ITPTRANSIFEX_EDIT_LANGUAGE');
+        $this->documentTitle = $isNew ? JText::_('COM_ITPTRANSIFEX_NEW_LANGUAGE') : JText::_('COM_ITPTRANSIFEX_EDIT_LANGUAGE');
 
         JToolBarHelper::title($this->documentTitle);
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-    <fieldset>
+    <fieldset addfieldpath="/administrator/components/com_itptransifex/models/fields">
 
         <field name="name" type="text" class="span12"
                label="COM_ITPTRANSIFEX_NAME"
@@ -20,9 +20,9 @@
                required="true"
                 />
 
-        <field name="language" type="itptlanguage"
+        <field name="language" type="transifexlanguage"
                label="COM_ITPTRANSIFEX_LANGUAGE"
-               description="COM_ITPTRANSIFEX_LANGUAGE_DESC"
+               description="COM_ITPTRANSIFEX_FIELD_LANGUAGE_DESC"
                required="true"
                 />
 
