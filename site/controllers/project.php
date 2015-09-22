@@ -45,7 +45,7 @@ class ItpTransifexControllerProject extends Prism\Controller\DefaultController
         $languageCode  = $this->input->post->getCmd("language");
 
         // Get project.
-        $project = new Transifex\Project(JFactory::getDbo());
+        $project = new Transifex\Project\Project(JFactory::getDbo());
         $project->load($projectId);
 
         // Check for validation errors.
@@ -55,7 +55,7 @@ class ItpTransifexControllerProject extends Prism\Controller\DefaultController
 
         // Get project.
         $keys = array("code" => $languageCode);
-        $language = new Transifex\Language(JFactory::getDbo());
+        $language = new Transifex\Language\Language(JFactory::getDbo());
         $language->load($keys);
 
         // Check for validation errors.
@@ -101,7 +101,9 @@ class ItpTransifexControllerProject extends Prism\Controller\DefaultController
             "url"               => $params->get("api_url"),
             "archives_folder"   => $archiveFolder,
             "cache_days"        => $params->get("cache_days", 1),
-            "tmp_path"          => $app->get("tmp_path")
+            "tmp_path"          => $app->get("tmp_path"),
+            "files_location"    => $params->get("files_location", "extension_folders"),
+            "include_lang_name" => (bool)$params->get("include_lang_name", 1)
         );
 
         try {

@@ -1,13 +1,13 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Resource
  * @subpackage   Resources
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Resource;
 
 use Prism\Database\ArrayObject;
 use Joomla\Utilities\ArrayHelper;
@@ -17,7 +17,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * This class provides functionality that manage resources.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Resource
  * @subpackage   Resources
  */
 class Resources extends ArrayObject
@@ -33,12 +33,12 @@ class Resources extends ArrayObject
      *    "state" => Prism\Constants::PUBLISHED,
      * );
      *
-     * $projects    = new Transifex\Projects(\JFactory::getDbo());
-     * $projects->load($options);
+     * $resources    = new Transifex\Resource\Resources(\JFactory::getDbo());
+     * $resources->load($options);
      *
-     * foreach ($projects as $project) {
-     *      echo $project["name"];
-     *      echo $project["description"];
+     * foreach ($resources as $resource) {
+     *      echo $resource["name"];
+     *      echo $resource["filename"];
      * }
      * </code>
      *
@@ -95,9 +95,9 @@ class Resources extends ArrayObject
         }
 
         // Filter by project ID.
-        $projectId = ArrayHelper::getValue($options, "project_id");
-        if (!empty($projectId)) {
-            $query->where("a.project_id = " . (int)$projectId);
+        $resourceId = ArrayHelper::getValue($options, "project_id");
+        if (!empty($resourceId)) {
+            $query->where("a.project_id = " . (int)$resourceId);
         }
 
         // Filter by state
@@ -120,10 +120,10 @@ class Resources extends ArrayObject
      *   2 => array("id" => 3),
      * );
      *
-     * $projects    = new Transifex\Projects(\JFactory::getDbo());
-     * $projects->set("items", $data);
+     * $resources    = new Transifex\Resource\Resources(\JFactory::getDbo());
+     * $resources->set("items", $data);
      *
-     * $projects->remove();
+     * $resources->remove();
      * </code>
      */
     public function remove()

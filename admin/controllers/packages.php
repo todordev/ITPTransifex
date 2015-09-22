@@ -21,6 +21,7 @@ class ItpTransifexControllerPackages extends Prism\Controller\Admin
     public function getModel($name = 'Package', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
+
         return $model;
     }
 
@@ -28,7 +29,7 @@ class ItpTransifexControllerPackages extends Prism\Controller\Admin
      * Remove record from packages map.
      *
      * @param ItpTransifexModelPackage $model
-     * @param array        $cid
+     * @param array                    $cid
      *
      * @throws Exception
      */

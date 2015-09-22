@@ -45,7 +45,7 @@ class ItpTransifexControllerLanguage extends Prism\Controller\Form\Backend
         /** @var $model ItpTransifexModelLanguage */
 
         $form = $model->getForm($data, false);
-        /** @var $form JForm * */
+        /** @var $form JForm */
 
         if (!$form) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
@@ -57,7 +57,6 @@ class ItpTransifexControllerLanguage extends Prism\Controller\Form\Backend
         // Check for validation errors.
         if ($validData === false) {
             $this->displayNotice($form->getErrors(), $redirectOptions);
-
             return;
         }
 

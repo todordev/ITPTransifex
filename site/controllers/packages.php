@@ -45,7 +45,7 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
         $packageId  = $this->input->post->getUint("package_id");
 
         // Get project.
-        $project = new Transifex\Project(JFactory::getDbo());
+        $project = new Transifex\Project\Project(JFactory::getDbo());
         $project->load($projectId);
 
         // Check for validation errors.
@@ -54,7 +54,7 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
         }
 
         // Get package.
-        $package = new Transifex\Package(JFactory::getDbo());
+        $package = new Transifex\Package\Package(JFactory::getDbo());
         $package->load($packageId);
 
         // Check for validation errors.
@@ -100,7 +100,9 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
             "url"               => $params->get("api_url"),
             "archives_folder"   => $archiveFolder,
             "cache_days"        => $params->get("cache_days", 1),
-            "tmp_path"          => $app->get("tmp_path")
+            "tmp_path"          => $app->get("tmp_path"),
+            "files_location"    => $params->get("files_location", "extension_folders"),
+            "include_lang_name" => (bool)$params->get("include_lang_name", 1)
         );
 
         try {

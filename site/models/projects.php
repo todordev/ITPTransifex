@@ -135,7 +135,7 @@ class ItpTransifexModelProjects extends JModelList
         if (!in_array($orderDirn, $allowedDirns)) {
             $orderDirn = "ASC";
         } else {
-            $orderDirn = Joomla\String\String::strtoupper($orderDirn);
+            $orderDirn = JString::strtoupper($orderDirn);
         }
 
         switch ($order) {

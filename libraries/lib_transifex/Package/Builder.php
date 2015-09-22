@@ -9,12 +9,11 @@
 
 namespace Transifex\Package;
 
-use Transifex\Package;
-use Transifex\Project;
-use Transifex\Resources;
-use Transifex\Language;
+use Transifex\Project\Project;
+use Transifex\Resource\Resources;
+use Transifex\Language\Language;
 use Prism\Transifex\Request;
-use Prism\String;
+use Prism\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Registry\Registry;
 
@@ -130,7 +129,7 @@ class Builder
 
             // If cached file does not exist, generate new one.
             if (!$cacheExists) {
-                $filePath = $this->preparePackage($package, $fileName);
+                $filePath = $this->preparePackage($package, (bool)$this->getOption("include_lang_name", 1));
             } else {
                 $filePath = $cachedFile;
             }
@@ -163,7 +162,7 @@ class Builder
         if (!empty($ids)) {
             $fileName = $this->project->getFilename();
             if (!$fileName) {
-                $fileName = "UNZIPFIRST";
+                $fileName = "UNZIPFIRST_".\JFilterOutput::stringURLSafe($this->project->getName());
             }
 
             $fileName .= "_".$languageCode;
@@ -191,7 +190,7 @@ class Builder
 
             // If cached file does not exist, generate new one.
             if (!$cacheExists) {
-                $filePath = $this->prepareProjectPackage($ids, $fileName);
+                $filePath = $this->prepareProjectPackage($ids, $fileName, (bool)$this->getOption("include_lang_name", 1));
             } else {
                 $filePath = $cachedFile;
             }
@@ -213,7 +212,7 @@ class Builder
      *
      * @return string
      */
-    public function preparePackage($package, $includeLanguageName = true)
+    protected function preparePackage($package, $includeLanguageName = true)
     {
         $packageFile  = "";
 
@@ -329,10 +328,7 @@ class Builder
         if (!empty($files)) {
 
             // Create temporary folder.
-            $string = new String();
-            $string->generateRandomString();
-
-            $tmpFolder   = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . "tmp_".(string)$string);
+            $tmpFolder   = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . "tmp_".(string)StringHelper::generateRandomString());
             \JFolder::create($tmpFolder);
 
             // Copy files to the temporary folder.
@@ -375,8 +371,13 @@ class Builder
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
-        $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
+            $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
+            $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
+        } else {// "language_folders"
+            $targetAdminFolder = "administrator/language/" . $langCodeDash;
+            $targetSiteFolder  = "language/" . $langCodeDash;
+        }
 
         $sourceAdminFolder = "admin/" . $langCodeDash;
         $sourceSiteFolder  = "site/" . $langCodeDash;
@@ -459,7 +460,11 @@ class Builder
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
+            $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;
@@ -516,7 +521,11 @@ class Builder
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
+            $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "administrator/language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;
@@ -570,7 +579,11 @@ class Builder
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "libraries/" . substr($packageName, 4) . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
+            $targetFolder = "libraries/" . \JString::ucfirst(substr($packageName, 4)) . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;

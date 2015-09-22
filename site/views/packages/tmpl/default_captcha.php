@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-$this->document->addScript('media/' . $this->option . '/js/site/packages_captcha.js');
+$this->document->addScript('media/com_itptransifex/js/site/packages_captcha.js');
 $this->document->addScript('//www.google.com/recaptcha/api.js?onload=transifexOnloadCallback&render=explicit');
 
 $js = '
@@ -46,11 +46,11 @@ $this->document->addScriptDeclaration($js);
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="js-modal-btn-download">
-                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                    <span class="fa fa-download" aria-hidden="true"></span>
                     <?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?>
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" id="js-modal-btn-close">
-                    <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+                    <span class="fa fa-times" aria-hidden="true"></span>
                     <?php echo JText::_("COM_ITPTRANSIFEX_CLOSE"); ?>
                 </button>
             </div>

@@ -1,13 +1,13 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Language
  * @subpackage   Languages
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Language;
 
 use Prism\Database\ArrayObject;
 use Joomla\Utilities\ArrayHelper;
@@ -17,7 +17,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * This class provides functionality that manage languages.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Language
  * @subpackage   Languages
  */
 class Languages extends ArrayObject
@@ -30,7 +30,7 @@ class Languages extends ArrayObject
      *     "ids" => array(1,2,3,4)
      * );
      *
-     * $languages = new Transifex\Languages(\JFactory::getDbo());
+     * $languages = new Transifex\Language\Languages(\JFactory::getDbo());
      *
      * $languages->load($options);
      * </code>
@@ -40,7 +40,7 @@ class Languages extends ArrayObject
     public function load($options = array())
     {
         $ids = ArrayHelper::getValue($options, "ids", array(), "array");
-        ArrayHelper::toInteger($ids);
+        $ids = ArrayHelper::toInteger($ids);
 
         $query = $this->db->getQuery(true);
 

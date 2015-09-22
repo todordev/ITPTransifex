@@ -18,7 +18,7 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexModelPackage extends JModelAdmin
 {
-    protected $serviceOptions;
+    protected $options = array();
 
     /**
      * Returns a reference to the a Table object, always creating it.
@@ -136,7 +136,7 @@ class ItpTransifexModelPackage extends JModelAdmin
         $db->setQuery($query);
         $results = $db->loadColumn();
 
-        Joomla\Utilities\ArrayHelper::toInteger($results);
+        $results = Joomla\Utilities\ArrayHelper::toInteger($results);
 
         // Prepare these resources that does not exist.
         foreach ($results as $resourceId) {
@@ -192,11 +192,31 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         // Prepare language code.
         $langCode1 = str_replace("-", "_", substr($table->get("alias"), -5, 5));
-        $langCode2 = Joomla\String\String::strtolower($table->get("language"));
+        $langCode2 = JString::strtolower($table->get("language"));
         if (strcmp($langCode1, $langCode2) == 0) {
             $alias = substr($table->get("alias"), 0, -5);
             $table->set("alias", $alias . $langCode2);
         }
+
+        // Check for existing alias.
+        if (!$table->get("id") and $this->isAliasExists($table->get("alias"))) {
+            $table->set("alias", Prism\String\StringHelper::generateRandomString(16) ."-". $langCode2);
+        }
+    }
+
+    protected function isAliasExists($alias)
+    {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+
+        $query
+            ->select("COUNT(*)")
+            ->from($db->quoteName("#__itptfx_packages", "a"))
+            ->where("a.alias = " . $db->quote($alias));
+
+        $db->setQuery($query);
+
+        return (bool)$db->loadResult();
     }
 
     /**
@@ -217,15 +237,15 @@ class ItpTransifexModelPackage extends JModelAdmin
         $packageFile = "";
 
         // Get package.
-        $package = new Transifex\Package($db);
+        $package = new Transifex\Package\Package($db);
         $package->load($packageId);
 
         // Prepare project folder
-        $project = new Transifex\Project($db);
+        $project = new Transifex\Project\Project($db);
         $project->load($package->getProjectId());
 
         // Prepare project URL that points to Transifex.
-        $this->serviceOptions["project_path"] = "project/" . $project->getAlias();
+        $this->options["project_path"] = "project/" . $project->getAlias();
 
         $packageFileName = $package->getFilename();
         $packageFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $packageFileName);
@@ -269,8 +289,8 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     /**
      * @param  array $packagesIds
-     * @param string $fileName
-     * @param bool $includeLanguageName
+     * @param  string $fileName
+     * @param  bool $includeLanguageName
      *
      * @return string
      */
@@ -287,15 +307,15 @@ class ItpTransifexModelPackage extends JModelAdmin
         foreach ($packagesIds as $packageId) {
             
             // Get package.
-            $package = new Transifex\Package($db);
+            $package = new Transifex\Package\Package($db);
             $package->load($packageId);
     
             // Prepare project folder
-            $project = new Transifex\Project($db);
+            $project = new Transifex\Project\Project($db);
             $project->load($package->getProjectId());
 
             // Prepare project URL that points to Transifex.
-            $this->serviceOptions["project_path"] = "project/" . $project->getAlias();
+            $this->options["project_path"] = "project/" . $project->getAlias();
 
             $packageFileName = $package->getFilename();
             $packageFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $packageFileName);
@@ -340,15 +360,12 @@ class ItpTransifexModelPackage extends JModelAdmin
         if (!empty($files)) {
 
             // Create temporary folder.
-            $string = new Prism\String();
-            $string->generateRandomString();
-
-            $tmpFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . "tmp_".(string)$string);
+            $tmpFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . "tmp_".(string)Prism\String\StringHelper::generateRandomString());
             JFolder::create($tmpFolder);
 
             // Copy files to the temporary folder.
             foreach ($files as $file) {
-                $baseName = $tmpFolder . DIRECTORY_SEPARATOR . basename($file);
+                $baseName = JPath::clean($tmpFolder . DIRECTORY_SEPARATOR . basename($file));
                 JFile::copy($file, $baseName);
             }
 
@@ -360,8 +377,8 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
     
     /**
-     * @param Transifex\Package $package
-     * @param Transifex\Resources $resources
+     * @param Transifex\Package\Package $package
+     * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
@@ -377,8 +394,13 @@ class ItpTransifexModelPackage extends JModelAdmin
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
-        $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
+            $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
+            $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
+        } else {// "language_folders"
+            $targetAdminFolder = "administrator/language/" . $langCodeDash;
+            $targetSiteFolder  = "language/" . $langCodeDash;
+        }
 
         $sourceAdminFolder = "admin/" . $langCodeDash;
         $sourceSiteFolder  = "site/" . $langCodeDash;
@@ -445,8 +467,8 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
 
     /**
-     * @param Transifex\Package $package
-     * @param Transifex\Resources $resources
+     * @param Transifex\Package\Package $package
+     * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
@@ -462,7 +484,11 @@ class ItpTransifexModelPackage extends JModelAdmin
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
+            $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;
@@ -497,8 +523,8 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
 
     /**
-     * @param Transifex\Package $package
-     * @param Transifex\Resources $resources
+     * @param Transifex\Package\Package $package
+     * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
@@ -519,7 +545,11 @@ class ItpTransifexModelPackage extends JModelAdmin
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
+            $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "administrator/language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;
@@ -556,8 +586,8 @@ class ItpTransifexModelPackage extends JModelAdmin
     /**
      * Prepare a package for a library.
      *
-     * @param Transifex\Package $package
-     * @param Transifex\Resources $resources
+     * @param Transifex\Package\Package $package
+     * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
@@ -573,7 +603,11 @@ class ItpTransifexModelPackage extends JModelAdmin
         $langCodeDash = str_replace("_", "-", $langCode);
 
         // Generate target folder of the language files.
-        $targetFolder = "libraries/" . substr($packageName, 4) . "/language/" . $langCodeDash;
+        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
+            $targetFolder = "libraries/" . JString::ucfirst(substr($packageName, 4)) . "/language/" . $langCodeDash;
+        } else { // "language_folders"
+            $targetFolder = "language/" . $langCodeDash;
+        }
 
         // Prepare options
         $manifestFileName = $langCodeDash . "." . $packageName;
@@ -610,7 +644,7 @@ class ItpTransifexModelPackage extends JModelAdmin
     /**
      * Generate a package name.
      *
-     * @param Transifex\Package $package
+     * @param Transifex\Package\Package $package
      * @param string $langCode
      * @param bool $includeLanguageName
      *
@@ -626,7 +660,7 @@ class ItpTransifexModelPackage extends JModelAdmin
                 "code" => $langCode
             );
 
-            $language = new Transifex\Language(JFactory::getDbo());
+            $language = new Transifex\Language\Language(JFactory::getDbo());
             $language->load($keys);
 
             $name = $package->getName() . " - ".$language->getName();
@@ -638,7 +672,7 @@ class ItpTransifexModelPackage extends JModelAdmin
     /**
      * This method downloads plugin and module files and generate a string with files list.
      *
-     * @param Transifex\Resources $resources
+     * @param Transifex\Resource\Resources $resources
      * @param array $options
      *
      * @return string
@@ -806,13 +840,13 @@ class ItpTransifexModelPackage extends JModelAdmin
             )
         );
 
-        $transifex = new Prism\Transifex\Request($this->serviceOptions["url"]);
+        $transifex = new Prism\Transifex\Request($this->options["url"]);
 
-        $transifex->setUsername($this->serviceOptions["username"]);
-        $transifex->setPassword($this->serviceOptions["password"]);
+        $transifex->setUsername($this->options["username"]);
+        $transifex->setPassword($this->options["password"]);
         $transifex->enableAuthentication();
 
-        $path = $this->serviceOptions["project_path"] . "/resource/" . $slug . "/translation/" . $langCode . "/";
+        $path = $this->options["project_path"] . "/resource/" . $slug . "/translation/" . $langCode . "/";
 
         $response = $transifex->get($path, $headers);
 
@@ -875,7 +909,7 @@ class ItpTransifexModelPackage extends JModelAdmin
     /**
      * Get a package filename from a resource file name.
      *
-     * @param Transifex\Resources $resources  Resources
+     * @param Transifex\Resource\Resources $resources  Resources
      * @param string $type Extension type - component, module or plugin.
      *
      * @return array|string
@@ -915,13 +949,13 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
 
     /**
-     * Set Transifex service options to the object.
+     * Set options to the object.
      *
      * @param array $options
      */
-    public function setTransifexOptions($options)
+    public function setOptions($options)
     {
-        $this->serviceOptions = $options;
+        $this->options = $options;
     }
 
     /**
@@ -1049,28 +1083,26 @@ class ItpTransifexModelPackage extends JModelAdmin
         $options = array(
             "ids" => $packagesIds
         );
-        $packages = new Transifex\Packages(JFactory::getDbo());
+        $packages = new Transifex\Package\Packages(JFactory::getDbo());
         $packages->load($options);
 
         // Check for existing packages.
         if (count($packages) > 0) {
 
-            $toPackageLanguageCode = Joomla\String\String::strtolower($language);
+            $toPackageLanguageCode = JString::strtolower($language);
 
             foreach ($packages as $key => $package) {
 
-                $newAlias        = Joomla\String\String::substr($package["alias"], 0, -5);
-                $endString       = Joomla\String\String::substr($package["alias"], -5, 5);
+                $newAlias        = JString::substr($package["alias"], 0, -5);
+                $endString       = JString::substr($package["alias"], -5, 5);
 
-                $fromPackageLanguageCode = Joomla\String\String::strtolower($package["language"]);
+                $fromPackageLanguageCode = JString::strtolower($package["language"]);
 
                 // If the end of string does not match old language code, or
                 // the end of string match new language code,
                 // I am going to generate a new string.
                 if ((strcmp($endString, $fromPackageLanguageCode) != 0) or (strcmp($endString, $toPackageLanguageCode) == 0)) {
-                    $hash = new Prism\String();
-                    $hash->generateRandomString(32);
-                    $newAlias = $hash->__toString();
+                    $newAlias = Prism\String\StringHelper::generateRandomString(32);
                 } else { // or I am going to add the new language code to the end of alias string.
                     $newAlias .= $toPackageLanguageCode;
                 }
@@ -1092,7 +1124,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      * Check for existing packages with same aliases in database.
      * If there are duplications, I am going to generate a new alias.
      *
-     * @param Transifex\Packages $packages
+     * @param Transifex\Package\Packages $packages
      */
     protected function preventDuplications($packages)
     {
@@ -1119,15 +1151,8 @@ class ItpTransifexModelPackage extends JModelAdmin
 
                 foreach ($packages as $key => $package) {
                     if (strcmp($alias, $package["alias"]) == 0) {
-
-                        $hash = new Prism\String();
-                        $hash->generateRandomString(32);
-                        $newAlias = $hash->__toString();
-
-                        $package["alias"] = $newAlias;
-
+                        $package["alias"] = Prism\String\StringHelper::generateRandomString(32);
                         $packages[$key] = $package;
-
                     }
                 }
 
@@ -1139,7 +1164,7 @@ class ItpTransifexModelPackage extends JModelAdmin
     /**
      * Create new packages.
      *
-     * @param Transifex\Packages $packages
+     * @param Transifex\Package\Packages $packages
      */
     protected function createPackages($packages)
     {
@@ -1153,11 +1178,11 @@ class ItpTransifexModelPackage extends JModelAdmin
             );
 
             // Get package resources.
-            $resources = new Transifex\Resources(JFactory::getDbo());
+            $resources = new Transifex\Resource\Resources(JFactory::getDbo());
             $resources->load($options);
 
             // Create a new package.
-            $p = new Transifex\Package(JFactory::getDbo());
+            $p = new Transifex\Package\Package(JFactory::getDbo());
             $p->bind($package);
             $p->store();
 
@@ -1171,7 +1196,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      * Copy all resources from a package to a new one.
      *
      * @param int $packageId
-     * @param Transifex\Resources $resources
+     * @param Transifex\Resource\Resources $resources
      */
     protected function copyResources($packageId, $resources)
     {
@@ -1192,7 +1217,7 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     public function changeVersion(array $packagesIds, $newVersion)
     {
-        Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+        $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
 
         if (!empty($packagesIds)) {
             $db = $this->getDbo();
@@ -1210,7 +1235,7 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     public function replaceText(array $packagesIds, $search, $replace)
     {
-        Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+        $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
 
         if (!empty($packagesIds) and !empty($search) and !empty($replace)) {
             $db = $this->getDbo();

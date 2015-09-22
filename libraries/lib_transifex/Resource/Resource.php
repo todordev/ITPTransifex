@@ -1,13 +1,13 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Resource
  * @subpackage   Resources
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Resource;
 
 use Prism\Database\Table;
 
@@ -16,7 +16,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * This class contains methods that are used for managing a resource.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Resource
  * @subpackage   Resources
  */
 class Resource extends Table
@@ -39,8 +39,8 @@ class Resource extends Table
      *     "alias" => "site-com_crowdfunding"
      * );
      *
-     * $package = new Transifex\Resource(\JFactory::getDbo());
-     * $package->load($keys);
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $resource->load($keys);
      *
      * @param int|array $keys
      * @param array $options
@@ -78,9 +78,9 @@ class Resource extends Table
      *    "alias" => "site-com_crowdfunding",
      * );
      *
-     * $package    = new Transifex\Resource(\JFactory::getDbo());
-     * $package->bind($data);
-     * $package->store();
+     * $resource    = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $resource->bind($data);
+     * $resource->store();
      * </code>
      */
     public function store()
@@ -143,53 +143,194 @@ class Resource extends Table
         $this->id = $this->db->insertid();
     }
 
+    /**
+     * Return the ID of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * if ($resource->getId()) {
+     * ...
+     * }
+     * </code>
+     *
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Return the name of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getName();
+     * </code>
+     *
+     * @return int
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * Return the alias of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getAlias();
+     * </code>
+     *
+     * @return int
+     */
     public function getAlias()
     {
         return $this->alias;
     }
 
+    /**
+     * Return the filename of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getFilename();
+     * </code>
+     *
+     * @return int
+     */
     public function getFilename()
     {
         return $this->filename;
     }
 
+    /**
+     * Return the I18n type of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getI18nType();
+     * </code>
+     *
+     * @return int
+     */
     public function getI18nType()
     {
         return $this->i18n_type;
     }
 
+    /**
+     * Check if the resource published.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * if (!$resource->isPublished()) {
+     * ...
+     * }
+     * </code>
+     *
+     * @return int
+     */
     public function isPublished()
     {
         return (!$this->published) ? false : true;
     }
 
+    /**
+     * Return the source language code of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getSourceLanguageCode();
+     * </code>
+     *
+     * @return int
+     */
     public function getSourceLanguageCode()
     {
         return $this->source_language_code;
     }
 
+    /**
+     * Return the type of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getType();
+     * </code>
+     *
+     * @return int
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * Return the project ID of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getProjectId();
+     * </code>
+     *
+     * @return int
+     */
     public function getProjectId()
     {
         return $this->project_id;
     }
 
     /**
-     * @param mixed $alias
+     * Set the alias of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setAlias("admin-com_crowdfunding");
+     * </code>
+     *
+     * @param string $alias
      *
      * @return self
      */
@@ -201,7 +342,18 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $state State of current resource - 1 = published, 0 = unpublished.
+     * Set the state of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setState(Prism\Constants::PUBLISHED);
+     * </code>
+     *
+     * @param int $state State of current resource - 1 = published, 0 = unpublished.
      *
      * @return self
      */
@@ -213,7 +365,17 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $i18n_type
+     * Set the state of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setState("INI");
+     *
+     * @param string $i18n_type
      *
      * @return self
      */
@@ -225,7 +387,17 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $filename
+     * Set the filename of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setFilename("com_gamification.ini");
+     *
+     * @param string $filename
      *
      * @return self
      */
@@ -237,7 +409,17 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $code
+     * Set the source language code of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setSourceLanguageCode("en_GB");
+     *
+     * @param string $code
      *
      * @return self
      */
@@ -249,7 +431,17 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $name
+     * Set the name of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setName("[ADMIN] en-GB.com_crowdfunding.ini");
+     *
+     * @param string $name
      *
      * @return self
      */
@@ -261,7 +453,18 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $projectId
+     * Set the project ID of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     * $projectId = 2;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setProjectId($projectId);
+     *
+     * @param int $projectId
      *
      * @return self
      */
@@ -273,7 +476,17 @@ class Resource extends Table
     }
 
     /**
-     * @param mixed $type
+     * Set the type of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setType("site");
+     *
+     * @param string $type The type of the resource - site or admin.
      *
      * @return self
      */

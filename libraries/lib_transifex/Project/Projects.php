@@ -1,13 +1,13 @@
 <?php
 /**
- * @package      ItpTransifex
+ * @package      Transifex\Project
  * @subpackage   Projects
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Project;
 
 use Prism\Database\ArrayObject;
 use Joomla\Utilities\ArrayHelper;
@@ -17,7 +17,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * This class provides functionality that manage projects.
  *
- * @package      ItpTransifex
+ * @package      Transifex\Project
  * @subpackage   Projects
  */
 class Projects extends ArrayObject
@@ -30,7 +30,7 @@ class Projects extends ArrayObject
      *    "ids" => array(1,2,3)
      * );
      *
-     * $projects    = new Transifex\Projects();
+     * $projects    = new Transifex\Project\Projects();
      * $projects->setDb(\JFactory::getDbo());
      * $projects->load($ids);
      *
@@ -45,7 +45,7 @@ class Projects extends ArrayObject
     public function load($options = array())
     {
         $ids = ArrayHelper::getValue($options, "ids", array(), "array");
-        ArrayHelper::toInteger($ids);
+        $ids = ArrayHelper::toInteger($ids);
 
         // Load project data
         $query = $this->db->getQuery(true);
@@ -68,7 +68,7 @@ class Projects extends ArrayObject
      * <code>
      * $projectsIds = array(1,2,3);
      *
-     * $projects    = new Transifex\Projects(\JFactory::getDbo());
+     * $projects    = new Transifex\Project\Projects(\JFactory::getDbo());
      * $projects->load($projectsIds);
      * $resourcesNumber = $projects->getNumberOfResources();
      * </code>
@@ -114,7 +114,7 @@ class Projects extends ArrayObject
      * <code>
      * $projectsIds = array(1,2,3);
      *
-     * $projects    = new Transifex\Projects(\JFactory::getDbo());
+     * $projects    = new Transifex\Project\Projects(\JFactory::getDbo());
      * $packagesNumber = $projects->getNumberOfPackages($projectsIds);
      * </code>
      *

@@ -14,6 +14,9 @@ jimport('joomla.form.formfield');
 jimport('joomla.form.helper');
 JFormHelper::loadFieldClass('list');
 
+jimport('Prism.init');
+jimport('Transifex.init');
+
 /**
  * Form field class that loads languages as options,
  * using code with 4 letters for ID.
@@ -40,10 +43,10 @@ class JFormFieldTransifexProject extends JFormFieldList
      */
     protected function getOptions()
     {
-        $projects = new Transifex\Projects(JFactory::getDbo());
+        $projects = new Transifex\Project\Projects(JFactory::getDbo());
         $projects->load();
 
-        $options = $projects->toOptions();
+        $options = $projects->toOptions("id", "name");
 
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $options);

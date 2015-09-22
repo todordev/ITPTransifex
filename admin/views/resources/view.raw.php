@@ -26,10 +26,10 @@ class ItpTransifexViewResources extends JViewLegacy
         $options = array(
             "package_id" => $packageId
         );
-        $this->items = new Transifex\Resources(JFactory::getDbo());
+        $this->items = new Transifex\Resource\Resources(JFactory::getDbo());
         $this->items->load($options);
 
-        $package = new Transifex\Package(JFactory::getDbo());
+        $package = new Transifex\Package\Package(JFactory::getDbo());
         $package->load($packageId);
 
         $this->projectId = $package->getProjectId();

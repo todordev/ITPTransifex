@@ -1,6 +1,12 @@
 ITP Transifex Release Notes
 ==========================
 
+###v2.1
+* Added option to select language location - extension folder, general folder.
+* Improved the library.
+* Replaced Glyphicons with Font Awesome on front-end.
+* Fixed issues.
+
 ###v2.0
 * Improved the library.
 * Edited to use Prism library.

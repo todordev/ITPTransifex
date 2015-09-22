@@ -14,7 +14,6 @@ defined('_JEXEC') or die;
 	<div class="span8 form-horizontal">
         <form  action="<?php echo JRoute::_('index.php?option=com_itptransifex&layout=edit'); ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
             <fieldset>
-
                 <?php echo $this->form->getControlGroup('name'); ?>
                 <?php echo $this->form->getControlGroup('alias'); ?>
                 <?php echo $this->form->getControlGroup('filename'); ?>
@@ -23,7 +22,6 @@ defined('_JEXEC') or die;
                 <?php echo $this->form->getControlGroup('description'); ?>
                 <?php echo $this->form->getControlGroup('image'); ?>
                 <?php echo $this->form->getControlGroup('published'); ?>
-
             </fieldset>
 
             <input type="hidden" name="task" value="" />

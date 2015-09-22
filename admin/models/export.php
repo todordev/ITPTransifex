@@ -120,7 +120,7 @@ class ItpTransifexModelExport extends JModelList
     /**
      * Prepare project meta data.
      *
-     * @param Transifex\Project $project
+     * @param Transifex\Project\Project $project
      * @param string $language
      *
      * @return string
@@ -133,7 +133,7 @@ class ItpTransifexModelExport extends JModelList
             "language" => $language
         );
 
-        $packages = new Transifex\Packages(JFactory::getDbo());
+        $packages = new Transifex\Package\Packages(JFactory::getDbo());
         $packages->load($options);
 
         $resources = $packages->getResources();
@@ -144,8 +144,8 @@ class ItpTransifexModelExport extends JModelList
     /**
      * Prepare the XML file that contains project data - information, packages, resources.
      *
-     * @param Transifex\Project $project
-     * @param Transifex\Packages $packages
+     * @param Transifex\Project\Project $project
+     * @param Transifex\Package\Packages $packages
      * @param array $resources
      *
      * @return string

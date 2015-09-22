@@ -18,10 +18,6 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexControllerPackage extends Prism\Controller\Admin
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Package', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
@@ -47,7 +43,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
         $model = $this->getModel();
         /** @var $model ItpTransifexModelPackage */
 
-        Joomla\Utilities\ArrayHelper::toInteger($resourcesIDs);
+        $resourcesIDs = Joomla\Utilities\ArrayHelper::toInteger($resourcesIDs);
 
         // Check for validation errors.
         if (!$resourcesIDs) {
@@ -99,6 +95,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
             // Set the language code to the session.
             // I will use it as default value of the field "language" in the form.
             $app->setUserState("package.language", $validData["language"]);
+            $app->setUserState("package.type", $validData["type"]);
 
             $validData["project_id"] = $projectId;
 
@@ -120,7 +117,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
 
         $response
             ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGE_CREATED"))
+            ->setText(JText::sprintf("COM_ITPTRANSIFEX_PACKAGE_CREATED_S", htmlentities($validData['name'], ENT_QUOTES, "UTF-8")))
             ->success();
 
         echo $response;
@@ -227,7 +224,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
-        $resource = new Transifex\Resource(JFactory::getDbo());
+        $resource = new Transifex\Resource\Resource(JFactory::getDbo());
         $resource->load($resourceId);
 
         if ($success and $resource->getId()) {

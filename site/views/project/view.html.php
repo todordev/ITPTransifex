@@ -31,26 +31,17 @@ class ItpTransifexViewProject extends JViewLegacy
     protected $pagination = null;
 
     /**
-     * @var Transifex\Project
+     * @var Transifex\Project\Project
      */
     protected $project;
 
     protected $packagesNumber;
     protected $layoutData;
-    protected $layoutsBasePath;
     protected $imageFolder;
 
     protected $option;
 
     protected $pageclass_sfx;
-
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->getCmd("option");
-
-        $this->layoutsBasePath = JPath::clean(JPATH_COMPONENT_ADMINISTRATOR . "/layouts");
-    }
 
     public function display($tpl = null)
     {
@@ -64,7 +55,7 @@ class ItpTransifexViewProject extends JViewLegacy
         }
 
         // Load project data.
-        $this->project = new Transifex\Project(JFactory::getDbo());
+        $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));

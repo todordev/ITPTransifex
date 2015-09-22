@@ -6,18 +6,22 @@
                label="COM_ITPTRANSIFEX_NAME"
                description="COM_ITPTRANSIFEX_PACKAGE_NAME_DESC"
                filter="trim"
-               required="true"/>
+               required="true"
+               hint="Plugin - Content - ITPShare, Component - Crowdfunding Platform"
+               />
 
         <field name="alias" type="text" class="span12"
                label="COM_ITPTRANSIFEX_ALIAS"
                description="COM_ITPTRANSIFEX_PACKAGE_ALIAS_DESC"
                filter="trim"
+               hint="plugin-content-itpshare-de_DE"
                />
 
         <field name="filename" type="text" class="span12"
                label="COM_ITPTRANSIFEX_FILENAME"
                description="COM_ITPTRANSIFEX_PACKAGE_FILENAME_DESC"
                required="true"
+               hint="lang_plg_content_itpshare"
                 />
 
         <field name="language" type="transifexlanguage"
@@ -40,6 +44,8 @@
         <field name="version" type="text"
                label="COM_ITPTRANSIFEX_VERSION"
                description="COM_ITPTRANSIFEX_VERSION_DESC"
+               default="1.0"
+               hint="1.0"
                 />
 
         <field name="id" type="text"
@@ -47,7 +53,7 @@
                description="JGLOBAL_FIELD_ID_DESC"
                default="0"
                readonly="true"
-                />
+               />
 
         <field name="description" type="textarea" class="span12"
                label="COM_ITPTRANSIFEX_DESCRIPTION"

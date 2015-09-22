@@ -32,24 +32,15 @@ jQuery(document).ready(function() {
     jQuery("#js-btn-sp").on("click", function(event){
 		
 		event.preventDefault();
+
+        var packageForm = jQuery("#packageForm");
 		
 		// Get form data
-		var formData = jQuery("#packageForm").serializeArray();
+		var formData = packageForm.serializeArray();
 		
 		// Get resource IDs
-		var resourceIDs = new Array();
-		var checkBoxes  = jQuery("#resourcesList input:checkbox");
-		jQuery.each(checkBoxes, function( index, value ) {
-			
-			if(jQuery(value).is(":checked")) {
-				var resourceId = parseInt(jQuery(value).val());
-				if(resourceId) {
-					resourceIDs.push(resourceId);
-				}
-			}
-			
-		});
-		
+		var resourceIDs = getCheckedBoxes("#resourcesList");
+
 		jQuery.each(resourceIDs, function( index, value ) {
 			var resource = {
 				"name" : "resource[]",
@@ -58,7 +49,7 @@ jQuery(document).ready(function() {
 			formData.push(resource);
 		});
 		
-		var url = jQuery("#packageForm").attr("action");
+		var url = packageForm.attr("action");
 		
 		// Load data for this package
 		jQuery.ajax({
@@ -75,16 +66,14 @@ jQuery(document).ready(function() {
 				jQuery('#js-cp-modal').modal('hide');
 				
 				if(!response.success) {
-					
 					PrismUIHelper.displayMessageFailure(response.title, response.text);
-				
 				} else {
 					
 					// Reset form data
-					resetProjectForm();
-					
+                    resetPackageForm();
+                    resetCheckedBoxes("#resourcesList");
+
 					PrismUIHelper.displayMessageSuccess(response.title, response.text);
-					
 				}
 				
 			}
@@ -98,26 +87,24 @@ jQuery(document).ready(function() {
 		event.preventDefault();
 		
 		// Reset form data
-		resetProjectForm();
+        resetPackageForm();
 		
 		jQuery('#js-cp-modal').modal('hide');
 	});
 	
-	// Reset form data
+	// Event when hide modal window.
     jQuery('#js-cp-modal').on('hide', function () {
-    	resetProjectForm();
+        resetPackageForm();
     });
         
     /**
      * Reset some form fields.
      */
-    function resetProjectForm() {
-    	
+    function resetPackageForm() {
     	jQuery("#jform_name").val("");
 		jQuery("#jform_filename").val("");
 		jQuery("#jform_version").val("");
 		jQuery("#jform_description").val("");
-		
     }
     
     /**
@@ -128,7 +115,7 @@ jQuery(document).ready(function() {
     	var hasSelectedItems = false;
     	
     	// Look for selected resources.
-    	var checkBoxes  = jQuery("#adminForm input:checkbox");
+    	var checkBoxes  = jQuery("#adminForm").find("input:checkbox");
 		jQuery.each(checkBoxes, function( index, value ) {
 			
 			if(jQuery(value).is(":checked")) {
@@ -141,7 +128,33 @@ jQuery(document).ready(function() {
 		
     }
 
-    // Editable filenames
+    function getCheckedBoxes(id) {
+
+        // Get resource IDs
+        var resourceIDs = [];
+        var checkedBoxes  = jQuery(id).find("input:checkbox");
+        jQuery.each(checkedBoxes, function( index, value ) {
+
+            if(jQuery(value).is(":checked")) {
+                var resourceId = parseInt(jQuery(value).val());
+                if(resourceId) {
+                    resourceIDs.push(resourceId);
+                }
+            }
+
+        });
+
+        return resourceIDs;
+    }
+
+    function resetCheckedBoxes(id) {
+        var checkedBoxes  = jQuery(id).find("input:checkbox");
+        jQuery.each(checkedBoxes, function( index, element ) {
+            jQuery(element).prop("checked", false);
+        });
+    }
+
+    // Editable file names
     var editableFilenameElemenats = jQuery('.js-editable-filename');
     editableFilenameElemenats.editable({
         url: 'index.php?option=com_itptransifex&task=resource.saveFilename',

@@ -10,7 +10,7 @@
 // no direct access
 defined('_JEXEC') or die;
 
-$this->document->addScript('media/' . $this->option . '/js/site/project_nocaptcha.js');
+$this->document->addScript('media/com_itptransifex/js/site/project_nocaptcha.js');
 ?>
 <form method="post" action="<?php echo JRoute::_("index.php?option=com_itptransifex"); ?>" target="_blank" id="js-form-download-project" style="display: none;">
     <input type="hidden" name="id" value="<?php echo $this->project->getId(); ?>" />

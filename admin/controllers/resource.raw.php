@@ -18,14 +18,9 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexControllerResource extends JControllerLegacy
 {
-    /**
-     * Proxy for getModel.
-     * @since   1.6
-     */
     public function getModel($name = 'Resource', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
-
         return $model;
     }
 

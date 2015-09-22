@@ -11,6 +11,9 @@ defined('_JEXEC') or die;
 
 class ItpTransifexTableLanguage extends JTable
 {
+    /**
+     * @param JDatabaseDriver $db
+     */
     public function __construct($db)
     {
         parent::__construct('#__itptfx_languages', 'id', $db);

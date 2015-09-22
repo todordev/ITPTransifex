@@ -242,10 +242,9 @@ class ItpTransifexModelProject extends JModelAdmin
         }
 
         // Generate temporary file name
-        $ext = Joomla\String\String::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
+        $ext = JString::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
 
-        $generatedName = new Prism\String();
-        $generatedName->generateRandomString(16);
+        $generatedName = Prism\String\StringHelper::generateRandomString(16);
 
         $tmpDestFile = $tmpFolder . DIRECTORY_SEPARATOR . $generatedName . "." . $ext;
 
@@ -594,7 +593,7 @@ class ItpTransifexModelProject extends JModelAdmin
                 foreach ($resource as $key => $value) {
 
                     if (is_scalar($value)) {
-                        $resource[$key] = Joomla\String\String::trim($value);
+                        $resource[$key] = JString::trim($value);
                     }
                 }
 
@@ -711,7 +710,7 @@ class ItpTransifexModelProject extends JModelAdmin
                     $packagesIds = array();
                 }
 
-                Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+                $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
 
                 if (!empty($packagesIds)) {
 

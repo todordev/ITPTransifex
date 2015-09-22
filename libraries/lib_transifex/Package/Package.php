@@ -1,22 +1,23 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Package
  * @subpackage   Packages
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Package;
 
 use Prism\Database\Table;
+use Transifex\Resource\Resources;
 
 defined('JPATH_PLATFORM') or die;
 
 /**
  * This class contains methods that are used for managing a package.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Package
  * @subpackage   Packages
  */
 class Package extends Table
@@ -41,7 +42,7 @@ class Package extends Table
      *     "alias" => "crowdfunding-component-en_gb"
      * );
      *
-     * $package = new Transifex\Package(\JFactory::getDbo());
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
      * $package->load($keys);
      * </code>
      *
@@ -82,7 +83,7 @@ class Package extends Table
      *    "alias" => "crowdfunding-package-en_gb",
      * );
      *
-     * $package    = new Transifex\Package(\JFactory::getDbo());
+     * $package    = new Transifex\Package\Package(\JFactory::getDbo());
      * $package->bind($data);
      * $package->store();
      * </code>
@@ -141,53 +142,192 @@ class Package extends Table
         $this->id = $this->db->insertid();
     }
 
+    /**
+     * Return the ID of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * if (!$this->getId()) {
+     * ...
+     * }
+     * </code>
+     *
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Return the name of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getName();
+     * </code>
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * Return the alias of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getAlias();
+     * </code>
+     *
+     * @return string
+     */
     public function getAlias()
     {
         return $this->alias;
     }
 
+    /**
+     * Return the filename of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getFilename();
+     * </code>
+     *
+     * @return string
+     */
     public function getFilename()
     {
         return $this->filename;
     }
 
+    /**
+     * Return the description of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getDescription();
+     * </code>
+     *
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * Return the version of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getVersion();
+     * </code>
+     *
+     * @return string
+     */
     public function getVersion()
     {
         return $this->version;
     }
 
+    /**
+     * Return the language of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getLanguage();
+     * </code>
+     *
+     * @return string
+     */
     public function getLanguage()
     {
         return $this->language;
     }
 
+    /**
+     * Return the type of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getType();
+     * </code>
+     *
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * Return the project ID of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * echo $this->getProject();
+     * </code>
+     *
+     * @return string
+     */
     public function getProjectId()
     {
         return $this->project_id;
     }
 
     /**
-     * @param mixed $alias
+     * Set the alias of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setAlias("mod-gamification-de_DE");
+     * </code>
+     *
+     * @param string $alias
      *
      * @return self
      */
@@ -199,7 +339,19 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $description
+     * Set the description of the package.
+     *
+     * <code>
+     * $id = 1;
+     * $description = "...";
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setDescription($description);
+     * </code>
+     *
+     * @param string $description
      *
      * @return self
      */
@@ -211,7 +363,18 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $filename
+     * Set the description of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setFilename("lang_mod_gamification");
+     * </code>
+     *
+     * @param string $filename
      *
      * @return self
      */
@@ -223,7 +386,18 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $language
+     * Set the language of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setLanguage("de_DE");
+     * </code>
+     *
+     * @param string $language
      *
      * @return self
      */
@@ -235,7 +409,18 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $name
+     * Set the name of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setName("Module - Gamification");
+     * </code>
+     *
+     * @param string $name
      *
      * @return self
      */
@@ -247,19 +432,42 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $projectId
+     * Set the project ID of the package.
+     *
+     * <code>
+     * $id = 1;
+     * $projectId = 2;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setProjectId($projectId);
+     * </code>
+     *
+     * @param int $projectId
      *
      * @return self
      */
     public function setProjectId($projectId)
     {
-        $this->project_id = $projectId;
+        $this->project_id = (int)$projectId;
 
         return $this;
     }
 
     /**
-     * @param mixed $type
+     * Set the type of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setType("module");
+     * </code>
+     *
+     * @param string $type The package type - component, module, plugin, library.
      *
      * @return self
      */
@@ -271,7 +479,18 @@ class Package extends Table
     }
 
     /**
-     * @param mixed $version
+     * Set the version of the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setVersion("1.0");
+     * </code>
+     *
+     * @param string $version
      *
      * @return self
      */
@@ -282,6 +501,22 @@ class Package extends Table
         return $this;
     }
 
+    /**
+     * Return the resources assigned to the package.
+     *
+     * <code>
+     * $id = 1;
+     *
+     * $package = new Transifex\Package\Package(\JFactory::getDbo());
+     * $package->load($id);
+     *
+     * $this->setVersion("1.0");
+     * </code>
+     *
+     * @param int $state The state of the resources - 0 = unpublished, 1 = published, -2 = trashed.
+     *
+     * @return Resources
+     */
     public function getResources($state = null)
     {
         if (is_null($this->resources)) {

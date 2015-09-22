@@ -61,6 +61,7 @@ class ItpTransifexViewLanguage extends JViewLegacy
         JToolBarHelper::title($this->documentTitle);
 
         JToolBarHelper::apply('language.apply');
+        JToolBarHelper::save2new('language.save2new');
         JToolBarHelper::save('language.save');
 
         if (!$isNew) {

@@ -80,7 +80,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
 
         $ids = $app->input->get("cid", array(), "array");
 
-        Joomla\Utilities\ArrayHelper::toInteger($ids);
+        $ids = Joomla\Utilities\ArrayHelper::toInteger($ids);
         $ids = array_filter($ids);
 
         if (!$ids) {
@@ -101,12 +101,11 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         $params         = JComponentHelper::getParams($this->option);
         /** @var  $params Joomla\Registry\Registry */
 
-        $includeLanguageName = $params->get("include_lang_name", 1);
-
         $serviceOptions = array(
-            "username" => $params->get("username"),
-            "password" => $params->get("password"),
-            "url"      => $params->get("api_url")
+            "username"          => $params->get("username"),
+            "password"          => $params->get("password"),
+            "url"               => $params->get("api_url"),
+            "files_location"    => $params->get("files_location", "extension_folders")
         );
 
         try {
@@ -114,12 +113,12 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
             $model = $this->getModel();
             /** @var $model ItpTransifexModelPackage */
 
-            $model->setTransifexOptions($serviceOptions);
+            $model->setOptions($serviceOptions);
 
             if (!is_null($packageId)) { // Create a file for one package.
-                $filePath = $model->preparePackage($packageId, $includeLanguageName);
+                $filePath = $model->preparePackage($packageId, $params->get("include_lang_name", 1));
             } else { // Create a file that contains many packages.
-                $filePath = $model->prepareProjectPackage($ids, "UNZIPFIRST", $includeLanguageName);
+                $filePath = $model->prepareProjectPackage($ids, "UNZIPFIRST", $params->get("include_lang_name", 1));
             }
 
             if (!$filePath) {
@@ -171,10 +170,11 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         $params         = JComponentHelper::getParams($this->option);
         /** @var  $params Joomla\Registry\Registry */
 
-        $serviceOptions = array(
-            "username" => $params->get("username"),
-            "password" => $params->get("password"),
-            "url"      => $params->get("api_url")
+        $options = array(
+            "username"          => $params->get("username"),
+            "password"          => $params->get("password"),
+            "url"               => $params->get("api_url"),
+            "files_location"    => $params->get("files_location", "extension_folders")
         );
 
         try {
@@ -182,15 +182,14 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
             $model = $this->getModel();
             /** @var $model ItpTransifexModelPackage */
 
-            $model->setTransifexOptions($serviceOptions);
+            $model->setOptions($options);
 
             // Get project.
-            $project    = new Transifex\Project(JFactory::getDbo());
+            $project    = new Transifex\Project\Project(JFactory::getDbo());
             $project->load($projectId);
 
             // Get packages.
-            $options = array("language" => $language);
-            $packages   = $project->getPackages($options);
+            $packages   = $project->getPackages(array("language" => $language));
 
             foreach ($packages as $package) {
                 $ids[] = $package["id"];
@@ -203,7 +202,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
                 }
 
                 $fileName .= "_".$language;
-                $filePath = $model->prepareProjectPackage($ids, $fileName);
+                $filePath = $model->prepareProjectPackage($ids, $fileName, $params->get("include_lang_name", 1));
             }
 
             if (!$filePath) {

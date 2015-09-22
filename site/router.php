@@ -86,6 +86,15 @@ function ItpTransifexBuildRoute(&$query)
 
                 break;
 
+            case "projects":
+
+                if (!$menuItemGiven) {
+                    $segments[] = $view;
+                }
+                unset($query['view']);
+
+                break;
+
             case "packages":
 
                 if (!$menuItemGiven) {
@@ -178,7 +187,7 @@ function ItpTransifexParseRoute($segments)
 
         // We check to see if an alias is given.  If not, we assume it is a package,
         // because the project always have alias.
-        if (5 == Joomla\String\String::strlen($segments[0])) {
+        if (5 == JString::strlen($segments[0])) {
             $language = ItpTransifexHelperRoute::getLanguage($segments[0]);
 
             if (!empty($language) and isset($item->query["id"])) {

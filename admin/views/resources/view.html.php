@@ -31,7 +31,7 @@ class ItpTransifexViewResources extends JViewLegacy
     protected $projectId;
 
     /**
-     * @var Transifex\Project
+     * @var Transifex\Project\Project
      */
     protected $project;
 
@@ -57,9 +57,9 @@ class ItpTransifexViewResources extends JViewLegacy
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
-        $this->projectId = $this->state->get("project_id");
+        $this->projectId  = $this->state->get("project_id");
 
-        $this->project = new Transifex\Project(JFactory::getDbo());
+        $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($this->projectId);
 
         $model      = JModelLegacy::getInstance("Package", "ItpTransifexModel", $config = array('ignore_request' => true));
@@ -102,7 +102,6 @@ class ItpTransifexViewResources extends JViewLegacy
      */
     protected function addSidebar()
     {
-        // Add submenu
         ItpTransifexHelper::addSubmenu("resources");
 
         JHtmlSidebar::setAction('index.php?option=' . $this->option . '&view=' . $this->getName());
@@ -181,6 +180,6 @@ class ItpTransifexViewResources extends JViewLegacy
         JHtml::_('Prism.ui.joomlaHelper');
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
     }
 }

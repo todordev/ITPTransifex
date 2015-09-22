@@ -37,7 +37,7 @@ class ItpTransifexControllerProjects extends Prism\Controller\Admin
             "view" => $this->view_list
         );
 
-        Joomla\Utilities\ArrayHelper::toInteger($pks);
+        $pks = Joomla\Utilities\ArrayHelper::toInteger($pks);
 
         // Check for validation errors.
         if (empty($pks)) {

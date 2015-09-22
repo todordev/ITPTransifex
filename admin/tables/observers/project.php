@@ -63,7 +63,7 @@ class ItpTransifexObserverProject extends JTableObserver
      */
     public function onBeforeDelete($pk)
     {
-        Joomla\Utilities\ArrayHelper::toInteger($pk);
+        $pk = Joomla\Utilities\ArrayHelper::toInteger($pk);
 
         // Delete old image if I upload a new one
         if (!empty($pk) and $this->table->get("image")) {

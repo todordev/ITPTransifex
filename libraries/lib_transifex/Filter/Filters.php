@@ -1,20 +1,20 @@
 <?php
 /**
- * @package      ItpTransifex
+ * @package      Transifex\Filter
  * @subpackage   Filters
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Filter;
 
 defined('JPATH_PLATFORM') or die;
 
 /**
  * This class provides functionality that manages filters.
  *
- * @package      ItpTransifex
+ * @package      Transifex\Filter
  * @subpackage   Filters
  */
 class Filters
@@ -34,7 +34,7 @@ class Filters
      * Initialize the object.
      *
      * <code>
-     * $filters = new Transifex\Filters(\JFactory::getDbo());
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
      * </code>
      *
      * @param \JDatabaseDriver $db Database object.
@@ -44,6 +44,17 @@ class Filters
         $this->db = $db;
     }
 
+    /**
+     * Create and initialize the object.
+     *
+     * <code>
+     * $filters = Transifex\Filter\Filters::getInstance(\JFactory::getDbo());
+     * </code>
+     *
+     * @param \JDatabaseDriver $db Database object.
+     *                             
+     * @return Filters
+     */
     public static function getInstance(\JDatabaseDriver $db)
     {
         if (is_null(self::$instance)) {
@@ -57,7 +68,7 @@ class Filters
      * Load and return projects as options.
      *
      * <code>
-     * $filters = new Transifex\Filters(\JFactory::getDbo());
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
      *
      * $options = $filters->getProjects();
      * </code>
@@ -95,7 +106,7 @@ class Filters
      * Load and return languages as options.
      *
      * <code>
-     * $filters = new Transifex\Filters(\JFactory::getDbo());
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
      *
      * // Could be "id", "code", "short_code".
      * $column  = "id";
@@ -149,7 +160,7 @@ class Filters
      * Return resource types as options.
      *
      * <code>
-     * $filters = new Transifex\Filters(\JFactory::getDbo());
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
      *
      * $options = $filters->getResourceTypes();
      * </code>
@@ -162,6 +173,7 @@ class Filters
             \JHtml::_("select.option", "component", \JText::_("COM_ITPTRANSIFEX_COMPONENT")),
             \JHtml::_("select.option", "module", \JText::_("COM_ITPTRANSIFEX_MODULE")),
             \JHtml::_("select.option", "plugin", \JText::_("COM_ITPTRANSIFEX_PLUGIN")),
+            \JHtml::_("select.option", "library", \JText::_("COM_ITPTRANSIFEX_LIBRARY"))
         );
     }
 }

@@ -15,7 +15,7 @@ defined('_JEXEC') or die;
         <h1><?php echo $this->escape($this->params->get('page_heading')); ?></h1>
     <?php } ?>
     <?php
-    $layout      = new JLayoutFile('project', $this->layoutsBasePath);
+    $layout      = new JLayoutFile('project');
     echo $layout->render($this->layoutData);
     ?>
     <table class="table table-striped">
@@ -32,7 +32,7 @@ defined('_JEXEC') or die;
             $number = (!isset($this->packagesNumber[$item->code])) ? 0 : (int)$this->packagesNumber[$item->code]["number"];
             ?>
             <tr>
-                <td class="js-prj-title<?php echo $item->id; ?> has-context">
+                <td class="js-prj-title<?php echo $item->id; ?> has-context col-md-10">
                     <?php echo $this->escape($item->name); ?> (<?php echo $this->escape($item->code); ?>)
                     <div class="font-xsmall">
                         <a href="<?php echo JRoute::_(ItpTransifexHelperRoute::getPackagesRoute($this->project->getSlug(), $item->code));?>">
@@ -40,9 +40,9 @@ defined('_JEXEC') or die;
                         </a>
                     </div>
                 </td>
-                <td>
+                <td class="col-md-2">
                     <button class="btn btn-primary js-prj-btn-download" data-language="<?php echo $this->escape($item->code); ?>">
-                        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                        <span class="fa fa-download" aria-hidden="true"></span>
                         <?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?>
                     </button>
                 </td>

@@ -79,7 +79,6 @@ class ItpTransifexViewLanguages extends JViewLegacy
      */
     protected function addSidebar()
     {
-        // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
         $this->sidebar = JHtmlSidebar::render();
     }
@@ -117,6 +116,6 @@ class ItpTransifexViewLanguages extends JViewLegacy
 
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
     }
 }

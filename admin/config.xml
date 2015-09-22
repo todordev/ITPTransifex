@@ -42,5 +42,9 @@
     <fieldset name="advanced" label="COM_ITPTRANSIFEX_ADVANCED">
         <field name="archives_folder" type="text" default="tmp/archives" label="COM_ITPTRANSIFEX_ARCHIVES_FOLDER" description="COM_ITPTRANSIFEX_ARCHIVES_FOLDER_DESC" class="input-xxlarge"/>
         <field name="cache_days" type="text" default="1" label="COM_ITPTRANSIFEX_CACHE_DAYS" description="COM_ITPTRANSIFEX_CACHE_DAYS_DESC"/>
+        <field name="files_location" type="list" default="extension_folders" label="COM_ITPTRANSIFEX_FILES_LOCATION" description="COM_ITPTRANSIFEX_FILES_LOCATION_DESC">
+            <option value="language_folders">COM_ITPTRANSIFEX_LANGUAGE_FOLDERS</option>
+            <option value="extension_folders">COM_ITPTRANSIFEX_EXTENSION_FOLDERS</option>
+        </field>
     </fieldset>
 </config>

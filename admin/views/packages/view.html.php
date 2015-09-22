@@ -35,6 +35,8 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $saveOrder;
     protected $saveOrderingUrl;
     protected $sortFields;
+    protected $projectId;
+    protected $project;
 
     protected $sidebar;
 
@@ -53,10 +55,17 @@ class ItpTransifexViewPackages extends JViewLegacy
         // Get the number of project resources
         $this->numberOfResources = $this->getNumberOfResources($this->items);
 
-        $languages = new Transifex\Languages(JFactory::getDbo());
+        $languages = new Transifex\Language\Languages(JFactory::getDbo());
         $languages->load();
 
         $this->languages = $languages->toOptions("code", "name");
+
+        // Get project.
+        $this->projectId  = $this->state->get("filter.project");
+        if (!empty($this->projectId)) {
+            $this->project = new Transifex\Project\Project(JFactory::getDbo());
+            $this->project->load($this->projectId);
+        }
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -76,7 +85,7 @@ class ItpTransifexViewPackages extends JViewLegacy
             $ids[] = $item->id;
         }
 
-        $packages = new Transifex\Packages(JFactory::getDbo());
+        $packages = new Transifex\Package\Packages(JFactory::getDbo());
         return $packages->getNumberOfResources($ids);
     }
 
@@ -108,29 +117,28 @@ class ItpTransifexViewPackages extends JViewLegacy
      */
     protected function addSidebar()
     {
-        // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
 
         JHtmlSidebar::setAction('index.php?option=' . $this->option . '&view=' . $this->getName());
 
-        $fitlers = new Transifex\Filters(JFactory::getDbo());
+        $filters = new Transifex\Filter\Filters(JFactory::getDbo());
 
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_PROJECT'),
             'filter_project',
-            JHtml::_('select.options', $fitlers->getProjects(), 'value', 'text', $this->state->get('filter.project'), true)
+            JHtml::_('select.options', $filters->getProjects(), 'value', 'text', $this->state->get('filter.project'), true)
         );
 
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_LANGUAGE'),
             'filter_language',
-            JHtml::_('select.options', $fitlers->getLanguages("code"), 'value', 'text', $this->state->get('filter.language'), true)
+            JHtml::_('select.options', $filters->getLanguages("code"), 'value', 'text', $this->state->get('filter.language'), true)
         );
 
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_TYPE'),
             'filter_type',
-            JHtml::_('select.options', $fitlers->getResourceTypes(), 'value', 'text', $this->state->get('filter.type'), true)
+            JHtml::_('select.options', $filters->getResourceTypes(), 'value', 'text', $this->state->get('filter.type'), true)
         );
 
         $this->sidebar = JHtmlSidebar::render();
@@ -144,7 +152,12 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected function addToolbar()
     {
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_PACKAGES_MANAGER'));
+        if (!empty($this->project) and $this->project->getId()) {
+            JToolBarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_PACKAGES_MANAGER_S', $this->escape($this->project->getName())));
+        } else {
+            JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_PACKAGES_MANAGER'));
+        }
+
         JToolBarHelper::editList('package.edit');
         JToolBarHelper::divider();
         JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "packages.delete");
@@ -191,6 +204,6 @@ class ItpTransifexViewPackages extends JViewLegacy
         JHtml::_('Prism.ui.joomlaList');
         JHtml::_('Prism.ui.joomlaHelper');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
     }
 }

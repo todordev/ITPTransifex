@@ -15,7 +15,7 @@ defined('_JEXEC') or die;
         <h1><?php echo $this->escape($this->params->get('page_heading')); ?></h1>
     <?php } ?>
     <?php
-    $layout      = new JLayoutFile('project', $this->layoutsBasePath);
+    $layout      = new JLayoutFile('project');
     echo $layout->render($this->layoutData);
     ?>
     <table class="table table-striped">
@@ -28,14 +28,14 @@ defined('_JEXEC') or die;
         <tbody>
         <?php foreach($this->items as $item) {?>
             <tr>
-                <td class="js-pkg-title<?php echo $item->id; ?> has-context">
+                <td class="js-pkg-title<?php echo $item->id; ?> has-context col-md-10">
                     <strong><?php echo $this->escape($item->name); ?> (<?php echo $this->escape($item->language); ?>)</strong>
                     <p><?php echo $this->escape($item->description); ?></p>
                     <div class="font-xsmall"><?php echo JText::sprintf("COM_ITPTRANSIFEX_VERSION_S", $item->version); ?></div>
                 </td>
-                <td>
+                <td class="col-md-2">
                     <button class="btn btn-primary js-pkg-btn-download" data-package-id="<?php echo (int)$this->escape($item->id); ?>">
-                        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                        <span class="fa fa-download" aria-hidden="true"></span>
                         <?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?>
                     </button>
                 </td>

@@ -58,13 +58,13 @@ class ItpTransifexViewProjects extends JViewLegacy
         }
 
         // Get the number of project resources
-        $projects = new Transifex\Projects(JFactory::getDbo());
+        $projects = new Transifex\Project\Projects(JFactory::getDbo());
         $this->numberOfResources = $projects->getNumberOfResources($ids);
 
         // Get number of packages.
         $this->numberOfPackages = $projects->getNumberOfPackages($ids);
 
-        $languages = new Transifex\Languages(JFactory::getDbo());
+        $languages = new Transifex\Language\Languages(JFactory::getDbo());
         $languages->load();
 
         $this->languages = $languages->toOptions("code", "name");
@@ -106,7 +106,6 @@ class ItpTransifexViewProjects extends JViewLegacy
      */
     protected function addSidebar()
     {
-        // Add submenu
         ItpTransifexHelper::addSubmenu($this->getName());
         $this->sidebar = JHtmlSidebar::render();
     }
@@ -156,6 +155,6 @@ class ItpTransifexViewProjects extends JViewLegacy
 
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . Joomla\String\String::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
     }
 }

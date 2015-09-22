@@ -1,22 +1,23 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Project
  * @subpackage   Projects
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Project;
 
 use Prism\Database\Table;
+use Transifex\Package\Packages;
 
 defined('JPATH_PLATFORM') or die;
 
 /**
  * This class contains methods that are used for managing a project.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Project
  * @subpackage   Projects
  */
 class Project extends Table
@@ -41,20 +42,20 @@ class Project extends Table
      * Load project data.
      * 
      * <code>
-     * $packageId = 1;
+     * $projectId = 1;
      * 
      * // Or other keys.
      * $keys = array(
      *     "alias" => "crowdfunding-component-en_gb"
      * );
      *
-     * $package = new Transifex\Project(\JFactory::getDbo());
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
      * 
      * // Load by package ID.
-     * $package->load($packageId);
+     * $project->load($projectId);
      * 
      * // Load by other keys.
-     * $package->load($keys);
+     * $project->load($keys);
      * </code>
      *
      * @param int|array $keys
@@ -97,7 +98,7 @@ class Project extends Table
      *  "alias" => "crowdfunding",
      * );
      *
-     * $project    = new Transifex\Project(\JFactory::getDbo());
+     * $project    = new Transifex\Project\Project(\JFactory::getDbo());
      * $project->bind($data);
      * $project->store();
      * </code>
@@ -164,52 +165,191 @@ class Project extends Table
         $this->id = $this->db->insertid();
     }
 
+    /**
+     * Return the ID of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * if ($project->getId()) {
+     * ...
+     * }
+     * </code>
+     *
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Return the name of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getName();
+     * </code>
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * Return the alias of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getAlias();
+     * </code>
+     *
+     * @return string
+     */
     public function getAlias()
     {
         return $this->alias;
     }
 
+    /**
+     * Return the slug of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getSlug();
+     * </code>
+     *
+     * @return string
+     */
     public function getSlug()
     {
         return $this->slug;
     }
 
+    /**
+     * Return the description of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getDescription();
+     * </code>
+     *
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * Return the language of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getLanguage();
+     * </code>
+     *
+     * @return string
+     */
     public function getLanguage()
     {
         return $this->source_language_code;
     }
 
+    /**
+     * Return the filename of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getFilename();
+     * </code>
+     *
+     * @return string
+     */
     public function getFilename()
     {
         return $this->filename;
     }
 
+    /**
+     * Return the link of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getLink();
+     * </code>
+     *
+     * @return string
+     */
     public function getLink()
     {
         return $this->link;
     }
 
+    /**
+     * Return the image of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * echo $project->getImage();
+     * </code>
+     *
+     * @return string
+     */
     public function getImage()
     {
         return $this->image;
     }
 
     /**
+     * Set the name of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setName("Gamification Platform");
+     * </code>
+     *
      * @param string $name
      *
      * @return self
@@ -221,6 +361,17 @@ class Project extends Table
     }
 
     /**
+     * Set the alias of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setAlias("gamification-platform");
+     * </code>
+     *
      * @param string $alias
      *
      * @return self
@@ -232,6 +383,18 @@ class Project extends Table
     }
 
     /**
+     * Set the description of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     * $description = "...";
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setDescription($description);
+     * </code>
+     *
      * @param string $description
      *
      * @return self
@@ -243,6 +406,17 @@ class Project extends Table
     }
 
     /**
+     * Set the filename of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setFileName("UNZIPFIRST_Gamification");
+     * </code>
+     *
      * @param string $filename
      *
      * @return self
@@ -254,6 +428,17 @@ class Project extends Table
     }
 
     /**
+     * Set the language of the project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setLanguage("de_DE");
+     * </code>
+     *
      * @param string $language
      *
      * @return self
@@ -266,6 +451,15 @@ class Project extends Table
 
     /**
      * Return the packages of current project.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setName("Gamification Platform");
+     * </code>
      *
      * @param array $options
      * @param bool  $force
@@ -285,6 +479,22 @@ class Project extends Table
         return $this->packages;
     }
 
+    /**
+     * Check if the project published.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * if ($project->isPublished()) {
+     * ...
+     * }
+     * </code>
+     *
+     * @return bool
+     */
     public function isPublished()
     {
         return (!$this->published) ? false : true;

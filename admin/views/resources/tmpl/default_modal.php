@@ -12,8 +12,13 @@ defined('_JEXEC') or die;
 
 // Set default value of the language field.
 $packageLanguage = JFactory::getApplication()->getUserState("package.language");
+$packageType = JFactory::getApplication()->getUserState("package.type");
 if (!empty($packageLanguage)) {
     $this->form->setValue("language", null, $packageLanguage);
+}
+
+if (!empty($packageType)) {
+    $this->form->setValue("type", null, $packageType);
 }
 ?>
 <div class="modal hide fade" id="js-cp-modal">

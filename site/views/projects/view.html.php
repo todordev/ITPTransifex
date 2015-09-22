@@ -46,12 +46,6 @@ class ItpTransifexViewProjects extends JViewLegacy
     protected $imageWidth = "";
     protected $imageHeight = "";
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
         $this->items      = $this->get('Items');

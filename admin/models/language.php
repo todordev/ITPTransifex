@@ -82,7 +82,7 @@ class ItpTransifexModelLanguage extends JModelAdmin
         $id        = Joomla\Utilities\ArrayHelper::getValue($data, "id");
         $name      = Joomla\Utilities\ArrayHelper::getValue($data, "name");
         $code      = Joomla\Utilities\ArrayHelper::getValue($data, "code");
-        $shortCode = Joomla\String\String::strtolower(Joomla\Utilities\ArrayHelper::getValue($data, "short_code"));
+        $shortCode = JString::strtolower(Joomla\Utilities\ArrayHelper::getValue($data, "short_code"));
 
         // Load a record from the database
         $row = $this->getTable();

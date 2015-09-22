@@ -33,9 +33,6 @@ class ItpTransifexViewResource extends JViewLegacy
         $this->option = JFactory::getApplication()->input->get("option");
     }
 
-    /**
-     * Display the view
-     */
     public function display($tpl = null)
     {
         $this->item  = $this->get('Item');

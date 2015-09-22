@@ -1,13 +1,13 @@
 <?php
 /**
- * @package      ITPTransifex
+ * @package      Transifex\Language
  * @subpackage   Languages
  * @author       Todor Iliev
  * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
-namespace Transifex;
+namespace Transifex\Language;
 
 use Prism\Database\TableImmutable;
 
@@ -16,7 +16,7 @@ defined('JPATH_PLATFORM') or die;
 /**
  * This class contains methods that are used for managing a language.
  *
- * @package      ITPTransifex
+ * @package      Transifex\Language
  * @subpackage   Languages
  */
 class Language extends TableImmutable
@@ -35,7 +35,7 @@ class Language extends TableImmutable
      *    "code" => "en_GB"
      * );
      *
-     * $language = new Transifex\Language(\JFactory::getDbo());
+     * $language = new Transifex\Language\Language(\JFactory::getDbo());
      *
      * $language->load($keys);
      * </code>
@@ -73,10 +73,10 @@ class Language extends TableImmutable
      * <code>
      * $id = 1;
      *
-     * $language = new Transifex\Language(\JFactory::getDbo());
+     * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
-     * if (!$this->getId) {
+     * if (!$this->getId()) {
      * ...
      * }
      * </code>
@@ -94,7 +94,7 @@ class Language extends TableImmutable
      * <code>
      * $id = 1;
      *
-     * $language = new Transifex\Language(\JFactory::getDbo());
+     * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
      * $name = $this->getName();
@@ -113,7 +113,7 @@ class Language extends TableImmutable
      * <code>
      * $id = 1;
      *
-     * $language = new Transifex\Language(\JFactory::getDbo());
+     * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
      * $code = $this->getCode();
@@ -132,7 +132,7 @@ class Language extends TableImmutable
      * <code>
      * $id = 1;
      *
-     * $language = new Transifex\Language(\JFactory::getDbo());
+     * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
      * $shortCode = $this->getShortCode();

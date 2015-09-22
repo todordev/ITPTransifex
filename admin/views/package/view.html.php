@@ -41,7 +41,7 @@ class ItpTransifexViewPackage extends JViewLegacy
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
 
-        $this->items = new Transifex\Resources(JFactory::getDbo());
+        $this->items = new Transifex\Resource\Resources(JFactory::getDbo());
 
         $options = array(
             "package_id" => $this->item->id

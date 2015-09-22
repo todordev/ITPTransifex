@@ -6,8 +6,8 @@
 	<authorUrl>http://itprism.com</authorUrl>
 	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com )</copyright>
 	<license>http://www.gnu.org/licenses/gpl-3.0.en.html</license>
-	<version>2.0</version>
-	<creationDate>02 September, 2015</creationDate>
+	<version>2.1</version>
+	<creationDate>21 September, 2015</creationDate>
 	<description><![CDATA[
     <p><a href="http://itprism.com/free-joomla-extensions/others/language-packages-manager" target="_blank">ITPTransifex</a> is an extension that provides capability to manage language packages, which are published on Transifex.</p>
     <p><a href='http://itprism.com/help/117-transifex-language-manager-guide' target='_blank'>Read documentation</a> that will help you to setup the extensions.</p>
@@ -44,6 +44,7 @@
         <folder>controllers</folder>
         <folder>helpers</folder>
         <folder>language</folder>
+        <folder>layouts</folder>
         <folder>models</folder>
         <folder>views</folder>
 
@@ -60,7 +61,6 @@
 			<folder>controllers</folder>
 			<folder>helpers</folder>
 			<folder>language</folder>
-			<folder>layouts</folder>
 			<folder>models</folder>
 			<folder>sql</folder>
             <folder>tables</folder>

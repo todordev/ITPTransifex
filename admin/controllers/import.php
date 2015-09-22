@@ -110,7 +110,7 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
             $fileName = basename($destination);
 
             // Extract file if it is archive
-            $ext = Joomla\String\String::strtolower(JFile::getExt($fileName));
+            $ext = JString::strtolower(JFile::getExt($fileName));
             if (strcmp($ext, "zip") == 0) {
 
                 $destinationFolder = JPath::clean($app->get("tmp_path")) . DIRECTORY_SEPARATOR . "project";
@@ -133,6 +133,5 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
         }
 
         $this->displayMessage(JText::_('COM_ITPTRANSIFEX_PROJECT_IMPORTED'), $redirectOptions);
-
     }
 }

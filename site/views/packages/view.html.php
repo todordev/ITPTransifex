@@ -28,7 +28,7 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $params;
 
     /**
-     * @var Transifex\Project
+     * @var Transifex\Project\Project
      */
     protected $project;
 
@@ -38,25 +38,16 @@ class ItpTransifexViewPackages extends JViewLegacy
     protected $filterPaginationLimit;
 
     protected $displayPackagesNumber;
-    protected $layoutsBasePath;
     protected $layoutData;
 
     /**
-     * @var Transifex\Language
+     * @var Transifex\Language\Language
      */
     protected $language;
 
     protected $option;
 
     protected $pageclass_sfx;
-
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->getCmd("option");
-
-        $this->layoutsBasePath = JPath::clean(JPATH_COMPONENT_ADMINISTRATOR . "/layouts");
-    }
 
     public function display($tpl = null)
     {
@@ -75,7 +66,7 @@ class ItpTransifexViewPackages extends JViewLegacy
         }
 
         // Load project data.
-        $this->project = new Transifex\Project(JFactory::getDbo());
+        $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
@@ -85,7 +76,7 @@ class ItpTransifexViewPackages extends JViewLegacy
         $keys = array(
             "code" => $languageCode
         );
-        $this->language = new Transifex\Language(JFactory::getDbo());
+        $this->language = new Transifex\Language\Language(JFactory::getDbo());
         $this->language->load($keys);
         if (!$this->language->getId()) {
             throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE"));

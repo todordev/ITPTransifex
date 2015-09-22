@@ -28,9 +28,11 @@ $project     = $displayData["project"];
 
         <p><?php echo $this->escape($project->getDescription()); ?></p>
 
+        <?php if ($project->getLink()) {?>
         <a href="<?php echo $project->getLink(); ?>" class="btn btn-default" target="_blank">
-            <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+            <span class="fa fa-link" aria-hidden="true"></span>
             <?php echo JText::sprintf("COM_ITPTRANSIFEX_TRANSLATE_S", $displayData["clean_title"]); ?>
         </a>
+        <?php } ?>
     </div>
 </div>

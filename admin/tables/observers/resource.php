@@ -64,7 +64,7 @@ class ItpTransifexObserverResource extends JTableObserver
     public function onBeforeDelete($pk)
     {
         if (is_array($pk)) {
-            Joomla\Utilities\ArrayHelper::toInteger($pk);
+            $pk = Joomla\Utilities\ArrayHelper::toInteger($pk);
         }
 
         if (is_array($pk) and !empty($pk)) {

@@ -54,7 +54,7 @@ class ItpTransifexControllerExport extends JControllerLegacy
         try {
 
             // Get project
-            $project = new Transifex\Project(JFactory::getDbo());
+            $project = new Transifex\Project\Project(JFactory::getDbo());
             $project->load($projectId);
 
             $output   = $model->getProject($project, $language);
