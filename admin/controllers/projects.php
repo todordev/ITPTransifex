@@ -34,15 +34,14 @@ class ItpTransifexControllerProjects extends Prism\Controller\Admin
         /** @var $model ItpTransifexModelProject */
 
         $redirectOptions = array(
-            "view" => $this->view_list
+            'view' => $this->view_list
         );
 
         $pks = Joomla\Utilities\ArrayHelper::toInteger($pks);
 
         // Check for validation errors.
-        if (empty($pks)) {
-            $this->displayWarning(JText::_("COM_ITPTRANSIFEX_INVALID_ITEM"), $redirectOptions);
-
+        if (!$pks) {
+            $this->displayWarning(JText::_('COM_ITPTRANSIFEX_INVALID_ITEM'), $redirectOptions);
             return;
         }
 
@@ -50,17 +49,15 @@ class ItpTransifexControllerProjects extends Prism\Controller\Admin
         /** @var  $params Joomla\Registry\Registry */
 
         $options = array(
-            "username" => $params->get("username"),
-            "password" => $params->get("password"),
-            "url"      => $params->get("api_url") . "project",
+            'username' => $params->get('username'),
+            'password' => $params->get('password'),
+            'url'      => $params->get('api_url') . 'project',
         );
 
         try {
-
             $model->synchronize($pks, $options);
-
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
@@ -82,12 +79,10 @@ class ItpTransifexControllerProjects extends Prism\Controller\Admin
     protected function postDeleteHook(JModelLegacy $model, $id = null)
     {
         try {
-
             $model->removePackages($id);
             $model->removeResources($id);
-
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
     }

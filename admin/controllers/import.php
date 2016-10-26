@@ -36,7 +36,7 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
         $data = array_merge($data, $file);
 
         $redirectOptions = array(
-            "view" => "projects",
+            'view' => 'projects',
         );
 
         $model = $this->getModel();
@@ -46,7 +46,7 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
         /** @var $form JForm */
 
         if (!$form) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"), 500);
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED'));
         }
 
         // Validate the form
@@ -55,24 +55,21 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
         // Check for errors.
         if ($validData === false) {
             $this->displayNotice($form->getErrors(), $redirectOptions);
-
             return;
         }
 
-        $fileData = Joomla\Utilities\ArrayHelper::getValue($data, "data");
-        if (empty($fileData) or empty($fileData["name"])) {
+        $fileData = Joomla\Utilities\ArrayHelper::getValue($data, 'data');
+        if (empty($fileData) or empty($fileData['name'])) {
             $this->displayNotice(JText::_('COM_ITPTRANSIFEX_ERROR_FILE_CANT_BE_UPLOADED'), $redirectOptions);
-
             return;
         }
 
         try {
-
             $uploadedFile = Joomla\Utilities\ArrayHelper::getValue($fileData, 'tmp_name');
             $uploadedName = Joomla\Utilities\ArrayHelper::getValue($fileData, 'name');
             $errorCode    = Joomla\Utilities\ArrayHelper::getValue($fileData, 'error');
 
-            $destination = JPath::clean($app->get("tmp_path")) . DIRECTORY_SEPARATOR . JFile::makeSafe($uploadedName);
+            $destination = JPath::clean($app->get('tmp_path')) . DIRECTORY_SEPARATOR . JFile::makeSafe($uploadedName);
 
             $file = new Prism\File\File();
 
@@ -80,10 +77,10 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
             $KB       = 1024 * 1024;
             $fileSize = (int)$this->input->server->get('CONTENT_LENGTH');
 
-            $mediaParams   = JComponentHelper::getParams("com_media");
+            $mediaParams   = JComponentHelper::getParams('com_media');
             /** @var $mediaParams Joomla\Registry\Registry */
 
-            $uploadMaxSize = $mediaParams->get("upload_maxsize") * $KB;
+            $uploadMaxSize = $mediaParams->get('upload_maxsize') * $KB;
 
             // Prepare size validator.
             $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
@@ -110,10 +107,9 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
             $fileName = basename($destination);
 
             // Extract file if it is archive
-            $ext = JString::strtolower(JFile::getExt($fileName));
-            if (strcmp($ext, "zip") == 0) {
-
-                $destinationFolder = JPath::clean($app->get("tmp_path")) . DIRECTORY_SEPARATOR . "project";
+            $ext = strtolower(JFile::getExt($fileName));
+            if (strcmp($ext, 'zip') === 0) {
+                $destinationFolder = JPath::clean($app->get('tmp_path')) . DIRECTORY_SEPARATOR . 'project';
                 if (JFolder::exists($destinationFolder)) {
                     JFolder::delete($destinationFolder);
                 }
@@ -124,11 +120,11 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
                 $filePath = $destination;
             }
 
-            $override   = Joomla\Utilities\ArrayHelper::getValue($data, "override", false, "bool");
+            $override   = Joomla\Utilities\ArrayHelper::getValue($data, 'override', false, 'bool');
             $model->importProject($filePath, $override);
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 

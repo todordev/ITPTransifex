@@ -26,7 +26,7 @@ defined('_JEXEC') or die;
                     <strong><?php echo JText::_('COM_ITPTRANSIFEX_COPY_PACKAGES'); ?></strong>
                 </label>
                 <label><?php echo JText::_('COM_ITPTRANSIFEX_LANGUAGE'); ?></label>
-                <?php echo JHtml::_("select.genericlist", $this->languages, "language"); ?>
+                <?php echo JHtml::_('select.genericlist', $this->languages, 'language'); ?>
             </div>
 
             <div class="well well-small">

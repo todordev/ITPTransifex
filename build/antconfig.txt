@@ -1,0 +1,6 @@
+cfg.name=itptransifex
+cfg.version=v3.0
+cfg.joomlaVersion=J3.6
+cfg.buildDir=packages
+cfg.sourceDir=D:/xampp/htdocs/itptransifex
+cfg.pkgDir=D:/cvsProjects/0Extensions/Free/Components/pkg_itptransifex

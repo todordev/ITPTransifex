@@ -40,14 +40,10 @@ class ItpTransifexViewPackages extends JViewLegacy
 
     protected $sidebar;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option     = JFactory::getApplication()->input->get('option');
+        
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
@@ -58,11 +54,11 @@ class ItpTransifexViewPackages extends JViewLegacy
         $languages = new Transifex\Language\Languages(JFactory::getDbo());
         $languages->load();
 
-        $this->languages = $languages->toOptions("code", "name");
+        $this->languages = $languages->toOptions('locale', 'name');
 
         // Get project.
-        $this->projectId  = $this->state->get("filter.project");
-        if (!empty($this->projectId)) {
+        $this->projectId  = $this->state->get('filter.project');
+        if ($this->projectId > 0) {
             $this->project = new Transifex\Project\Project(JFactory::getDbo());
             $this->project->load($this->projectId);
         }
@@ -97,7 +93,7 @@ class ItpTransifexViewPackages extends JViewLegacy
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
-        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
+        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') === 0);
 
         if ($this->saveOrder) {
             $this->saveOrderingUrl = 'index.php?option=' . $this->option . '&task=' . $this->getName() . '.saveOrderAjax&format=raw';
@@ -132,7 +128,7 @@ class ItpTransifexViewPackages extends JViewLegacy
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_LANGUAGE'),
             'filter_language',
-            JHtml::_('select.options', $filters->getLanguages("code"), 'value', 'text', $this->state->get('filter.language'), true)
+            JHtml::_('select.options', $filters->getLanguages('locale'), 'value', 'text', $this->state->get('filter.language'), true)
         );
 
         JHtmlSidebar::addFilter(
@@ -153,21 +149,21 @@ class ItpTransifexViewPackages extends JViewLegacy
     {
         // Set toolbar items for the page
         if (!empty($this->project) and $this->project->getId()) {
-            JToolBarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_PACKAGES_MANAGER_S', $this->escape($this->project->getName())));
+            JToolbarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_PACKAGES_MANAGER_S', $this->escape($this->project->getName())));
         } else {
-            JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_PACKAGES_MANAGER'));
+            JToolbarHelper::title(JText::_('COM_ITPTRANSIFEX_PACKAGES_MANAGER'));
         }
 
-        JToolBarHelper::editList('package.edit');
-        JToolBarHelper::divider();
-        JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "packages.delete");
-        JToolBarHelper::divider();
+        JToolbarHelper::editList('package.edit');
+        JToolbarHelper::divider();
+        JToolbarHelper::deleteList(JText::_('COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION'), 'packages.delete');
+        JToolbarHelper::divider();
 
-        JToolBarHelper::custom("package.download", 'download', null, JText::_("COM_ITPTRANSIFEX_DOWNLOAD"));
-        JToolBarHelper::divider();
+        JToolbarHelper::custom('package.download', 'download', null, JText::_('COM_ITPTRANSIFEX_DOWNLOAD'));
+        JToolbarHelper::divider();
 
         // Get the toolbar object instance
-        $bar = JToolBar::getInstance('toolbar');
+        $bar = JToolbar::getInstance('toolbar');
 
         $layoutData = array(
             'title' => JText::_('JTOOLBAR_BATCH')
@@ -178,8 +174,8 @@ class ItpTransifexViewPackages extends JViewLegacy
         $html = $layout->render($layoutData);
         $bar->appendButton('Custom', $html, 'batch');
 
-        JToolBarHelper::divider();
-        JToolBarHelper::custom('packages.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
+        JToolbarHelper::divider();
+        JToolbarHelper::custom('packages.backToDashboard', 'dashboard', '', JText::_('COM_ITPTRANSIFEX_BACK_DASHBOARD'), false);
     }
 
     /**
@@ -204,6 +200,6 @@ class ItpTransifexViewPackages extends JViewLegacy
         JHtml::_('Prism.ui.joomlaList');
         JHtml::_('Prism.ui.joomlaHelper');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }
 }

@@ -32,11 +32,11 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, 'id');
 
         $redirectOptions = array(
-            "task" => $this->getTask(),
-            "id"   => $itemId
+            'task' => $this->getTask(),
+            'id'   => $itemId
         );
 
         $model = $this->getModel();
@@ -46,7 +46,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         /** @var $form JForm */
 
         if (!$form) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED'));
         }
 
         // Validate form data
@@ -55,18 +55,14 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         // Check for validation errors.
         if ($validData === false) {
             $this->displayNotice($form->getErrors(), $redirectOptions);
-
             return;
         }
 
         try {
-
             $itemId = $model->save($validData);
-
-            $redirectOptions["id"] = $itemId;
-
+            $redirectOptions['id'] = $itemId;
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
@@ -78,7 +74,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
 
-        $ids = $app->input->get("cid", array(), "array");
+        $ids = $app->input->get('cid', array(), 'array');
 
         $ids = Joomla\Utilities\ArrayHelper::toInteger($ids);
         $ids = array_filter($ids);
@@ -89,7 +85,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
 
         // Get package ID if I have to create a one file.
         $packageId = null;
-        if (1 == count($ids)) {
+        if (1 === count($ids)) {
             $packageId = (int)array_pop($ids);
 
             // Check for validation errors.
@@ -102,23 +98,21 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         /** @var  $params Joomla\Registry\Registry */
 
         $serviceOptions = array(
-            "username"          => $params->get("username"),
-            "password"          => $params->get("password"),
-            "url"               => $params->get("api_url"),
-            "files_location"    => $params->get("files_location", "extension_folders")
+            'username'          => $params->get('username'),
+            'password'          => $params->get('password'),
+            'url'               => $params->get('api_url')
         );
 
         try {
-
             $model = $this->getModel();
             /** @var $model ItpTransifexModelPackage */
 
             $model->setOptions($serviceOptions);
 
-            if (!is_null($packageId)) { // Create a file for one package.
-                $filePath = $model->preparePackage($packageId, $params->get("include_lang_name", 1));
+            if ($packageId !== null) { // Create a file for one package.
+                $filePath = $model->preparePackage($packageId, $params->get('include_lang_name', 1));
             } else { // Create a file that contains many packages.
-                $filePath = $model->prepareProjectPackage($ids, "UNZIPFIRST", $params->get("include_lang_name", 1));
+                $filePath = $model->prepareProjectPackage($ids, 'UNZIPFIRST', $params->get('include_lang_name', 1));
             }
 
             if (!$filePath) {
@@ -126,7 +120,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
             }
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
@@ -156,8 +150,8 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
 
-        $projectId= $this->input->getInt("id");
-        $language = $this->input->getCmd("language");
+        $projectId= $this->input->getInt('id');
+        $language = $this->input->getCmd('language');
 
         $filePath  = null;
         $ids       = array();
@@ -171,14 +165,13 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
         /** @var  $params Joomla\Registry\Registry */
 
         $options = array(
-            "username"          => $params->get("username"),
-            "password"          => $params->get("password"),
-            "url"               => $params->get("api_url"),
-            "files_location"    => $params->get("files_location", "extension_folders")
+            'username'          => $params->get('username'),
+            'password'          => $params->get('password'),
+            'url'               => $params->get('api_url'),
+            'files_location'    => $params->get('files_location', 'extension_folders')
         );
 
         try {
-
             $model = $this->getModel();
             /** @var $model ItpTransifexModelPackage */
 
@@ -189,20 +182,20 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
             $project->load($projectId);
 
             // Get packages.
-            $packages   = $project->getPackages(array("language" => $language));
+            $packages   = $project->getPackages(array('language' => $language));
 
             foreach ($packages as $package) {
-                $ids[] = $package["id"];
+                $ids[] = $package['id'];
             }
 
-            if (!empty($ids)) {
-                $fileName = $project->getFileName();
+            if (count($ids) > 0) {
+                $fileName = $project->getFilename();
                 if (!$fileName) {
-                    $fileName = "UNZIPFIRST";
+                    $fileName = 'UNZIPFIRST';
                 }
 
-                $fileName .= "_".$language;
-                $filePath = $model->prepareProjectPackage($ids, $fileName, $params->get("include_lang_name", 1));
+                $fileName .= '_'.$language;
+                $filePath = $model->prepareProjectPackage($ids, $fileName, $params->get('include_lang_name', 1));
             }
 
             if (!$filePath) {
@@ -210,7 +203,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Form\Backend
             }
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 

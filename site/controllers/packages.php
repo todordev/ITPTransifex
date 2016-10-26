@@ -25,7 +25,7 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
      * @param    string $prefix The class prefix. Optional.
      * @param    array  $config Configuration array for model. Optional.
      *
-     * @return    object    The model.
+     * @return    ItpTransifexModelProject    The model.
      * @since    1.5
      */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
@@ -41,8 +41,8 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
 
-        $projectId = $this->input->post->getUint("id");
-        $packageId  = $this->input->post->getUint("package_id");
+        $projectId = $this->input->post->getUint('id');
+        $packageId  = $this->input->post->getUint('package_id');
 
         // Get project.
         $project = new Transifex\Project\Project(JFactory::getDbo());
@@ -66,54 +66,51 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
         /** @var  $params Joomla\Registry\Registry */
 
         // Validate captcha
-        if ($params->get("enable_captcha", 0)) {
-
-            $secret     = $params->get("private_key");
-            $request    = $this->input->post->getString("g-recaptcha-response");
+        if ($params->get('enable_captcha', 0)) {
+            $secret     = $params->get('private_key');
+            $request    = $this->input->post->getString('g-recaptcha-response');
 
             if (!$secret) {
-                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_SECRET_KEY"));
+                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_SECRET_KEY'));
                 return;
             }
 
             if (!$request) {
-                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_CAPTCHA_STRING"));
+                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_CAPTCHA_STRING'));
                 return;
             }
 
             if (!ItpTransifexHelper::validateCaptcha($secret, $request)) {
-                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_CAPTCHA_STRING"));
+                $this->setRedirect(JRoute::_(ItpTransifexHelperRoute::getProjectRoute($projectId)), JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_CAPTCHA_STRING'));
                 return;
             }
         }
 
         // Prepare archives folder.
-        jimport("joomla.filesystem.folder");
-        $archiveFolder = JPath::clean(JPATH_ROOT . "/". $params->get("archives_folder", "tmp/archives"));
+        $archiveFolder = JPath::clean(JPATH_ROOT . '/'. $params->get('archives_folder', 'tmp/archives'));
         if (!JFolder::exists($archiveFolder)) {
             JFolder::create($archiveFolder);
         }
 
         $options = array(
-            "username"          => $params->get("username"),
-            "password"          => $params->get("password"),
-            "url"               => $params->get("api_url"),
-            "archives_folder"   => $archiveFolder,
-            "cache_days"        => $params->get("cache_days", 1),
-            "tmp_path"          => $app->get("tmp_path"),
-            "files_location"    => $params->get("files_location", "extension_folders"),
-            "include_lang_name" => (bool)$params->get("include_lang_name", 1)
+            'username'          => $params->get('username'),
+            'password'          => $params->get('password'),
+            'url'               => $params->get('api_url'),
+            'archives_folder'   => $archiveFolder,
+            'cache_days'        => $params->get('cache_days', 1),
+            'tmp_path'          => $app->get('tmp_path'),
+            'files_location'    => $params->get('files_location', 'extension_folders'),
+            'include_lang_name' => (bool)$params->get('include_lang_name', 1)
         );
 
         try {
-
             $packageBuilder = new Transifex\Package\Builder(JFactory::getDbo(), $project);
             $packageBuilder->setOptions($options);
 
             $filePath = $packageBuilder->build($package);
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
@@ -134,7 +131,6 @@ class ItpTransifexControllerPackages extends Prism\Controller\DefaultController
         $app->sendHeaders();
 
         echo file_get_contents($filePath);
-
         $app->close();
     }
 }

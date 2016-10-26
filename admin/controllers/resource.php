@@ -34,21 +34,21 @@ class ItpTransifexControllerResource extends Prism\Controller\Form\Backend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, 'id');
 
         $redirectOptions = array(
-            "task" => $this->getTask(),
-            "id"   => $itemId
+            'task' => $this->getTask(),
+            'id'   => $itemId
         );
 
         $model = $this->getModel();
         /** @var $model ItpTransifexModelResource */
 
         $form = $model->getForm($data, false);
-        /** @var $form JForm * */
+        /** @var $form JForm */
 
         if (!$form) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED'));
         }
 
         // Validate form data
@@ -62,13 +62,10 @@ class ItpTransifexControllerResource extends Prism\Controller\Form\Backend
         }
 
         try {
-
             $itemId = $model->save($validData);
-
-            $redirectOptions["id"] = $itemId;
-
+            $redirectOptions['id'] = $itemId;
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 

@@ -3,7 +3,7 @@
  * @package      Transifex\Filter
  * @subpackage   Filters
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -45,26 +45,6 @@ class Filters
     }
 
     /**
-     * Create and initialize the object.
-     *
-     * <code>
-     * $filters = Transifex\Filter\Filters::getInstance(\JFactory::getDbo());
-     * </code>
-     *
-     * @param \JDatabaseDriver $db Database object.
-     *                             
-     * @return Filters
-     */
-    public static function getInstance(\JDatabaseDriver $db)
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new Filters($db);
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * Load and return projects as options.
      *
      * <code>
@@ -73,18 +53,18 @@ class Filters
      * $options = $filters->getProjects();
      * </code>
      *
+     * @throws \RuntimeException
      * @return array
      */
     public function getProjects()
     {
-        if (!isset($this->options["projects"])) {
-
+        if (!array_key_exists('projects', $this->options)) {
             $query = $this->db->getQuery(true);
 
             $query
-                ->select("a.id AS value, a.name AS text")
-                ->from($this->db->quoteName("#__itptfx_projects", "a"))
-                ->group("a.name");
+                ->select('a.id AS value, a.name AS text')
+                ->from($this->db->quoteName('#__itptfx_projects', 'a'))
+                ->group('a.name');
 
             $this->db->setQuery($query);
             $results = $this->db->loadAssocList();
@@ -93,10 +73,9 @@ class Filters
                 $results = array();
             }
 
-            $this->options["projects"] = $results;
-
+            $this->options['projects'] = $results;
         } else {
-            $results = $this->options["projects"];
+            $results = $this->options['projects'];
         }
 
         return $results;
@@ -116,44 +95,87 @@ class Filters
      *
      * @param string $value Column name used for value.
      *
+     * @throws \RuntimeException
      * @return array
      */
-    public function getLanguages($value = "id")
+    public function getLanguages($value = 'id')
     {
-        if (!isset($this->options["languages"])) {
-
+        if (!array_key_exists('languages', $this->options)) {
             $query = $this->db->getQuery(true);
 
             switch ($value) {
-
-                case "code":
-                    $query->select("a.code AS value, a.name AS text");
+                case 'locale':
+                    $query->select('a.locale AS value, a.name AS text');
                     break;
 
-                case "short_code":
-                    $query->select("a.short_code AS value, a.name AS text");
+                case 'code':
+                    $query->select('a.code AS value, a.name AS text');
                     break;
 
                 default:
-                    $query->select("a.id AS value, a.name AS text");
+                    $query->select('a.id AS value, a.name AS text');
                     break;
             }
 
             $query
                 ->from($this->db->quoteName('#__itptfx_languages', 'a'))
-                ->order("a.name ASC");
+                ->order('a.name ASC');
 
             $this->db->setQuery($query);
 
             $results = $this->db->loadAssocList();
 
-            $this->options["languages"] = $results;
-
+            $this->options['languages'] = $results;
         } else {
-            $results = $this->options["languages"];
+            $results = $this->options['languages'];
         }
 
         return $results;
+    }
+
+    /**
+     * Load and return languages as options.
+     *
+     * <code>
+     * $projectId  = 1;
+     *
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
+     * $options = $filters->getCategories($projectId);
+     * </code>
+     *
+     * @param int $projectId
+     *
+     * @throws \RuntimeException
+     * @return array
+     */
+    public function getCategories($projectId = 0)
+    {
+        if (!array_key_exists('categories', $this->options)) {
+            $categories = array();
+            $query = $this->db->getQuery(true);
+
+            $query
+                ->select('DISTINCT a.category')
+                ->from($this->db->quoteName('#__itptfx_resources', 'a'))
+                ->order('a.category ASC');
+
+            if ($projectId > 0) {
+                $query->where('a.project_id = ' .(int)$projectId);
+            }
+
+            $query->where('a.category IS NOT NULL');
+
+            $this->db->setQuery($query);
+
+            $results = (array)$this->db->loadAssocList();
+            foreach ($results as $result) {
+                $categories[] = array('text' => $result['category'], 'value' => $result['category']);
+            }
+
+            $this->options['categories'] = $categories;
+        }
+
+        return $this->options['categories'];
     }
 
     /**
@@ -165,15 +187,16 @@ class Filters
      * $options = $filters->getResourceTypes();
      * </code>
      *
+     * @throws \InvalidArgumentException
      * @return array
      */
     public function getResourceTypes()
     {
         return array(
-            \JHtml::_("select.option", "component", \JText::_("COM_ITPTRANSIFEX_COMPONENT")),
-            \JHtml::_("select.option", "module", \JText::_("COM_ITPTRANSIFEX_MODULE")),
-            \JHtml::_("select.option", "plugin", \JText::_("COM_ITPTRANSIFEX_PLUGIN")),
-            \JHtml::_("select.option", "library", \JText::_("COM_ITPTRANSIFEX_LIBRARY"))
+            \JHtml::_('select.option', 'component', \JText::_('COM_ITPTRANSIFEX_COMPONENT')),
+            \JHtml::_('select.option', 'module', \JText::_('COM_ITPTRANSIFEX_MODULE')),
+            \JHtml::_('select.option', 'plugin', \JText::_('COM_ITPTRANSIFEX_PLUGIN')),
+            \JHtml::_('select.option', 'library', \JText::_('COM_ITPTRANSIFEX_LIBRARY'))
         );
     }
 }

@@ -32,8 +32,8 @@ class ItpTransifexViewPackages extends JViewLegacy
      */
     protected $project;
 
-    protected $items = null;
-    protected $pagination = null;
+    protected $items;
+    protected $pagination;
 
     protected $filterPaginationLimit;
 
@@ -55,52 +55,51 @@ class ItpTransifexViewPackages extends JViewLegacy
         /** @var $app JApplicationSite */
 
         // Get current project
-        $projectId = $app->input->getInt("id");
+        $projectId = $app->input->getInt('id');
         if (!$projectId) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT'));
         }
 
-        $languageCode = $app->input->getCmd("lang");
+        $languageCode = $app->input->getCmd('lang');
         if (!$languageCode) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE'));
         }
 
         // Load project data.
         $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT'));
         }
 
         // Load project data.
         $keys = array(
-            "code" => $languageCode
+            'locale' => $languageCode
         );
         $this->language = new Transifex\Language\Language(JFactory::getDbo());
         $this->language->load($keys);
         if (!$this->language->getId()) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_LANGUAGE'));
         }
 
         // Initialise variables
-        $this->state      = $this->get("State");
+        $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
         // Get params
-        $this->params = $this->state->get("params");
+        $this->params = $this->state->get('params');
         /** @var  $this->params Joomla\Registry\Registry */
 
         // Prepare layout data.
-        $this->layoutData = array(
-            "params"  => $this->params,
-            "project" => $this->project,
-            "clean_title" => $this->escape($this->project->getName()),
-            "h_tag" => (!$this->params->get('show_page_heading', 1)) ? "h1" : "h2",
-            "image_width" => $this->params->get("image_width", "200"),
-            "image_height" => $this->params->get("image_height", "200"),
-            "images_folder" => $this->params->get("images_directory", "images/itptransifex")
-        );
+        $this->layoutData = new stdClass;
+        $this->layoutData->params      = $this->params;
+        $this->layoutData->project     = $this->project;
+        $this->layoutData->cleanTitle  = $this->escape($this->project->getName());
+        $this->layoutData->hTag        = (!$this->params->get('show_page_heading', 1)) ? 'h1' : 'h2';
+        $this->layoutData->imageWidth  = $this->params->get('image_width', '200');
+        $this->layoutData->imageHeight = $this->params->get('image_height', '200');
+        $this->layoutData->imageFolder = $this->params->get('images_directory', 'images/itptransifex');
 
         $this->prepareDocument();
 

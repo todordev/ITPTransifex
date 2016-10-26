@@ -3,14 +3,14 @@
  * @package      Transifex\Project
  * @subpackage   Projects
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Transifex\Project;
 
-use Prism\Database\ArrayObject;
 use Joomla\Utilities\ArrayHelper;
+use Prism\Database\Collection;
 
 defined('JPATH_PLATFORM') or die;
 
@@ -20,7 +20,7 @@ defined('JPATH_PLATFORM') or die;
  * @package      Transifex\Project
  * @subpackage   Projects
  */
-class Projects extends ArrayObject
+class Projects extends Collection
 {
     /**
      * Load projects from database.
@@ -41,21 +41,22 @@ class Projects extends ArrayObject
      * </code>
      *
      * @param array $options
+     *
+     * @throws \RuntimeException
      */
-    public function load($options = array())
+    public function load(array $options = array())
     {
-        $ids = ArrayHelper::getValue($options, "ids", array(), "array");
-        $ids = ArrayHelper::toInteger($ids);
+        $ids = $this->getOptionIds($options);
 
         // Load project data
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.alias, a.description, a.source_language_code, a.filename")
-            ->from($this->db->quoteName("#__itptfx_projects", "a"));
+            ->select('a.id, a.name, a.alias, a.description, a.source_language_code, a.filename')
+            ->from($this->db->quoteName('#__itptfx_projects', 'a'));
 
-        if (!empty($ids)) {
-            $query->where("a.id IN ( " . implode(",", $ids) . " )");
+        if (count($ids) > 0) {
+            $query->where('a.id IN ( ' . implode(',', $ids) . ' )');
         }
 
         $this->db->setQuery($query);
@@ -75,18 +76,17 @@ class Projects extends ArrayObject
      *
      * @param array $ids Projects IDs
      *
+     * @throws \RuntimeException
      * @return array
      */
-    public function getNumberOfResources($ids = array())
+    public function getNumberOfResources(array $ids = array())
     {
         // If it is missing IDs as parameter, get the IDs of the current items.
-        if (!$ids and !empty($this->items)) {
-
+        if (!$ids and count($this->items) > 0) {
             $ids = array();
             foreach ($this->items as $item) {
                 $ids[] = $item->id;
             }
-
         }
 
         // If there are no IDs, return empty array.
@@ -98,14 +98,14 @@ class Projects extends ArrayObject
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.project_id, COUNT(*) as number")
-            ->from($this->db->quoteName("#__itptfx_resources", "a"))
-            ->where("a.project_id IN (" . implode(",", $ids) . ")")
-            ->group("a.project_id");
+            ->select('a.project_id, COUNT(*) as number')
+            ->from($this->db->quoteName('#__itptfx_resources', 'a'))
+            ->where('a.project_id IN (' . implode(',', $ids) . ')')
+            ->group('a.project_id');
 
         $this->db->setQuery($query);
 
-        return (array)$this->db->loadAssocList("project_id");
+        return (array)$this->db->loadAssocList('project_id');
     }
 
     /**
@@ -120,12 +120,13 @@ class Projects extends ArrayObject
      *
      * @param array $ids Projects IDs
      *
+     * @throws \RuntimeException
      * @return array
      */
-    public function getNumberOfPackages($ids = array())
+    public function getNumberOfPackages(array $ids = array())
     {
         // If it is missing IDs as parameter, get the IDs of the current items.
-        if (!$ids and !empty($this->items)) {
+        if (!$ids and count($this->items) > 0) {
             $ids = array();
             foreach ($this->items as $item) {
                 $ids[] = $item->id;
@@ -141,13 +142,13 @@ class Projects extends ArrayObject
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.project_id, COUNT(*) as number")
-            ->from($this->db->quoteName("#__itptfx_packages", "a"))
-            ->where("a.project_id IN (" . implode(",", $ids) . ")")
-            ->group("a.project_id");
+            ->select('a.project_id, COUNT(*) as number')
+            ->from($this->db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.project_id IN (' . implode(',', $ids) . ')')
+            ->group('a.project_id');
 
         $this->db->setQuery($query);
 
-        return (array)$this->db->loadAssocList("project_id");
+        return (array)$this->db->loadAssocList('project_id');
     }
 }

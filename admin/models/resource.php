@@ -39,14 +39,14 @@ class ItpTransifexModelResource extends JModelAdmin
      * @param   array   $data     An optional array of data for the form to interrogate.
      * @param   boolean $loadData True if the form is to load its own data (default case), false if not.
      *
-     * @return  JForm   A JForm object on success, false on failure
+     * @return  JForm|bool   A JForm object on success, false on failure
      * @since   1.6
      */
     public function getForm($data = array(), $loadData = true)
     {
         // Get the form.
         $form = $this->loadForm($this->option . '.resource', 'resource', array('control' => 'jform', 'load_data' => $loadData));
-        if (empty($form)) {
+        if (!$form) {
             return false;
         }
 
@@ -64,7 +64,7 @@ class ItpTransifexModelResource extends JModelAdmin
         // Check the session for previously entered form data.
         $data = JFactory::getApplication()->getUserState($this->option . '.edit.resource.data', array());
 
-        if (empty($data)) {
+        if (!$data) {
             $data = $this->getItem();
         }
 
@@ -76,32 +76,39 @@ class ItpTransifexModelResource extends JModelAdmin
      *
      * @param array $data   The data about item
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      * @return   int  Item ID
      */
     public function save($data)
     {
-        $id        = Joomla\Utilities\ArrayHelper::getValue($data, "id");
-        $name      = Joomla\Utilities\ArrayHelper::getValue($data, "name");
-        $alias     = Joomla\Utilities\ArrayHelper::getValue($data, "alias");
-        $filename  = Joomla\Utilities\ArrayHelper::getValue($data, "filename");
-        $type      = Joomla\Utilities\ArrayHelper::getValue($data, "type");
-        $published = Joomla\Utilities\ArrayHelper::getValue($data, "published");
+        $id        = Joomla\Utilities\ArrayHelper::getValue($data, 'id');
+        $name      = Joomla\Utilities\ArrayHelper::getValue($data, 'name');
+        $alias     = Joomla\Utilities\ArrayHelper::getValue($data, 'alias');
+        $filename  = Joomla\Utilities\ArrayHelper::getValue($data, 'filename');
+        $category  = Joomla\Utilities\ArrayHelper::getValue($data, 'category');
+        $source    = Joomla\Utilities\ArrayHelper::getValue($data, 'source');
+        $path      = Joomla\Utilities\ArrayHelper::getValue($data, 'path');
+        $published = Joomla\Utilities\ArrayHelper::getValue($data, 'published');
 
         // Load a record from the database
         $row = $this->getTable();
         $row->load($id);
 
-        $row->set("name", $name);
-        $row->set("alias", $alias);
-        $row->set("filename", $filename);
-        $row->set("type", $type);
-        $row->set("published", $published);
+        $row->set('name', $name);
+        $row->set('alias', $alias);
+        $row->set('filename', $filename);
+        $row->set('category', $category);
+        $row->set('path', $path);
+        $row->set('source', $source);
+        $row->set('published', $published);
 
         $this->prepareTable($row);
 
         $row->store(true);
 
-        return $row->get("id");
+        return $row->get('id');
     }
 
     /**
@@ -116,29 +123,29 @@ class ItpTransifexModelResource extends JModelAdmin
         $query = $db->getQuery(true);
 
         $query
-            ->update($db->quoteName("#__itptfx_resources"))
-            ->set($db->quoteName("filename") . "=" .$db->quote($filename))
-            ->where($db->quoteName("id") ."=". (int)$id);
+            ->update($db->quoteName('#__itptfx_resources'))
+            ->set($db->quoteName('filename') . '=' .$db->quote($filename))
+            ->where($db->quoteName('id') .'='. (int)$id);
 
         $db->setQuery($query);
         $db->execute();
     }
 
     /**
-     * Save the type of the resource.
+     * Save the category of the resource.
      *
      * @param   int  $id
      * @param   string $type
      */
-    public function saveType($id, $type)
+    public function saveCategory($id, $type)
     {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
 
         $query
-            ->update($db->quoteName("#__itptfx_resources"))
-            ->set($db->quoteName("type") . "=" .$db->quote($type))
-            ->where($db->quoteName("id") ."=". (int)$id);
+            ->update($db->quoteName('#__itptfx_resources'))
+            ->set($db->quoteName('category') . '=' .$db->quote($type))
+            ->where($db->quoteName('id') .'='. (int)$id);
 
         $db->setQuery($query);
         $db->execute();
@@ -148,7 +155,7 @@ class ItpTransifexModelResource extends JModelAdmin
     {
         // Fix magic quotes
         if (get_magic_quotes_gpc()) {
-            $table->name = stripcslashes($table->name);
+            $table->set('name', stripcslashes($table->get('name')));
         }
     }
 
@@ -160,54 +167,50 @@ class ItpTransifexModelResource extends JModelAdmin
         $query = $db->getQuery(true);
         $query
             ->select(
-                "a.id, a.name, a.alias, a.filename, a.type, a.i18n_type, " .
-                "a.source_language_code, a.project_id, " .
-                "b.alias AS project_slug"
+                'a.id, a.name, a.alias, a.filename, a.type, a.i18n_type, ' .
+                'a.source_language_code, a.project_id, ' .
+                'b.alias AS project_slug'
             )
-            ->from($db->quoteName("#__itptfx_resources", "a"))
-            ->leftJoin($db->quoteName("#__itptfx_projects", "b") . " ON a.project_id = b.id")
-            ->where("a.id IN (" . implode(",", $pks) . ")");
+            ->from($db->quoteName('#__itptfx_resources', 'a'))
+            ->leftJoin($db->quoteName('#__itptfx_projects', 'b') . ' ON a.project_id = b.id')
+            ->where('a.id IN (' . implode(',', $pks) . ')');
 
         $db->setQuery($query);
-        $resources = $db->loadObjectList();
+        $resources = (array)$db->loadObjectList();
 
-        if (!empty($resources)) {
-
-            $transifexUrl = Joomla\Utilities\ArrayHelper::getValue($options, "url");
+        if (count($resources) > 0) {
+            $transifexUrl = Joomla\Utilities\ArrayHelper::getValue($options, 'url');
 
             $transifex = new Prism\Transifex\Request($transifexUrl);
 
-            $transifex->setUsername($options["username"]);
-            $transifex->setPassword($options["password"]);
+            $transifex->setUsername($options['username']);
+            $transifex->setPassword($options['password']);
             $transifex->enableAuthentication();
 
             $options = array(
-                "headers" => array(
+                'headers' => array(
                     'Content-type: application/json',
                     'X-HTTP-Method-Override: GET'
                 )
             );
 
             foreach ($resources as $resource) {
-                $uri      = "project/" . $resource->project_slug . "/resource/" . $resource->alias;
+                $uri      = 'project/' . $resource->project_slug . '/resource/' . $resource->alias;
                 $response = $transifex->get($uri, $options);
 
                 // Store the data
                 if (!empty($response->slug)) {
-
                     $query = $db->getQuery(true);
                     $query
-                        ->update($db->quoteName("#__itptfx_resources"))
-                        ->set($db->quoteName("name") . "=" . $db->quote($response->name))
-                        ->set($db->quoteName("source_language_code") . "=" . $db->quote($response->source_language_code))
-                        ->set($db->quoteName("i18n_type") . "=" . $db->quote($response->i18n_type))
-                        ->where($db->quoteName("alias") . "=" . $db->quote($resource->alias));
+                        ->update($db->quoteName('#__itptfx_resources'))
+                        ->set($db->quoteName('name') . '=' . $db->quote($response->name))
+                        ->set($db->quoteName('source_language_code') . '=' . $db->quote($response->source_language_code))
+                        ->set($db->quoteName('i18n_type') . '=' . $db->quote($response->i18n_type))
+                        ->where($db->quoteName('alias') . '=' . $db->quote($resource->alias));
 
                     $db->setQuery($query);
                     $db->execute();
-
                 }
-
             }
         }
     }

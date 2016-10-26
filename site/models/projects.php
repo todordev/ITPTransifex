@@ -43,7 +43,7 @@ class ItpTransifexModelProjects extends JModelList
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
 
-        $value = $app->input->getString("filter_search");
+        $value = $app->input->getString('filter_search');
         $this->setState('filter.search', $value);
 
         // Load the component parameters.
@@ -51,9 +51,9 @@ class ItpTransifexModelProjects extends JModelList
         $this->setState('params', $params);
 
         // Set limit
-        $value = $app->input->getInt("limit");
+        $value = $app->input->getInt('limit');
         if (!$value) {
-            $value = $params->get("items_limit", $app->get('list_limit', 20));
+            $value = $params->get('items_limit', $app->get('list_limit', 20));
         }
         $this->setState('list.limit', $value);
 
@@ -99,7 +99,7 @@ class ItpTransifexModelProjects extends JModelList
             $this->getState(
                 'list.select',
                 'a.id, a.name, a.description, a.filename, a.source_language_code, a.image, ' .
-                $query->concatenate(array("a.id", "a.alias"), ":") . " AS slug"
+                $query->concatenate(array('a.id', 'a.alias'), ':') . ' AS slug'
             )
         )
             ->from($db->quoteName('#__itptfx_projects', 'a'))
@@ -112,7 +112,7 @@ class ItpTransifexModelProjects extends JModelList
                 $query->where('a.id = ' . (int)substr($search, 3));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }
@@ -126,25 +126,25 @@ class ItpTransifexModelProjects extends JModelList
 
     protected function getOrderString()
     {
-        $params    = $this->getState("params");
+        $params    = $this->getState('params');
 
-        $order     = $params->get("items_order", "title");
-        $orderDirn = $params->get("items_order_direction", "desc");
+        $order     = $params->get('items_order', 'title');
+        $orderDirn = $params->get('items_order_direction', 'desc');
 
-        $allowedDirns = array("asc", "desc");
-        if (!in_array($orderDirn, $allowedDirns)) {
-            $orderDirn = "ASC";
+        $allowedDirns = array('asc', 'desc');
+        if (!in_array($orderDirn, $allowedDirns, true)) {
+            $orderDirn = 'ASC';
         } else {
-            $orderDirn = JString::strtoupper($orderDirn);
+            $orderDirn = strtoupper($orderDirn);
         }
 
         switch ($order) {
-            case "ordering":
-                $orderCol = "a.ordering";
+            case 'ordering':
+                $orderCol = 'a.ordering';
                 break;
 
             default: // Name
-                $orderCol = "a.name";
+                $orderCol = 'a.name';
                 break;
         }
 

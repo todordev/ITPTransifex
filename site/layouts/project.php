@@ -9,21 +9,22 @@
 
 // no direct access
 defined('_JEXEC') or die;
-$project     = $displayData["project"];
+$project     = $displayData->project;
+/**
+ * @var $project \Transifex\Project\Project
+ */
 ?>
 <div class="row">
     <div class="col-md-3">
         <?php if (!$project->getImage()) { ?>
-            <img src="<?php echo "media/com_itptransifex/images/no_image.png"; ?>"
-                 alt="<?php echo $displayData["clean_title"]; ?>" width="200"
-                 height="200" />
+            <img src="<?php echo 'media/com_itptransifex/images/no_image.png'; ?>" alt="<?php echo $displayData->cleanTitle; ?>" width="200" height="200" />
         <?php } else { ?>
-            <img src="<?php echo $displayData["images_folder"]."/".$project->getImage(); ?>" alt="<?php echo $displayData["clean_title"]; ?>" width="<?php echo $displayData["image_width"]; ?>" height="<?php echo $displayData["image_height"]; ?>"/>
+            <img src="<?php echo $displayData->imageFolder.'/'.$project->getImage(); ?>" alt="<?php echo $displayData->cleanTitle; ?>" width="<?php echo $displayData->imageWidth; ?>" height="<?php echo $displayData->imageHeight; ?>"/>
         <?php } ?>
     </div>
     <div class="col-md-9">
         <?php
-            echo "<".$displayData["h_tag"].">".$displayData["clean_title"]."</".$displayData["h_tag"].">";
+            echo '<'.$displayData->hTag.'>'.$displayData->cleanTitle.'</'.$displayData->hTag.'>';
         ?>
 
         <p><?php echo $this->escape($project->getDescription()); ?></p>
@@ -31,7 +32,7 @@ $project     = $displayData["project"];
         <?php if ($project->getLink()) {?>
         <a href="<?php echo $project->getLink(); ?>" class="btn btn-default" target="_blank">
             <span class="fa fa-link" aria-hidden="true"></span>
-            <?php echo JText::sprintf("COM_ITPTRANSIFEX_TRANSLATE_S", $displayData["clean_title"]); ?>
+            <?php echo JText::sprintf('COM_ITPTRANSIFEX_TRANSLATE_S', $displayData->cleanTitle); ?>
         </a>
         <?php } ?>
     </div>

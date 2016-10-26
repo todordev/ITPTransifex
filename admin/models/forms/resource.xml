@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-    <fieldset>
-
+    <fieldset addfieldpath="/administrator/components/com_userideas/models/fields">
         <field name="name" type="text"
                label="COM_ITPTRANSIFEX_NAME"
                description="COM_ITPTRANSIFEX_RESOURCE_NAME_DESC"
@@ -23,15 +22,16 @@
                required="true"
                 />
 
-        <field name="type" type="list"
-               label="COM_ITPTRANSIFEX_TYPE"
+        <field name="category" type="transifexcategory"
+               label="COM_ITPTRANSIFEX_CATEGORY"
                description="COM_ITPTRANSIFEX_RESOURCE_TYPE_DESC"
                required="true"
                 >
-            <option value="site">site</option>
-            <option value="admin">admin</option>
+            <option value="">COM_ITPTRANSIFEX_SELECT_CATEGORY</option>
         </field>
 
+        <field name="source" type="text" label="COM_ITPTRANSIFEX_SOURCE_FOLDER" description="COM_ITPTRANSIFEX_SOURCE_FOLDER_DESC" hint="admin, site, etc..." />
+        <field name="path" type="text" class="input-xxlarge" label="COM_ITPTRANSIFEX_TARGET_PATH" description="COM_ITPTRANSIFEX_TARGET_PATH_DESC" hint="/components/com_userideas/language" />
         <field name="id" type="text"
                label="JGLOBAL_FIELD_ID_LABEL"
                description="JGLOBAL_FIELD_ID_DESC"

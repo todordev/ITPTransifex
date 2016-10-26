@@ -29,22 +29,17 @@ class ItpTransifexViewPackage extends JViewLegacy
     protected $documentTitle;
     protected $option;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option = JFactory::getApplication()->input->get('option');
+        
         $this->item  = $this->get('Item');
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
 
         $this->items = new Transifex\Resource\Resources(JFactory::getDbo());
-
         $options = array(
-            "package_id" => $this->item->id
+            'package_id' => $this->item->id
         );
         $this->items->load($options);
 
@@ -63,19 +58,19 @@ class ItpTransifexViewPackage extends JViewLegacy
     protected function addToolbar()
     {
         JFactory::getApplication()->input->set('hidemainmenu', true);
-        $isNew = ($this->item->id == 0);
+        $isNew = ((int)$this->item->id === 0);
 
         $this->documentTitle = JText::_('COM_ITPTRANSIFEX_EDIT_PACKAGE');
 
-        JToolBarHelper::title($this->documentTitle);
+        JToolbarHelper::title($this->documentTitle);
 
-        JToolBarHelper::apply('package.apply');
-        JToolBarHelper::save('package.save');
+        JToolbarHelper::apply('package.apply');
+        JToolbarHelper::save('package.save');
 
         if (!$isNew) {
-            JToolBarHelper::cancel('package.cancel', 'JTOOLBAR_CANCEL');
+            JToolbarHelper::cancel('package.cancel', 'JTOOLBAR_CANCEL');
         } else {
-            JToolBarHelper::cancel('package.cancel', 'JTOOLBAR_CLOSE');
+            JToolbarHelper::cancel('package.cancel', 'JTOOLBAR_CLOSE');
         }
     }
 

@@ -38,15 +38,14 @@ class ItpTransifexControllerResources extends Prism\Controller\Admin
         /** @var $model ItpTransifexModelResource */
 
         $redirectOptions = array(
-            "view" => $this->view_list
+            'view' => $this->view_list
         );
 
         $pks = Joomla\Utilities\ArrayHelper::toInteger($pks);
 
         // Check for validation errors.
-        if (empty($pks)) {
-            $this->displayWarning(JText::_("COM_ITPTRANSIFEX_INVALID_ITEM"), $redirectOptions);
-
+        if (!$pks) {
+            $this->displayWarning(JText::_('COM_ITPTRANSIFEX_INVALID_ITEM'), $redirectOptions);
             return;
         }
 
@@ -54,20 +53,18 @@ class ItpTransifexControllerResources extends Prism\Controller\Admin
         /** @var  $params Joomla\Registry\Registry */
 
         $options = array(
-            "username" => $params->get("username"),
-            "password" => $params->get("password"),
-            "url"      => $params->get("api_url"),
+            'username' => $params->get('username'),
+            'password' => $params->get('password'),
+            'url'      => $params->get('api_url'),
         );
 
         try {
-
             $model->synchronize($pks, $options);
-
         } catch (RuntimeException $e) {
             $this->displayWarning($e->getMessage(), $redirectOptions);
             return;
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 

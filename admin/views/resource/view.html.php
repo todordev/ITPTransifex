@@ -27,14 +27,10 @@ class ItpTransifexViewResource extends JViewLegacy
     protected $documentTitle;
     protected $option;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option = JFactory::getApplication()->input->get('option');
+        
         $this->item  = $this->get('Item');
         $this->form  = $this->get('Form');
         $this->state = $this->get('State');
@@ -53,17 +49,17 @@ class ItpTransifexViewResource extends JViewLegacy
     protected function addToolbar()
     {
         JFactory::getApplication()->input->set('hidemainmenu', true);
-        $isNew = ($this->item->id == 0);
+        $isNew = ((int)$this->item->id === 0);
 
         $this->documentTitle = JText::_('COM_ITPTRANSIFEX_EDIT_RESOURCE');
 
-        JToolBarHelper::title($this->documentTitle);
+        JToolbarHelper::title($this->documentTitle);
 
-        JToolBarHelper::apply('resource.apply');
-        JToolBarHelper::save('resource.save');
+        JToolbarHelper::apply('resource.apply');
+        JToolbarHelper::save('resource.save');
 
         if (!$isNew) {
-            JToolBarHelper::cancel('resource.cancel', 'JTOOLBAR_CANCEL');
+            JToolbarHelper::cancel('resource.cancel', 'JTOOLBAR_CANCEL');
         }
     }
 

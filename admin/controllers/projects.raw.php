@@ -25,7 +25,7 @@ class ItpTransifexControllerProjects extends JControllerAdmin
      * @param    string $prefix The class prefix. Optional.
      * @param    array  $config Configuration array for model. Optional.
      *
-     * @return    object    The model.
+     * @return    ItpTransifexModelProject    The model.
      * @since    1.5
      */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
@@ -59,11 +59,9 @@ class ItpTransifexControllerProjects extends JControllerAdmin
         $model = $this->getModel();
 
         try {
-
             $model->saveorder($pks, $order);
-
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 

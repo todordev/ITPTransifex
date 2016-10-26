@@ -76,6 +76,7 @@ class ItpTransifexModelProjects extends JModelList
     /**
      * Build an SQL query to load the list data.
      *
+     * @throws \RuntimeException
      * @return  JDatabaseQuery
      * @since   1.6
      */
@@ -91,20 +92,20 @@ class ItpTransifexModelProjects extends JModelList
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.alias, a.filename, a.link, a.ordering, a.published'
+                'a.id, a.name, a.alias, a.filename, a.link, a.ordering, a.published, a.source_language_code'
             )
         );
 
-        $query->from($db->quoteName("#__itptfx_projects", "a"));
+        $query->from($db->quoteName('#__itptfx_projects', 'a'));
 
         // Filter by search in title
-        $search = $this->getState('filter.search');
-        if (!empty($search)) {
+        $search = (string)$this->getState('filter.search');
+        if ($search !== '') {
             if (stripos($search, 'id:') === 0) {
                 $query->where('a.id = ' . (int)substr($search, 3));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }

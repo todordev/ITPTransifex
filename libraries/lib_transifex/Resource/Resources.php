@@ -3,14 +3,14 @@
  * @package      Transifex\Resource
  * @subpackage   Resources
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Transifex\Resource;
 
-use Prism\Database\ArrayObject;
 use Joomla\Utilities\ArrayHelper;
+use Prism\Database\Collection;
 
 defined('JPATH_PLATFORM') or die;
 
@@ -20,7 +20,7 @@ defined('JPATH_PLATFORM') or die;
  * @package      Transifex\Resource
  * @subpackage   Resources
  */
-class Resources extends ArrayObject
+class Resources extends Collection
 {
     /**
      * Load resources from database.
@@ -43,38 +43,39 @@ class Resources extends ArrayObject
      * </code>
      *
      * @param array $options
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
-    public function load($options = array())
+    public function load(array $options = array())
     {
-        $ids   = ArrayHelper::getValue($options, "ids", array(), "array");
-        $ids   = ArrayHelper::toInteger($ids);
+        $ids   = $this->getOptionIds($options);
 
         $query = $this->db->getQuery(true);
         $query
             ->select(
-                "a.id, a.name, a.alias, a.filename, a.type, a.i18n_type, " .
-                "a.source_language_code, a.project_id"
+                'a.id, a.name, a.alias, a.filename, a.category, a.source, a.path, ' .
+                'a.i18n_type, a.source_language_code, a.project_id'
             )
-            ->from($this->db->quoteName("#__itptfx_resources", "a"))
-            ->order("a.name ASC");
+            ->from($this->db->quoteName('#__itptfx_resources', 'a'))
+            ->order('a.name ASC');
 
         // Filter by project ID.
-        $packageId = ArrayHelper::getValue($options, "package_id");
-        if (!empty($packageId)) {
-
+        $packageId = ArrayHelper::getValue($options, 'package_id', 0, 'int');
+        if ($packageId > 0) {
             // Get package resources IDs.
             $subQuery = $this->db->getQuery(true);
             $subQuery
-                ->select("a.resource_id")
-                ->from($this->db->quoteName("#__itptfx_packages_map", "a"))
-                ->where("a.package_id = " . (int)$packageId);
+                ->select('a.resource_id')
+                ->from($this->db->quoteName('#__itptfx_packages_map', 'a'))
+                ->where('a.package_id = ' . (int)$packageId);
 
             $this->db->setQuery($subQuery);
             $ids_ = (array)$this->db->loadColumn();
 
             // Merge the IDs of the resourced based on package ID
             // and the IDs provided by the developer.
-            if (!empty($ids_)) {
+            if (count($ids_) > 0) {
                 $ids = array_merge($ids, $ids_);
                 $ids = array_unique($ids);
             }
@@ -82,28 +83,28 @@ class Resources extends ArrayObject
             unset($ids_);
 
             // Filter by IDs.
-            if (!empty($ids)) {
-                $query->where("a.id IN ( " . implode(",", $ids) . " )");
+            if (count($ids) > 0) {
+                $query->where('a.id IN ( ' . implode(',', $ids) . ' )');
             } else {
-                $query->where("a.id = 0");
+                $query->where('a.id = 0');
             }
         }
 
         // Filter by IDs.
-        if (!empty($ids) and !$packageId) {
-            $query->where("a.id IN ( " . implode(",", $ids) . " )");
+        if (count($ids) > 0 and !$packageId) {
+            $query->where('a.id IN ( ' . implode(',', $ids) . ' )');
         }
 
         // Filter by project ID.
-        $resourceId = ArrayHelper::getValue($options, "project_id");
-        if (!empty($resourceId)) {
-            $query->where("a.project_id = " . (int)$resourceId);
+        $resourceId = ArrayHelper::getValue($options, 'project_id', 0, 'int');
+        if ($resourceId > 0) {
+            $query->where('a.project_id = ' . (int)$resourceId);
         }
 
         // Filter by state
-        $state = ArrayHelper::getValue($options, "state");
-        if (is_numeric($state)) {
-            $query->where("a.published = " . (int)$state);
+        $state = ArrayHelper::getValue($options, 'state');
+        if ($state !== null and is_numeric($state)) {
+            $query->where('a.published = ' . (int)$state);
         }
 
         $this->db->setQuery($query);
@@ -125,18 +126,18 @@ class Resources extends ArrayObject
      *
      * $resources->remove();
      * </code>
+     *
+     * @throws \RuntimeException
      */
     public function remove()
     {
-        if (!empty($this->items)) {
-
+        if (count($this->items) > 0) {
             foreach ($this->items as $key => $item) {
-
                 // Remove resources in resource map.
                 $query = $this->db->getQuery(true);
                 $query
-                    ->delete($this->db->quoteName("#__itptfx_resources_map"))
-                    ->where($this->db->quoteName("resource_id") . "=" . (int)$item["id"]);
+                    ->delete($this->db->quoteName('#__itptfx_resources_map'))
+                    ->where($this->db->quoteName('resource_id') . '=' . (int)$item['id']);
 
                 $this->db->setQuery($query);
                 $this->db->execute();
@@ -144,8 +145,8 @@ class Resources extends ArrayObject
                 // Remove resources
                 $query = $this->db->getQuery(true);
                 $query
-                    ->delete($this->db->quoteName("#__itptfx_resources"))
-                    ->where($this->db->quoteName("id") . "=" . (int)$item["id"]);
+                    ->delete($this->db->quoteName('#__itptfx_resources'))
+                    ->where($this->db->quoteName('id') . '=' . (int)$item['id']);
 
                 $this->db->setQuery($query);
                 $this->db->execute();

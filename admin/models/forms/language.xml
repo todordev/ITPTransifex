@@ -5,10 +5,11 @@
         <field name="name" type="text"
                label="COM_ITPTRANSIFEX_NAME"
                description="COM_ITPTRANSIFEX_LANGUAGE_NAME_DESC"
+               hint="English (United Kingdom)"
                filter="trim"
                required="true"/>
 
-        <field name="code" type="text"
+        <field name="locale" type="text"
                label="COM_ITPTRANSIFEX_LOCALE_CODE"
                description="COM_ITPTRANSIFEX_LOCALE_CODE_DESC"
                hint="en_GB"
@@ -16,7 +17,7 @@
                required="true"
                 />
 
-        <field name="short_code" type="text"
+        <field name="code" type="text"
                label="COM_ITPTRANSIFEX_COUNTRY_CODE"
                description="COM_ITPTRANSIFEX_COUNTRY_CODE_DESC"
                hint="en"

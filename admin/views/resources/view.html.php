@@ -45,24 +45,19 @@ class ItpTransifexViewResources extends JViewLegacy
 
     protected $sidebar;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option     = JFactory::getApplication()->input->get('option');
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
-        $this->projectId  = $this->state->get("project_id");
+        $this->projectId  = $this->state->get('project_id');
 
         $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($this->projectId);
 
-        $model      = JModelLegacy::getInstance("Package", "ItpTransifexModel", $config = array('ignore_request' => true));
+        $model      = JModelLegacy::getInstance('Package', 'ItpTransifexModel', $config = array('ignore_request' => true));
         $this->form = $model->getForm();
 
         // Prepare sorting data
@@ -98,30 +93,42 @@ class ItpTransifexViewResources extends JViewLegacy
     }
 
     /**
-     * Add a menu on the sidebar of page
+     * Add a menu on the sidebar of page.
+     *
+     * @throws \RuntimeException
      */
     protected function addSidebar()
     {
-        ItpTransifexHelper::addSubmenu("resources");
+        ItpTransifexHelper::addSubmenu('resources');
 
         JHtmlSidebar::setAction('index.php?option=' . $this->option . '&view=' . $this->getName());
 
         JHtmlSidebar::addFilter(
             JText::_('JOPTION_SELECT_PUBLISHED'),
             'filter_state',
-            JHtml::_('select.options', JHtml::_('jgrid.publishedOptions', array("archived" => false)), 'value', 'text', $this->state->get('filter.state'), true)
+            JHtml::_('select.options', JHtml::_('jgrid.publishedOptions', array('archived' => false)), 'value', 'text', $this->state->get('filter.state'), true)
         );
 
         // Prepare filter types
-        $types = array(
-            "site"  => "site",
-            "admin" => "admin",
-        );
+        $filters    = new \Transifex\Filter\Filters(JFactory::getDbo());
+        $categories = $filters->getCategories($this->projectId);
+
         JHtmlSidebar::addFilter(
-            JText::_('COM_ITPTRANSIFEX_SELECT_TYPE'),
-            'filter_type',
-            JHtml::_('select.options', $types, 'value', 'text', $this->state->get('filter.type'), true)
+            JText::_('COM_ITPTRANSIFEX_SELECT_CATEGORY'),
+            'filter_category',
+            JHtml::_('select.options', $categories, 'value', 'text', $this->state->get('filter.category'), true)
         );
+
+        $defaultCategories = array(
+            ['text' => 'component', 'value' => 'component'],
+            ['text' => 'module', 'value' => 'module'],
+            ['text' => 'plugin', 'value' => 'plugin']
+        );
+
+        $categories = array_merge($defaultCategories, $categories);
+        $categories = array_map('unserialize', array_unique(array_map('serialize', $categories)));
+
+        $this->document->addScriptOptions('com_userideas_filter_categories', $categories);
 
         $this->sidebar = JHtmlSidebar::render();
     }
@@ -134,24 +141,24 @@ class ItpTransifexViewResources extends JViewLegacy
     protected function addToolbar()
     {
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_RESOURCES_MANAGER_S', $this->escape($this->project->getName())));
-        JToolBarHelper::custom('package.create', "plus", "", JText::_("COM_ITPTRANSIFEX_CREATE_PACKAGE"), false);
-        JToolBarHelper::custom('resources.update', "refresh", "", JText::_("COM_ITPTRANSIFEX_UPDATE"), false);
-        JToolBarHelper::divider();
+        JToolbarHelper::title(JText::sprintf('COM_ITPTRANSIFEX_RESOURCES_MANAGER_S', $this->escape($this->project->getName())));
+        JToolbarHelper::custom('package.create', 'plus', '', JText::_('COM_ITPTRANSIFEX_CREATE_PACKAGE'), false);
+        JToolbarHelper::custom('resources.update', 'refresh', '', JText::_('COM_ITPTRANSIFEX_UPDATE'), false);
+        JToolbarHelper::divider();
 
-        if ($this->state->get('filter.state') == -2) {
+        if ((int)$this->state->get('filter.state') === -2) {
             JToolbarHelper::deleteList('', 'resources.delete', 'JTOOLBAR_EMPTY_TRASH');
         } else {
             JToolbarHelper::trash('resources.trash');
         }
 
-        JToolBarHelper::divider();
+        JToolbarHelper::divider();
 
         // Help button
-        $bar = JToolBar::getInstance('toolbar');
-        $bar->appendButton('Link', 'arrow-left-3', JText::_('COM_ITPTRANSIFEX_BACK_TO_PROJECTS'), "index.php?option=com_itptransifex&view=projects");
+        $bar = JToolbar::getInstance('toolbar');
+        $bar->appendButton('Link', 'arrow-left-3', JText::_('COM_ITPTRANSIFEX_BACK_TO_PROJECTS'), 'index.php?option=com_itptransifex&view=projects');
 
-        JToolBarHelper::custom('projects.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
+        JToolbarHelper::custom('projects.backToDashboard', 'dashboard', '', JText::_('COM_ITPTRANSIFEX_BACK_DASHBOARD'), false);
     }
 
     /**
@@ -172,7 +179,6 @@ class ItpTransifexViewResources extends JViewLegacy
 
         // Scripts
         JHtml::_('behavior.multiselect');
-        JHtml::_('formbehavior.chosen', 'select');
         JHtml::_('bootstrap.tooltip');
 
         JHtml::_('Prism.ui.pnotify');
@@ -180,6 +186,6 @@ class ItpTransifexViewResources extends JViewLegacy
         JHtml::_('Prism.ui.joomlaHelper');
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }
 }

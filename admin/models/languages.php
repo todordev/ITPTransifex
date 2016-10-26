@@ -91,6 +91,8 @@ class ItpTransifexModelLanguages extends JModelList
     /**
      * Build an SQL query to load the list data.
      *
+     * @throws \RuntimeException
+     *
      * @return  JDatabaseQuery
      * @since   1.6
      */
@@ -106,19 +108,19 @@ class ItpTransifexModelLanguages extends JModelList
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.code, a.short_code'
+                'a.id, a.name, a.locale, a.code'
             )
         );
-        $query->from($db->quoteName("#__itptfx_languages", "a"));
+        $query->from($db->quoteName('#__itptfx_languages', 'a'));
 
         // Filter by search in title
-        $search = $this->getState('filter.search');
-        if (!empty($search)) {
+        $search = (string)$this->getState('filter.search');
+        if ($search !== '') {
             if (stripos($search, 'id:') === 0) {
                 $query->where('a.id = ' . (int)substr($search, 3));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }

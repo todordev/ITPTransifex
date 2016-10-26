@@ -24,7 +24,7 @@ class ItpTransifexModelPackages extends JModelList
     {
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
-                "id", "a.id"
+                'id', 'a.id'
             );
         }
 
@@ -44,7 +44,7 @@ class ItpTransifexModelPackages extends JModelList
      */
     protected function populateState($ordering = 'ordering', $direction = 'ASC')
     {
-        parent::populateState("a.name", "ASC");
+        parent::populateState('a.name', 'ASC');
 
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
@@ -54,11 +54,11 @@ class ItpTransifexModelPackages extends JModelList
         $this->setState('params', $params);
 
         // Set project id.
-        $value = $app->input->get("id", 0, "uint");
+        $value = $app->input->get('id', 0, 'uint');
         $this->setState($this->context . '.id', $value);
 
         // Set language.
-        $value = $app->input->get("lang");
+        $value = $app->input->get('lang');
         $this->setState($this->context . '.lang', $value);
     }
 
@@ -93,8 +93,8 @@ class ItpTransifexModelPackages extends JModelList
         $db = $this->getDbo();
         /** @var $db JDatabaseDriver */
 
-        $projectId = $this->getState($this->context.".id");
-        $language  = $this->getState($this->context.".lang");
+        $projectId = $this->getState($this->context.'.id');
+        $language  = $this->getState($this->context.'.lang');
 
         // Create a new query object.
         $query = $db->getQuery(true);
@@ -107,8 +107,8 @@ class ItpTransifexModelPackages extends JModelList
             )
         );
         $query->from($db->quoteName('#__itptfx_packages', 'a'));
-        $query->where("a.project_id = " .(int)$projectId);
-        $query->where("a.language = " .$db->quote($language));
+        $query->where('a.project_id = ' .(int)$projectId);
+        $query->where('a.language = ' .$db->quote($language));
 
         // Add the list ordering clause.
         $orderString = $this->getOrderString();
@@ -119,8 +119,8 @@ class ItpTransifexModelPackages extends JModelList
 
     protected function getOrderString()
     {
-        $orderCol  = $this->getState("list.ordering", "a.title");
-        $orderDirn = $this->getState("list.direction", "ASC");
+        $orderCol  = $this->getState('list.ordering', 'a.title');
+        $orderDirn = $this->getState('list.direction', 'ASC');
 
         $orderString = $orderCol . ' ' . $orderDirn;
 

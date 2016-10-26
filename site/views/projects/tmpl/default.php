@@ -15,7 +15,7 @@ defined('_JEXEC') or die;?>
     <?php } ?>
 
     <?php if (empty($this->items)) { ?>
-        <p class="alert alert-warning"><?php echo JText::_("COM_ITPTRANSIFEX_NO_ITEMS_MATCHING_QUERY"); ?></p>
+        <p class="alert alert-warning"><?php echo JText::_('COM_ITPTRANSIFEX_NO_ITEMS_MATCHING_QUERY'); ?></p>
     <?php } ?>
 
     <?php echo $this->loadTemplate($this->templateView); ?>

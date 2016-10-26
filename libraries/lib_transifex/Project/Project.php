@@ -3,7 +3,7 @@
  * @package      Transifex\Project
  * @subpackage   Projects
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -27,12 +27,12 @@ class Project extends Table
     protected $alias;
     protected $description;
     protected $source_language_code;
-    protected $filename;
+    protected $filename = '';
     protected $image;
     protected $link;
     protected $published = 0;
     protected $ordering = 0;
-    protected $last_update = "0000-00-00";
+    protected $last_update = '1000-01-01';
 
     protected $slug;
     
@@ -40,53 +40,53 @@ class Project extends Table
 
     /**
      * Load project data.
-     * 
+     *
      * <code>
      * $projectId = 1;
-     * 
+     *
      * // Or other keys.
      * $keys = array(
      *     "alias" => "crowdfunding-component-en_gb"
      * );
      *
      * $project = new Transifex\Project\Project(\JFactory::getDbo());
-     * 
+     *
      * // Load by package ID.
      * $project->load($projectId);
-     * 
+     *
      * // Load by other keys.
      * $project->load($keys);
      * </code>
      *
      * @param int|array $keys
      * @param array $options
+     *
+     * @throws \RuntimeException
      */
-    public function load($keys, $options = array())
+    public function load($keys, array $options = array())
     {
         $query = $this->db->getQuery(true);
 
         $query
             ->select(
-                "a.id, a.name, a.alias, a.description, a.source_language_code, " .
-                "a.filename, a.link, a.image, a.published, a.ordering, a.last_update, " .
-                $query->concatenate(array("a.id", "a.alias"), ":") . " AS slug"
+                'a.id, a.name, a.alias, a.description, a.source_language_code, ' .
+                'a.filename, a.link, a.image, a.published, a.ordering, a.last_update, ' .
+                $query->concatenate(array('a.id', 'a.alias'), ':') . ' AS slug'
             )
-            ->from($this->db->quoteName("#__itptfx_projects", "a"));
+            ->from($this->db->quoteName('#__itptfx_projects', 'a'));
 
         if (!is_array($keys)) {
-            $query->where("a.id = " . (int)$keys);
+            $query->where('a.id = ' . (int)$keys);
         } else {
             foreach ($keys as $key => $value) {
-                $query->where($this->db->quoteName("a.".$key) . "=" . $this->db->quote($value));
+                $query->where($this->db->quoteName('a.'.$key) . '=' . $this->db->quote($value));
             }
         }
 
         $this->db->setQuery($query);
-        $result = $this->db->loadAssoc();
+        $result = (array)$this->db->loadAssoc();
 
-        if (!empty($result)) {
-            $this->bind($result);
-        }
+        $this->bind($result);
     }
     
     /**
@@ -114,25 +114,24 @@ class Project extends Table
 
     protected function updateObject()
     {
-        $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
-        $filename   = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
-        $language   = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
-        $image      = (!$this->image) ? "NULL" : $this->db->quote($this->image);
+        $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
+        $language   = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
+        $image      = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->update($this->db->quoteName("#__itptfx_projects"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("description") . "=" . $description)
-            ->set($this->db->quoteName("source_language_code") . "=" . $language)
-            ->set($this->db->quoteName("filename") . "=" . $filename)
-            ->set($this->db->quoteName("image") . "=" . $image)
-            ->set($this->db->quoteName("ordering") . "=" . (int)$this->ordering)
-            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
-            ->set($this->db->quoteName("last_update") . "=" . $this->db->quote($this->last_update))
-            ->where($this->db->quoteName("id") ."=". (int)$this->id);
+            ->update($this->db->quoteName('#__itptfx_projects'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('description') . '=' . $description)
+            ->set($this->db->quoteName('source_language_code') . '=' . $language)
+            ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('image') . '=' . $image)
+            ->set($this->db->quoteName('ordering') . '=' . (int)$this->ordering)
+            ->set($this->db->quoteName('published') . '=' . (int)$this->published)
+            ->set($this->db->quoteName('last_update') . '=' . $this->db->quote($this->last_update))
+            ->where($this->db->quoteName('id') .'='. (int)$this->id);
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -140,24 +139,23 @@ class Project extends Table
 
     protected function insertObject()
     {
-        $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
-        $filename   = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
-        $language   = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
-        $image      = (!$this->image) ? "NULL" : $this->db->quote($this->image);
+        $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
+        $language   = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
+        $image      = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->insert($this->db->quoteName("#__itptfx_projects"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("description") . "=" . $description)
-            ->set($this->db->quoteName("source_language_code") . "=" . $language)
-            ->set($this->db->quoteName("filename") . "=" . $filename)
-            ->set($this->db->quoteName("image") . "=" . $image)
-            ->set($this->db->quoteName("ordering") . "=" . (int)$this->ordering)
-            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
-            ->set($this->db->quoteName("last_update") . "=" . $this->db->quote($this->last_update));
+            ->insert($this->db->quoteName('#__itptfx_projects'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('description') . '=' . $description)
+            ->set($this->db->quoteName('source_language_code') . '=' . $language)
+            ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('image') . '=' . $image)
+            ->set($this->db->quoteName('ordering') . '=' . (int)$this->ordering)
+            ->set($this->db->quoteName('published') . '=' . (int)$this->published)
+            ->set($this->db->quoteName('last_update') . '=' . $this->db->quote($this->last_update));
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -464,13 +462,13 @@ class Project extends Table
      * @param array $options
      * @param bool  $force
      *
+     * @throws \RuntimeException
      * @return Packages
      */
-    public function getPackages($options = array(), $force = false)
+    public function getPackages(array $options = array(), $force = false)
     {
-        if (is_null($this->packages) or $force) {
-
-            $options["project_id"] = (int)$this->id;
+        if ($this->packages === null or $force) {
+            $options['project_id'] = (int)$this->id;
             
             $this->packages = new Packages(\JFactory::getDbo());
             $this->packages->load($options);

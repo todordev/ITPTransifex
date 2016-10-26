@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 
 class ItpTransifexController extends JControllerLegacy
 {
-    protected $cacheableViews = array("projects");
+    protected $cacheableViews = array('projects');
 
     /**
      * Method to display a view.
@@ -31,13 +31,13 @@ class ItpTransifexController extends JControllerLegacy
         $viewName = $this->input->getCmd('view', '');
         $this->input->set('view', $viewName);
 
-        $option = $this->input->getCmd("options", "com_itptransifex");
+        $option = $this->input->getCmd('options', 'com_itptransifex');
 
         $document = JFactory::getDocument();
         $document->addStyleSheet('../media/' . $option . '/css/frontend.style.css');
 
         // Cache some views.
-        if (in_array($viewName, $this->cacheableViews)) {
+        if (in_array($viewName, $this->cacheableViews, true)) {
             $cachable = true;
         }
 

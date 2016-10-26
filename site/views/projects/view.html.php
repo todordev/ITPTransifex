@@ -30,7 +30,7 @@ class ItpTransifexViewProjects extends JViewLegacy
     protected $items;
     protected $pagination;
 
-    protected $allowedLayouts = array("grid", "list");
+    protected $allowedLayouts = array('grid', 'list');
     protected $templateView;
     protected $numberInRow;
     protected $imageFolder;
@@ -43,8 +43,8 @@ class ItpTransifexViewProjects extends JViewLegacy
 
     protected $pageclass_sfx;
 
-    protected $imageWidth = "";
-    protected $imageHeight = "";
+    protected $imageWidth = '';
+    protected $imageHeight = '';
 
     public function display($tpl = null)
     {
@@ -52,30 +52,25 @@ class ItpTransifexViewProjects extends JViewLegacy
         $this->state      = $this->get('State');
         $this->pagination = $this->get('Pagination');
 
-        $this->params     = $this->state->get("params");
+        $this->params     = $this->state->get('params');
 
-        $this->numberInRow = $this->params->get("items_row", 4);
+        $this->numberInRow = $this->params->get('items_row', 4);
 
         // Get the folder with images
-        $this->imageFolder = $this->params->get("images_directory", "images/itptransifex");
-
-        // Prepare items parameters.
-        if (!empty($this->items)) {
-//            $this->items = ItpTransifexHelper::prepareCategories($this->items, $this->numberInRow);
-        }
+        $this->imageFolder = $this->params->get('images_directory', 'images/itptransifex');
 
         // Get layout
-        $layout = $this->params->get("layout", "grid");
-        $this->templateView = (in_array($layout, $this->allowedLayouts)) ? $layout : "grid";
+        $layout = $this->params->get('layout', 'grid');
+        $this->templateView = in_array($layout, $this->allowedLayouts, true) ? $layout : 'grid';
 
         // Get params
-        $this->params = $this->state->get("params");
+        $this->params = $this->state->get('params');
         /** @var  $params Joomla\Registry\Registry */
 
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
-        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
+        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') === 0);
 
         $this->prepareDocument();
 
@@ -103,11 +98,11 @@ class ItpTransifexViewProjects extends JViewLegacy
 
         // Meta keywords
         if ($this->params->get('menu-meta_keywords')) {
-            $this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
+            $this->document->setMetaData('keywords', $this->params->get('menu-meta_keywords'));
         }
 
         if ($this->params->get('robots')) {
-            $this->document->setMetadata('robots', $this->params->get('robots'));
+            $this->document->setMetaData('robots', $this->params->get('robots'));
         }
 
         // Scripts
@@ -143,9 +138,9 @@ class ItpTransifexViewProjects extends JViewLegacy
         // Add title before or after Site Name
         if (!$title) {
             $title = $app->get('sitename');
-        } elseif ($app->get('sitename_pagetitles', 0) == 1) {
+        } elseif ((int)$app->get('sitename_pagetitles', 0) === 1) {
             $title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
-        } elseif ($app->get('sitename_pagetitles', 0) == 2) {
+        } elseif ((int)$app->get('sitename_pagetitles', 0) === 2) {
             $title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
         }
 

@@ -10,8 +10,8 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport("Prism.init");
-jimport("Transifex.init");
+jimport('Prism.init');
+jimport('Transifex.init');
 
 $controller = JControllerLegacy::getInstance('ItpTransifex');
 $controller->execute(JFactory::getApplication()->input->getCmd('task'));

@@ -3,7 +3,7 @@
  * @package      Transifex\Package
  * @subpackage   Packages
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -48,30 +48,29 @@ class Package extends Table
      *
      * @param int|array $keys
      * @param array $options
+     *
+     * @throws \RuntimeException
      */
-    public function load($keys, $options = array())
+    public function load($keys, array $options = array())
     {
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.alias, a.filename, a.description, a.version, a.language, a.type, a.project_id")
-            ->from($this->db->quoteName("#__itptfx_packages", "a"));
+            ->select('a.id, a.name, a.alias, a.filename, a.description, a.version, a.language, a.type, a.project_id')
+            ->from($this->db->quoteName('#__itptfx_packages', 'a'));
 
         if (is_array($keys)) {
             foreach ($keys as $key => $value) {
-                $query->where($this->db->quoteName("a.".$key) . "=" . $this->db->quote($value));
+                $query->where($this->db->quoteName('a.'.$key) . '=' . $this->db->quote($value));
             }
         } else {
-            $query->where("a.id = " . (int)$keys);
+            $query->where('a.id = ' . (int)$keys);
         }
 
         $this->db->setQuery($query);
-        $result = $this->db->loadAssoc();
+        $result = (array)$this->db->loadAssoc();
 
-        if (!empty($result)) {
-            $this->bind($result);
-        }
-
+        $this->bind($result);
     }
 
     /**
@@ -79,7 +78,7 @@ class Package extends Table
      *
      * <code>
      * $data = array(
-     *    "name" => "CrowdFunding Package",
+     *    "name"  => "CrowdFunding Package",
      *    "alias" => "crowdfunding-package-en_gb",
      * );
      *
@@ -99,21 +98,21 @@ class Package extends Table
 
     protected function updateObject()
     {
-        $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
+        $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->update($this->db->quoteName("#__itptfx_packages"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("description") . "=" . $description)
-            ->set($this->db->quoteName("filename") . "=" . $this->db->quote($this->filename))
-            ->set($this->db->quoteName("version") . "=" . $this->db->quote($this->version))
-            ->set($this->db->quoteName("language") . "=" . $this->db->quote($this->language))
-            ->set($this->db->quoteName("type") . "=" . $this->db->quote($this->type))
-            ->set($this->db->quoteName("project_id") . "=" . (int)$this->project_id)
-            ->where($this->db->quoteName("id") ."=". (int)$this->id);
+            ->update($this->db->quoteName('#__itptfx_packages'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('description') . '=' . $description)
+            ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('version') . '=' . $this->db->quote($this->version))
+            ->set($this->db->quoteName('language') . '=' . $this->db->quote($this->language))
+            ->set($this->db->quoteName('type') . '=' . $this->db->quote($this->type))
+            ->set($this->db->quoteName('project_id') . '=' . (int)$this->project_id)
+            ->where($this->db->quoteName('id') .'='. (int)$this->id);
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -121,20 +120,20 @@ class Package extends Table
 
     protected function insertObject()
     {
-        $description   = (!$this->description) ? "NULL" : $this->db->quote($this->description);
+        $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->insert($this->db->quoteName("#__itptfx_packages"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("description") . "=" . $description)
-            ->set($this->db->quoteName("filename") . "=" . $this->db->quote($this->filename))
-            ->set($this->db->quoteName("version") . "=" . $this->db->quote($this->version))
-            ->set($this->db->quoteName("language") . "=" . $this->db->quote($this->language))
-            ->set($this->db->quoteName("type") . "=" . $this->db->quote($this->type))
-            ->set($this->db->quoteName("project_id") . "=" . (int)$this->project_id);
+            ->insert($this->db->quoteName('#__itptfx_packages'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('description') . '=' . $description)
+            ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('version') . '=' . $this->db->quote($this->version))
+            ->set($this->db->quoteName('language') . '=' . $this->db->quote($this->language))
+            ->set($this->db->quoteName('type') . '=' . $this->db->quote($this->type))
+            ->set($this->db->quoteName('project_id') . '=' . (int)$this->project_id);
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -160,7 +159,7 @@ class Package extends Table
      */
     public function getId()
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     /**
@@ -515,18 +514,19 @@ class Package extends Table
      *
      * @param int $state The state of the resources - 0 = unpublished, 1 = published, -2 = trashed.
      *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      * @return Resources
      */
     public function getResources($state = null)
     {
-        if (is_null($this->resources)) {
-
+        if ($this->resources === null) {
             // Get package resources.
             $query = $this->db->getQuery(true);
             $query
-                ->select("a.resource_id")
-                ->from($this->db->quoteName("#__itptfx_packages_map", "a"))
-                ->where("a.package_id = " . (int)$this->getId());
+                ->select('a.resource_id')
+                ->from($this->db->quoteName('#__itptfx_packages_map', 'a'))
+                ->where('a.package_id = ' . (int)$this->getId());
 
             $this->db->setQuery($query);
             $resourcesIds = $this->db->loadColumn();
@@ -534,8 +534,8 @@ class Package extends Table
             // Load resources.
 
             $options = array(
-                "ids" => $resourcesIds,
-                "state" => $state
+                'ids'  => $resourcesIds,
+                'state' => $state
             );
 
             $this->resources = new Resources($this->db);

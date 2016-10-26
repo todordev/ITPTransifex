@@ -36,9 +36,18 @@ if (!empty($packageType)) {
                     <?php echo $this->form->getControlGroup('name'); ?>
                     <?php echo $this->form->getControlGroup('alias'); ?>
                     <?php echo $this->form->getControlGroup('filename'); ?>
-                    <?php echo $this->form->getControlGroup('language'); ?>
-                    <?php echo $this->form->getControlGroup('type'); ?>
-                    <?php echo $this->form->getControlGroup('version'); ?>
+
+                    <div class="row-fluid">
+                        <div class="span3">
+                            <?php echo $this->form->getControlGroup('language'); ?>
+                        </div>
+                        <div class="span3">
+                            <?php echo $this->form->getControlGroup('type'); ?>
+                        </div>
+                        <div class="span3">
+                            <?php echo $this->form->getControlGroup('version'); ?>
+                        </div>
+                    </div>
                     <?php echo $this->form->getControlGroup('description'); ?>
                 </div>
             </div>
@@ -50,7 +59,11 @@ if (!empty($packageType)) {
     </div>
     <div class="modal-footer">
         <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader" />
-        <a href="#" class="btn btn-primary" id="js-btn-sp"><?php echo JText::_("COM_ITPTRANSIFEX_SUBMIT");?></a>
-        <a href="#" class="btn" id="js-btn-cp-cancel"><?php echo JText::_("COM_ITPTRANSIFEX_CANCEL");?></a>
+        <a href="#" class="btn btn-primary" id="js-btn-sp">
+            <?php echo JText::_('COM_ITPTRANSIFEX_SUBMIT');?>
+        </a>
+        <a href="#" class="btn" id="js-btn-cp-cancel">
+            <?php echo JText::_('COM_ITPTRANSIFEX_CANCEL');?>
+        </a>
     </div>
 </div>

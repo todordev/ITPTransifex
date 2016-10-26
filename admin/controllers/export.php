@@ -18,6 +18,13 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexControllerExport extends Prism\Controller\Admin
 {
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param array  $config
+     *
+     * @return ItpTransifexModelExport
+     */
     public function getModel($name = 'Export', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
@@ -35,13 +42,12 @@ class ItpTransifexControllerExport extends Prism\Controller\Admin
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
 
-        $projectId = $this->input->getInt("id");
-        $language  = $this->input->getCmd("language");
+        $projectId = $this->input->getInt('id');
+        $language  = $this->input->getCmd('language');
 
         $model = $this->getModel();
 
         try {
-
             // Get project
             $project = new Transifex\Project\Project(JFactory::getDbo());
             $project->load($projectId);
@@ -52,17 +58,17 @@ class ItpTransifexControllerExport extends Prism\Controller\Admin
             $fileName = $project->getName();
 
             $filter   = JFilterInput::getInstance();
-            $fileName = $filter->clean($fileName, "CMD")."_".$language.".xml";
+            $fileName = $filter->clean($fileName, 'CMD').'_'.$language.'.xml';
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
-        $tmpFolder = JPath::clean($app->get("tmp_path"));
+        $tmpFolder = JPath::clean($app->get('tmp_path'));
 
         $archiveName = JFile::stripExt(basename($fileName));
-        $archiveFile = $archiveName . ".zip";
+        $archiveFile = $archiveName . '.zip';
         $destination = $tmpFolder . DIRECTORY_SEPARATOR . $archiveFile;
 
         // compression type

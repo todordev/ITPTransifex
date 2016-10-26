@@ -39,14 +39,10 @@ class ItpTransifexViewProjects extends JViewLegacy
 
     protected $sidebar;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option     = JFactory::getApplication()->input->get('option');
+        
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
@@ -67,7 +63,7 @@ class ItpTransifexViewProjects extends JViewLegacy
         $languages = new Transifex\Language\Languages(JFactory::getDbo());
         $languages->load();
 
-        $this->languages = $languages->toOptions("code", "name");
+        $this->languages = $languages->toOptions('locale', 'name');
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -88,7 +84,7 @@ class ItpTransifexViewProjects extends JViewLegacy
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
-        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
+        $this->saveOrder = strcmp($this->listOrder, 'a.ordering') === 0;
 
         if ($this->saveOrder) {
             $this->saveOrderingUrl = 'index.php?option=' . $this->option . '&task=' . $this->getName() . '.saveOrderAjax&format=raw';
@@ -118,22 +114,22 @@ class ItpTransifexViewProjects extends JViewLegacy
     protected function addToolbar()
     {
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_PROJECTS_MANAGER'));
-        JToolBarHelper::addNew('project.add');
-        JToolBarHelper::editList('project.edit');
+        JToolbarHelper::title(JText::_('COM_ITPTRANSIFEX_PROJECTS_MANAGER'));
+        JToolbarHelper::addNew('project.add');
+        JToolbarHelper::editList('project.edit');
         JToolbarHelper::divider();
-        JToolbarHelper::publishList("projects.publish");
-        JToolbarHelper::unpublishList("projects.unpublish");
-        JToolBarHelper::divider();
-        JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "projects.delete");
-        JToolBarHelper::divider();
-        JToolBarHelper::custom('projects.update', "refresh", "", JText::_("COM_ITPTRANSIFEX_UPDATE"), false);
-        JToolBarHelper::custom("package.downloadProject", 'download', null, JText::_("COM_ITPTRANSIFEX_DOWNLOAD"));
+        JToolbarHelper::publishList('projects.publish');
+        JToolbarHelper::unpublishList('projects.unpublish');
+        JToolbarHelper::divider();
+        JToolbarHelper::deleteList(JText::_('COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION'), 'projects.delete');
+        JToolbarHelper::divider();
+        JToolbarHelper::custom('projects.update', 'refresh', '', JText::_('COM_ITPTRANSIFEX_UPDATE'), false);
+        JToolbarHelper::custom('package.downloadProject', 'download', null, JText::_('COM_ITPTRANSIFEX_DOWNLOAD'));
 
-        JToolBarHelper::divider();
+        JToolbarHelper::divider();
 
-        JToolBarHelper::divider();
-        JToolBarHelper::custom('projects.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
+        JToolbarHelper::divider();
+        JToolbarHelper::custom('projects.backToDashboard', 'dashboard', '', JText::_('COM_ITPTRANSIFEX_BACK_DASHBOARD'), false);
     }
 
     /**
@@ -150,11 +146,10 @@ class ItpTransifexViewProjects extends JViewLegacy
 
         // Scripts
         JHtml::_('behavior.multiselect');
-        JHtml::_('formbehavior.chosen', '#sortTable, #directionTable, #limit');
         JHtml::_('bootstrap.tooltip');
 
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }
 }

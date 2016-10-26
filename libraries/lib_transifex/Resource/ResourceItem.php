@@ -3,7 +3,7 @@
  * @package      Transifex\Resource
  * @subpackage   Resources
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -19,13 +19,15 @@ defined('JPATH_PLATFORM') or die;
  * @package      Transifex\Resource
  * @subpackage   Resources
  */
-class Resource extends Table
+class ResourceItem extends Table
 {
     protected $id;
     protected $name;
     protected $alias;
     protected $filename;
-    protected $type;
+    protected $category;
+    protected $source;
+    protected $path;
     protected $i18n_type;
     protected $source_language_code;
     protected $published;
@@ -44,29 +46,29 @@ class Resource extends Table
      *
      * @param int|array $keys
      * @param array $options
+     *
+     * @throws \RuntimeException
      */
-    public function load($keys, $options = array())
+    public function load($keys, array $options = array())
     {
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.alias, a.filename, a.type, a.i18n_type, a.source_language_code, a.published, a.project_id")
-            ->from($this->db->quoteName("#__itptfx_resources", "a"));
+            ->select('a.id, a.name, a.alias, a.filename, a.category, a.source, a.path, a.i18n_type, a.source_language_code, a.published, a.project_id')
+            ->from($this->db->quoteName('#__itptfx_resources', 'a'));
 
         if (!is_array($keys)) {
-            $query->where("a.id = " . (int)$keys);
+            $query->where('a.id = ' . (int)$keys);
         } else {
             foreach ($keys as $key => $value) {
-                $query->where($this->db->quoteName("a.".$key) . "=" . $this->db->quote($value));
+                $query->where($this->db->quoteName('a.'.$key) . '=' . $this->db->quote($value));
             }
         }
 
         $this->db->setQuery($query);
-        $result = $this->db->loadAssoc();
+        $result = (array)$this->db->loadAssoc();
 
-        if (!empty($result)) {
-            $this->bind($result);
-        }
+        $this->bind($result);
     }
 
     /**
@@ -94,24 +96,28 @@ class Resource extends Table
 
     protected function updateObject()
     {
-        $filename    = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
-        $type        = (!$this->type) ? "NULL" : $this->db->quote($this->type);
-        $i18n_type   = (!$this->i18n_type) ? "NULL" : $this->db->quote($this->i18n_type);
-        $language    = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
+        $filename    = (!$this->filename) ? 'NULL' : $this->db->quote($this->filename);
+        $category    = (!$this->category) ? 'NULL' : $this->db->quote($this->category);
+        $source      = (!$this->source) ? 'NULL' : $this->db->quote($this->source);
+        $path        = (!$this->path) ? 'NULL' : $this->db->quote($this->path);
+        $i18n_type   = (!$this->i18n_type) ? 'NULL' : $this->db->quote($this->i18n_type);
+        $language    = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->update($this->db->quoteName("#__itptfx_resources"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("filename") . "=" . $filename)
-            ->set($this->db->quoteName("type") . "=" . $type)
-            ->set($this->db->quoteName("i18n_type") . "=" . $i18n_type)
-            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
-            ->set($this->db->quoteName("source_language_code") . "=" . $language)
-            ->set($this->db->quoteName("project_id") . "=" . (int)$this->project_id)
-            ->where($this->db->quoteName("id") ."=". (int)$this->id);
+            ->update($this->db->quoteName('#__itptfx_resources'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('filename') . '=' . $filename)
+            ->set($this->db->quoteName('category') . '=' . $category)
+            ->set($this->db->quoteName('source') . '=' . $source)
+            ->set($this->db->quoteName('path') . '=' . $path)
+            ->set($this->db->quoteName('i18n_type') . '=' . $i18n_type)
+            ->set($this->db->quoteName('published') . '=' . (int)$this->published)
+            ->set($this->db->quoteName('source_language_code') . '=' . $language)
+            ->set($this->db->quoteName('project_id') . '=' . (int)$this->project_id)
+            ->where($this->db->quoteName('id') .'='. (int)$this->id);
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -119,23 +125,27 @@ class Resource extends Table
 
     protected function insertObject()
     {
-        $filename    = (!$this->filename) ? "NULL" : $this->db->quote($this->filename);
-        $type        = (!$this->type) ? "NULL" : $this->db->quote($this->type);
-        $i18n_type   = (!$this->i18n_type) ? "NULL" : $this->db->quote($this->i18n_type);
-        $language    = (!$this->source_language_code) ? "NULL" : $this->db->quote($this->source_language_code);
+        $filename    = (!$this->filename) ? 'NULL' : $this->db->quote($this->filename);
+        $category    = (!$this->category) ? 'NULL' : $this->db->quote($this->category);
+        $source      = (!$this->source) ? 'NULL' : $this->db->quote($this->source);
+        $path        = (!$this->path) ? 'NULL' : $this->db->quote($this->path);
+        $i18n_type   = (!$this->i18n_type) ? 'NULL' : $this->db->quote($this->i18n_type);
+        $language    = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
 
         $query = $this->db->getQuery(true);
 
         $query
-            ->insert($this->db->quoteName("#__itptfx_resources"))
-            ->set($this->db->quoteName("name") . "=" . $this->db->quote($this->name))
-            ->set($this->db->quoteName("alias") . "=" . $this->db->quote($this->alias))
-            ->set($this->db->quoteName("filename") . "=" . $filename)
-            ->set($this->db->quoteName("type") . "=" . $type)
-            ->set($this->db->quoteName("i18n_type") . "=" . $i18n_type)
-            ->set($this->db->quoteName("published") . "=" . (int)$this->published)
-            ->set($this->db->quoteName("source_language_code") . "=" . $language)
-            ->set($this->db->quoteName("project_id") . "=" . (int)$this->project_id);
+            ->insert($this->db->quoteName('#__itptfx_resources'))
+            ->set($this->db->quoteName('name') . '=' . $this->db->quote($this->name))
+            ->set($this->db->quoteName('alias') . '=' . $this->db->quote($this->alias))
+            ->set($this->db->quoteName('filename') . '=' . $filename)
+            ->set($this->db->quoteName('category') . '=' . $category)
+            ->set($this->db->quoteName('source') . '=' . $source)
+            ->set($this->db->quoteName('path') . '=' . $path)
+            ->set($this->db->quoteName('i18n_type') . '=' . $i18n_type)
+            ->set($this->db->quoteName('published') . '=' . (int)$this->published)
+            ->set($this->db->quoteName('source_language_code') . '=' . $language)
+            ->set($this->db->quoteName('project_id') . '=' . (int)$this->project_id);
 
         $this->db->setQuery($query);
         $this->db->execute();
@@ -161,7 +171,7 @@ class Resource extends Table
      */
     public function getId()
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     /**
@@ -281,7 +291,7 @@ class Resource extends Table
     }
 
     /**
-     * Return the type of the resource.
+     * Return the category of the resource.
      *
      * <code>
      * $resourceId = 1;
@@ -289,14 +299,52 @@ class Resource extends Table
      * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
      * $project->load($resourceId);
      *
-     * echo $resource->getType();
+     * echo $resource->getCategory();
      * </code>
      *
      * @return int
      */
-    public function getType()
+    public function getCategory()
     {
-        return $this->type;
+        return $this->category;
+    }
+
+    /**
+     * Return the source folder of the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getSource();
+     * </code>
+     *
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Return the path to the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * echo $resource->getPath();
+     * </code>
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**
@@ -476,7 +524,7 @@ class Resource extends Table
     }
 
     /**
-     * Set the type of the resource.
+     * Set the category of the resource.
      *
      * <code>
      * $resourceId = 1;
@@ -484,15 +532,59 @@ class Resource extends Table
      * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
      * $project->load($resourceId);
      *
-     * $resource->setType("site");
+     * $resource->setCategory("module");
      *
-     * @param string $type The type of the resource - site or admin.
+     * @param string $category The category of the resource.
      *
      * @return self
      */
-    public function setType($type)
+    public function setCategory($category)
     {
-        $this->type = $type;
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * Set the path to the resource.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setPath("/modules/mod_userideasitems");
+     *
+     * @param string $path The path to the resource.
+     *
+     * @return self
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the name of the folder where the resource will be stored in the package.
+     *
+     * <code>
+     * $resourceId = 1;
+     *
+     * $resource = new Transifex\Resource\Resource(\JFactory::getDbo());
+     * $project->load($resourceId);
+     *
+     * $resource->setSource("admin");
+     *
+     * @param string $sourceFolder Folder name
+     *
+     * @return self
+     */
+    public function setSource($sourceFolder)
+    {
+        $this->source = $sourceFolder;
 
         return $this;
     }

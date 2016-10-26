@@ -7,6 +7,9 @@
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
+use Joomla\Utilities\ArrayHelper;
+use Joomla\String\StringHelper;
+
 // no direct access
 defined('_JEXEC') or die;
 
@@ -27,7 +30,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param   string $prefix A prefix for the table class name. Optional.
      * @param   array $config Configuration array for model. Optional.
      *
-     * @return  JTable  A database object
+     * @return  ItpTransifexTablePackage|bool  A database object
      * @since   1.6
      */
     public function getTable($type = 'Package', $prefix = 'ItpTransifexTable', $config = array())
@@ -41,14 +44,14 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param   array   $data     An optional array of data for the form to interogate.
      * @param   boolean $loadData True if the form is to load its own data (default case), false if not.
      *
-     * @return  JForm   A JForm object on success, false on failure
+     * @return  JForm|bool   A JForm object on success, false on failure
      * @since   1.6
      */
     public function getForm($data = array(), $loadData = true)
     {
         // Get the form.
         $form = $this->loadForm($this->option . '.package', 'package', array('control' => 'jform', 'load_data' => $loadData));
-        if (empty($form)) {
+        if (!$form) {
             return false;
         }
 
@@ -66,7 +69,7 @@ class ItpTransifexModelPackage extends JModelAdmin
         // Check the session for previously entered form data.
         $data = JFactory::getApplication()->getUserState($this->option . '.edit.package.data', array());
 
-        if (empty($data)) {
+        if (!$data) {
             $data = $this->getItem();
         }
 
@@ -78,42 +81,39 @@ class ItpTransifexModelPackage extends JModelAdmin
      *
      * @param array $data   The data about item
      *
+     * @throws \InvalidArgumentException
      * @return   int  Item ID
      */
     public function save($data)
     {
-        $id        = Joomla\Utilities\ArrayHelper::getValue($data, "id", 0, "int");
-        $name      = Joomla\Utilities\ArrayHelper::getValue($data, "name");
-        $alias     = Joomla\Utilities\ArrayHelper::getValue($data, "alias");
-        $filename  = Joomla\Utilities\ArrayHelper::getValue($data, "filename");
-        $desc      = Joomla\Utilities\ArrayHelper::getValue($data, "description");
-        $version   = Joomla\Utilities\ArrayHelper::getValue($data, "version");
-        $type      = Joomla\Utilities\ArrayHelper::getValue($data, "type");
-        $language  = Joomla\Utilities\ArrayHelper::getValue($data, "language");
-        $projectId = Joomla\Utilities\ArrayHelper::getValue($data, "project_id", 0, "int");
-
-        if (!$desc) {
-            $desc = null;
-        }
+        $id             = ArrayHelper::getValue($data, 'id', 0, 'int');
+        $name           = StringHelper::trim(ArrayHelper::getValue($data, 'name'));
+        $alias          = StringHelper::trim(ArrayHelper::getValue($data, 'alias'));
+        $filename       = StringHelper::trim(ArrayHelper::getValue($data, 'filename'));
+        $description    = StringHelper::trim(ArrayHelper::getValue($data, 'description'));
+        $version        = StringHelper::trim(ArrayHelper::getValue($data, 'version'));
+        $type           = ArrayHelper::getValue($data, 'type');
+        $language       = ArrayHelper::getValue($data, 'language');
+        $projectId      = ArrayHelper::getValue($data, 'project_id', 0, 'int');
 
         // Load a record from the database
         $row = $this->getTable();
         $row->load($id);
 
-        $row->set("name", $name);
-        $row->set("alias", $alias);
-        $row->set("filename", $filename);
-        $row->set("description", $desc);
-        $row->set("version", $version);
-        $row->set("language", $language);
-        $row->set("type", $type);
-        $row->set("project_id", $projectId);
+        $row->set('name', $name);
+        $row->set('alias', $alias);
+        $row->set('filename', $filename);
+        $row->set('description', $description);
+        $row->set('version', $version);
+        $row->set('language', $language);
+        $row->set('type', $type);
+        $row->set('project_id', $projectId);
 
         $this->prepareTable($row);
 
         $row->store(true);
 
-        return $row->get("id");
+        return $row->get('id');
     }
 
     /**
@@ -121,6 +121,8 @@ class ItpTransifexModelPackage extends JModelAdmin
      *
      * @param integer $packageId
      * @param array $resourcesIDs
+     *
+     * @throws \RuntimeException
      */
     public function saveResourcesIds($packageId, $resourcesIDs)
     {
@@ -129,78 +131,76 @@ class ItpTransifexModelPackage extends JModelAdmin
         // Get existed resources
         $query = $db->getQuery(true);
         $query
-            ->select("a.resource_id")
-            ->from($db->quoteName("#__itptfx_packages_map", "a"))
-            ->where("a.package_id = " . (int)$packageId);
+            ->select('a.resource_id')
+            ->from($db->quoteName('#__itptfx_packages_map', 'a'))
+            ->where('a.package_id = ' . (int)$packageId);
 
         $db->setQuery($query);
         $results = $db->loadColumn();
 
-        $results = Joomla\Utilities\ArrayHelper::toInteger($results);
+        $results = ArrayHelper::toInteger($results);
 
         // Prepare these resources that does not exist.
         foreach ($results as $resourceId) {
-            $key = array_search($resourceId, $resourcesIDs);
+            $key = array_search((int)$resourceId, $resourcesIDs, true);
             if (false !== $key) {
                 unset($resourcesIDs[$key]);
             }
         }
 
-        // Add newest resources to the map.
-        if (!empty($resourcesIDs)) {
-
-            $columns = array("package_id", "resource_id");
+        // Add new resources to the map.
+        if (count($resourcesIDs) > 0) {
+            $columns = array('package_id', 'resource_id');
 
             $values = array();
             foreach ($resourcesIDs as $resourceId) {
-                $values[] = (int)$packageId . "," . (int)$resourceId;
+                $values[] = (int)$packageId . ',' . (int)$resourceId;
             }
 
             $query = $db->getQuery(true);
             $query
-                ->insert($db->quoteName("#__itptfx_packages_map"))
+                ->insert($db->quoteName('#__itptfx_packages_map'))
                 ->columns($columns)
                 ->values($values);
 
             $db->setQuery($query);
             $db->execute();
         }
-
     }
     
     protected function prepareTable($table)
     {
         // Fix magic quotes
         if (get_magic_quotes_gpc()) {
-            $table->set("name", stripcslashes($table->get("name")));
-            $table->set("description", stripcslashes($table->get("description")));
+            $table->set('name', stripcslashes($table->get('name')));
+            $table->set('description', stripcslashes($table->get('description')));
         }
 
-        if (!$table->get("filename")) {
-            $table->set("filename", null);
+        if (!$table->get('filename')) {
+            $table->set('filename', null);
         }
 
-        if (!$table->get("description")) {
-            $table->set("description", null);
+        if (!$table->get('description')) {
+            $table->set('description', null);
         }
 
         // If an alias does not exist, I will generate the new one using the title.
-        if (!$table->get("alias")) {
-            $table->set("alias", $table->get("name")."-".$table->get("language"));
+        if (!$table->get('alias')) {
+            $table->set('alias', $table->get('name').'-'.$table->get('language'));
         }
-        $table->set("alias", JFilterOutput::stringURLSafe($table->get("alias")));
+        $table->set('alias', Prism\Utilities\StringHelper::stringUrlSafe($table->get('alias')));
 
         // Prepare language code.
-        $langCode1 = str_replace("-", "_", substr($table->get("alias"), -5, 5));
-        $langCode2 = JString::strtolower($table->get("language"));
-        if (strcmp($langCode1, $langCode2) == 0) {
-            $alias = substr($table->get("alias"), 0, -5);
-            $table->set("alias", $alias . $langCode2);
+        $langCode1 = str_replace('-', '_', substr($table->get('alias'), -5, 5));
+        $langCode2 = StringHelper::strtolower($table->get('language'));
+        if (strcmp($langCode1, $langCode2) === 0) {
+            $alias = substr($table->get('alias'), 0, -5);
+            $table->set('alias', $alias . $langCode2);
         }
 
         // Check for existing alias.
-        if (!$table->get("id") and $this->isAliasExists($table->get("alias"))) {
-            $table->set("alias", Prism\String\StringHelper::generateRandomString(16) ."-". $langCode2);
+        if (!$table->get('id') and $this->isAliasExists($table->get('alias'))) {
+            $table->set('alias', Prism\Utilities\StringHelper::generateRandomString(16) .'-'. $langCode2);
         }
     }
 
@@ -210,11 +210,11 @@ class ItpTransifexModelPackage extends JModelAdmin
         $query = $db->getQuery(true);
 
         $query
-            ->select("COUNT(*)")
-            ->from($db->quoteName("#__itptfx_packages", "a"))
-            ->where("a.alias = " . $db->quote($alias));
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.alias = ' . $db->quote($alias));
 
-        $db->setQuery($query);
+        $db->setQuery($query, 0, 1);
 
         return (bool)$db->loadResult();
     }
@@ -225,6 +225,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param int $packageId
      * @param bool $includeLanguageName Include or not language name to package name.
      *
+     * @throws Exception
      * @return string
      */
     public function preparePackage($packageId, $includeLanguageName = true)
@@ -233,8 +234,6 @@ class ItpTransifexModelPackage extends JModelAdmin
         /** @var $app JApplicationAdministrator */
 
         $db = $this->getDbo();
-
-        $packageFile = "";
 
         // Get package.
         $package = new Transifex\Package\Package($db);
@@ -245,10 +244,10 @@ class ItpTransifexModelPackage extends JModelAdmin
         $project->load($package->getProjectId());
 
         // Prepare project URL that points to Transifex.
-        $this->options["project_path"] = "project/" . $project->getAlias();
+        $this->options['project_path'] = 'project/' . $project->getAlias();
 
         $packageFileName = $package->getFilename();
-        $packageFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $packageFileName);
+        $packageFolder   = JPath::clean($app->get('tmp_path') . DIRECTORY_SEPARATOR . $packageFileName);
 
         // Remove old folder
         if (JFolder::exists($packageFolder)) {
@@ -264,27 +263,13 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         $packageType = $package->getType();
 
-        switch ($packageType) {
-
-            case "component":
-                $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
-                break;
-
-            case "module":
-                $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
-                break;
-
-            case "plugin":
-                $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
-                break;
-
-            case "library":
-                $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
-                break;
+        if (strcmp('plugin', $packageType) === 0) {
+            $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
+        } else {
+            $packageFile = $this->prepareExtension($package, $resources, $packageFolder, $includeLanguageName);
         }
 
         return $packageFile;
-
     }
 
     /**
@@ -292,9 +277,10 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param  string $fileName
      * @param  bool $includeLanguageName
      *
+     * @throws Exception
      * @return string
      */
-    public function prepareProjectPackage(array $packagesIds, $fileName = "UNZIPFIRST", $includeLanguageName = true)
+    public function prepareProjectPackage(array $packagesIds, $fileName = 'UNZIPFIRST', $includeLanguageName = true)
     {
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
@@ -302,10 +288,9 @@ class ItpTransifexModelPackage extends JModelAdmin
         $db = $this->getDbo();
 
         $files       = array();
-        $packageFile = "";
+        $packageFile = '';
 
         foreach ($packagesIds as $packageId) {
-            
             // Get package.
             $package = new Transifex\Package\Package($db);
             $package->load($packageId);
@@ -315,10 +300,10 @@ class ItpTransifexModelPackage extends JModelAdmin
             $project->load($package->getProjectId());
 
             // Prepare project URL that points to Transifex.
-            $this->options["project_path"] = "project/" . $project->getAlias();
+            $this->options['project_path'] = 'project/' . $project->getAlias();
 
             $packageFileName = $package->getFilename();
-            $packageFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $packageFileName);
+            $packageFolder   = JPath::clean($app->get('tmp_path') . DIRECTORY_SEPARATOR . $packageFileName);
     
             // Remove old folder
             if (JFolder::exists($packageFolder)) {
@@ -333,23 +318,16 @@ class ItpTransifexModelPackage extends JModelAdmin
             $resources = $package->getResources($published);
     
             $packageType = $package->getType();
-    
+
             switch ($packageType) {
-    
-                case "component":
-                    $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
-                    break;
-    
-                case "module":
-                    $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
-                    break;
-    
-                case "plugin":
+                case 'plugin':
                     $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
                     break;
 
-                case "library":
-                    $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
+                case 'library':
+                case 'component':
+                case 'module':
+                    $packageFile = $this->prepareExtension($package, $resources, $packageFolder, $includeLanguageName);
                     break;
             }
             
@@ -357,10 +335,9 @@ class ItpTransifexModelPackage extends JModelAdmin
         }
 
         // Make an archive.
-        if (!empty($files)) {
-
+        if (count($files) > 0) {
             // Create temporary folder.
-            $tmpFolder   = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . "tmp_".(string)Prism\String\StringHelper::generateRandomString());
+            $tmpFolder   = JPath::clean($app->get('tmp_path') . DIRECTORY_SEPARATOR . 'tmp_'.(string)Prism\Utilities\StringHelper::generateRandomString());
             JFolder::create($tmpFolder);
 
             // Copy files to the temporary folder.
@@ -377,6 +354,8 @@ class ItpTransifexModelPackage extends JModelAdmin
     }
     
     /**
+     * Prepare component, module, library or other package.
+     *
      * @param Transifex\Package\Package $package
      * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
@@ -384,54 +363,18 @@ class ItpTransifexModelPackage extends JModelAdmin
      *
      * @return string
      */
-    protected function prepareComponent($package, $resources, $packageFolder, $includeLanguageName)
+    protected function prepareExtension($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "component");
+        $packageName = $this->getPackageName($resources);
 
         // Get package language code. Generate a language code with dash.
         $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
-            $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
-            $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
-        } else {// "language_folders"
-            $targetAdminFolder = "administrator/language/" . $langCodeDash;
-            $targetSiteFolder  = "language/" . $langCodeDash;
-        }
-
-        $sourceAdminFolder = "admin/" . $langCodeDash;
-        $sourceSiteFolder  = "site/" . $langCodeDash;
+        $langCodeDash = str_replace('_', '-', $langCode);
 
         // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        // Create admin folder.
-        $packageAdminFolder = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . "admin");
-        if (!JFolder::exists($packageAdminFolder)) {
-            JFolder::create($packageAdminFolder);
-        }
-
-        // Create admin language folder
-        $packageAdminLangFolder = JPath::clean($packageAdminFolder . DIRECTORY_SEPARATOR . $langCodeDash);
-        if (!JFolder::exists($packageAdminLangFolder)) {
-            JFolder::create($packageAdminLangFolder);
-        }
-
-        // Create site folder.
-        $packageSiteFolder = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . "site");
-        if (!JFolder::exists($packageSiteFolder)) {
-            JFolder::create($packageSiteFolder);
-        }
-
-        // Create site language folder
-        $projectSiteLangFolder = JPath::clean($packageSiteFolder . DIRECTORY_SEPARATOR . $langCodeDash);
-        if (!JFolder::exists($projectSiteLangFolder)) {
-            JFolder::create($projectSiteLangFolder);
-        }
+        $manifestFileName = $langCodeDash . '.' . $packageName;
+        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . '.xml');
 
         $date = new JDate();
 
@@ -439,206 +382,81 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         // Prepare options
         $options = array(
-            "name"                => $name,
-            "description"         => $package->getDescription(),
-            "version"             => $package->getVersion(),
-            "creation_date"       => $date->format("d F, Y"),
-            "source_admin_folder" => $sourceAdminFolder,
-            "source_site_folder"  => $sourceSiteFolder,
-            "target_admin_folder" => $targetAdminFolder,
-            "target_site_folder"  => $targetSiteFolder,
-            "lang_code"           => $langCode,
-            "lang_code_dash"      => $langCodeDash,
-            "manifest_filename"   => $manifestFile,
-            "package_folder"      => $packageFolder
+            'name'                => $name,
+            'description'         => $package->getDescription(),
+            'version'             => $package->getVersion(),
+            'creation_date'       => $date->format('d F, Y'),
+            'lang_code'           => $langCode,
+            'lang_code_dash'      => $langCodeDash,
+            'manifest_filename'   => $manifestFile,
+            'package_folder'      => $packageFolder
         );
 
         // Download files
-        $filesList = $this->downloadComponentFiles($resources, $options);
+        $filesList = $this->fetchFiles($resources, $options);
 
         // Generate manifest
         $this->generateManifest($options, $filesList);
 
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
+        $packageFileName = $package->getFilename() . '_' . $langCodeDash;
 
-        return $packageFile;
-
+        return $this->createPackage($packageFileName, $packageFolder);
     }
 
     /**
+     * Prepare plugin package.
+     *
      * @param Transifex\Package\Package $package
      * @param Transifex\Resource\Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
-     * @return string
-     */
-    protected function prepareModule($package, $resources, $packageFolder, $includeLanguageName)
-    {
-        // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "module");
-
-        // Get package language code. Generate a language code with dash.
-        $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
-            $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "language/" . $langCodeDash;
-        }
-
-        // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        $date = new JDate();
-
-        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
-
-        $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
-        );
-
-        // Download files
-        $filesList = $this->downloadFiles($resources, $options);
-
-        // Generate manifest
-        $this->generateManifest($options, $filesList);
-
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
-
-        return $packageFile;
-    }
-
-    /**
-     * @param Transifex\Package\Package $package
-     * @param Transifex\Resource\Resources $resources
-     * @param string  $packageFolder
-     * @param bool  $includeLanguageName
-     *
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
      * @return string
      */
     protected function preparePlugin($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
-        $packageNames = $this->getPackageName($resources, "plugin");
+        $packageNames = $this->getPackageName($resources, 'plugin');
 
-        $pluginType = $packageNames[1];
-        $pluginName = $packageNames[2];
-
+//        $pluginType  = $packageNames[1];
+//        $pluginName  = $packageNames[2];
         $packageName = $packageNames[3];
 
         // Get package language code. Generate a language code with dash.
         $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
-            $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "administrator/language/" . $langCodeDash;
-        }
+        $langCodeDash = str_replace('_', '-', $langCode);
 
         // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
+        $manifestFileName = $langCodeDash . '.' . $packageName;
+        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . '.xml');
 
         $date = new JDate();
 
         $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
 
         $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
+            'name'              => $name,
+            'description'       => $package->getDescription(),
+            'version'           => $package->getVersion(),
+            'creation_date'     => $date->format('d F, Y'),
+            'lang_code'         => $langCode,
+            'lang_code_dash'    => $langCodeDash,
+            'manifest_filename' => $manifestFile,
+            'package_folder'    => $packageFolder
         );
 
         // Download files
-        $siteFilesList = $this->downloadFiles($resources, $options, "plugin");
-
-        // Generate manifest
-        $this->generateManifest($options, $siteFilesList);
-
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
-
-        return $packageFile;
-    }
-
-    /**
-     * Prepare a package for a library.
-     *
-     * @param Transifex\Package\Package $package
-     * @param Transifex\Resource\Resources $resources
-     * @param string  $packageFolder
-     * @param bool  $includeLanguageName
-     *
-     * @return string
-     */
-    protected function prepareLibrary($package, $resources, $packageFolder, $includeLanguageName)
-    {
-        // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "library");
-
-        // Get package language code. Generate a language code with dash.
-        $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->options["files_location"]) == 0) {
-            $targetFolder = "libraries/" . JString::ucfirst(substr($packageName, 4)) . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "language/" . $langCodeDash;
-        }
-
-        // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        $date = new JDate();
-
-        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
-
-        $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
-        );
-
-        // Download files
-        $filesList = $this->downloadFiles($resources, $options);
+        $filesList = $this->fetchFiles($resources, $options);
 
         // Generate manifest
         $this->generateManifest($options, $filesList);
 
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
+        $packageFileName = $package->getFilename() . '_' . $langCodeDash;
 
-        return $packageFile;
+        return $this->createPackage($packageFileName, $packageFolder);
     }
 
     /**
@@ -648,6 +466,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      * @param string $langCode
      * @param bool $includeLanguageName
      *
+     * @throws \RuntimeException
      * @return string
      */
     protected function generatePackageName($package, $langCode, $includeLanguageName)
@@ -655,164 +474,123 @@ class ItpTransifexModelPackage extends JModelAdmin
         if (!$includeLanguageName) {
             $name = $package->getName();
         } else {
-
             $keys = array(
-                "code" => $langCode
+                'locale' => $langCode
             );
 
             $language = new Transifex\Language\Language(JFactory::getDbo());
             $language->load($keys);
 
-            $name = $package->getName() . " - ".$language->getName();
+            $name = $package->getName() . ' - '.$language->getName();
         }
 
         return $name;
     }
 
-    /**
-     * This method downloads plugin and module files and generate a string with files list.
-     *
-     * @param Transifex\Resource\Resources $resources
-     * @param array $options
-     *
-     * @return string
-     */
-    protected function downloadFiles($resources, $options)
+    protected function fetchFiles($resources, $options)
     {
-        $targetFolder  = Joomla\Utilities\ArrayHelper::getValue($options, "target_folder");
-        $langCode      = Joomla\Utilities\ArrayHelper::getValue($options, "lang_code");
-        $langCodeDash  = Joomla\Utilities\ArrayHelper::getValue($options, "lang_code_dash");
-        $packageFolder = Joomla\Utilities\ArrayHelper::getValue($options, "package_folder");
+        $langCode              = ArrayHelper::getValue($options, 'lang_code');
+        $langCodeDash          = ArrayHelper::getValue($options, 'lang_code_dash');
+        $packageFolder         = ArrayHelper::getValue($options, 'package_folder');
 
-        $filesList = array();
-
-        // Download files
-
-        $filesList[] = '<files target="' . $targetFolder . '">';
-
-        foreach ($resources as $resource) {
-
-            $filename    = JFile::makeSafe($langCodeDash . "." . $resource["filename"]);
-            $destination = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $filename);
-
-            $this->downloadFile($resource["alias"], $langCode, $destination);
-
-            $filesList[] = '<filename>' . $filename . '</filename>';
-
-        }
-
-        $filesList[] = '</files>';
-
-        return implode("\n", $filesList);
-
-    }
-
-    protected function downloadComponentFiles($resources, $options)
-    {
-        $sourceAdminLangFolder = Joomla\Utilities\ArrayHelper::getValue($options, "source_admin_folder");
-        $sourceSiteLangFolder  = Joomla\Utilities\ArrayHelper::getValue($options, "source_site_folder");
-        $targetAdminLangFolder = Joomla\Utilities\ArrayHelper::getValue($options, "target_admin_folder");
-        $targetSiteLangFolder  = Joomla\Utilities\ArrayHelper::getValue($options, "target_site_folder");
-        $langCode              = Joomla\Utilities\ArrayHelper::getValue($options, "lang_code");
-        $langCodeDash          = Joomla\Utilities\ArrayHelper::getValue($options, "lang_code_dash");
-        $packageFolder         = Joomla\Utilities\ArrayHelper::getValue($options, "package_folder");
-
-        $adminFiles = array();
-        $siteFiles  = array();
+        $files = array();
 
         // Separate admin files and site ones.
         foreach ($resources as $resource) {
-            if (strcmp("admin", $resource["type"]) == 0) { // Admin folder
-                $adminFiles[] = array(
-                    "filename" => $langCodeDash . "." . $resource["filename"],
-                    "slug"     => $resource["alias"],
-                );
-            }
+            if (!empty($resource['path'])) {
+                $path = md5($resource['path']);
 
-            if (strcmp("site", $resource["type"]) == 0) { // Site folder
-                $siteFiles[] = array(
-                    "filename" => $langCodeDash . "." . $resource["filename"],
-                    "slug"     => $resource["alias"],
+                $files[$path]['paths'] = array(
+                    'source_folder' => $resource['source'],
+                    'target_path'   => $resource['path'] .'/'. $langCodeDash,
+                );
+                
+                $files[$path]['files'][] = array(
+                    'filename'      => $langCodeDash . '.' . $resource['filename'],
+                    'slug'          => $resource['alias']
                 );
             }
         }
 
-        // Download admin files
-        if (!empty($adminFiles)) {
+        // Download files
+        foreach ($files as $key => $filesData) {
+            $paths        = $filesData['paths'];
+            $sourceFolder = $paths['source_folder'] ?: '';
 
-            foreach ($adminFiles as $fileData) {
-                $destination = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceAdminLangFolder . DIRECTORY_SEPARATOR . $fileData["filename"]);
-                $this->downloadFile($fileData["slug"], $langCode, $destination);
+            // Create site folder.
+            $sourceFolderPath = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceFolder);
+            
+            if (!JFolder::exists($sourceFolderPath)) {
+                JFolder::create($sourceFolderPath);
             }
 
-        }
-
-        // Download site files
-        if (!empty($siteFiles)) {
-
-            foreach ($siteFiles as $fileData) {
-                $destination = JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceSiteLangFolder . DIRECTORY_SEPARATOR . $fileData["filename"]);
-                $this->downloadFile($fileData["slug"], $langCode, $destination);
+            foreach ($filesData['files'] as $fileData) {
+                $destination = JPath::clean($sourceFolderPath . DIRECTORY_SEPARATOR . $fileData['filename']);
+                
+                try {
+                    $this->downloadFile($fileData['slug'], $langCode, $destination);
+                } catch (\Exception $e) {
+                    unset($files[$key]);
+                    JLog::add($e->getMessage() . "\n SLUG: ".$fileData['slug'], JLog::ERROR, 'com_userideas');
+                }
             }
-
         }
 
         // Generate the list of files
         $filesList = array();
 
         // A list with admin files
-        if (!empty($adminFiles)) {
-            $filesList[] = '<files folder="' . $sourceAdminLangFolder . '" target="' . $targetAdminLangFolder . '">';
-            foreach ($adminFiles as $fileData) {
-                $filesList[] = '<filename>' . $fileData["filename"] . '</filename>';
-            }
-            $filesList[] = '</files>';
-        }
+        if (count($files) > 0) {
+            foreach ($files as $filesData) {
+                $paths       = $filesData['paths'];
+                if ($paths['source_folder'] !== null and $paths['source_folder'] !== '') {
+                    $filesList[] = '<files folder="' . $paths['source_folder'] . '" target="' . $paths['target_path'] . '">';
+                } else {
+                    $filesList[] = '<files target="' . $paths['target_path'] . '">';
+                }
+                
+                foreach ($filesData['files'] as $fileData) {
+                    $filesList[] = '<filename>' . $fileData['filename'] . '</filename>';
+                }
 
-        // A list with site files
-        if (!empty($siteFiles)) {
-            $filesList[] = '<files folder="' . $sourceSiteLangFolder . '" target="' . $targetSiteLangFolder . '">';
-            foreach ($siteFiles as $fileData) {
-                $filesList[] = '<filename>' . $fileData["filename"] . '</filename>';
+                $filesList[] = '</files>';
             }
-            $filesList[] = '</files>';
         }
 
         return implode("\n", $filesList);
-
     }
 
     protected function generateManifest($options, $filesList)
     {
-        $params = JComponentHelper::getParams("com_itptransifex");
+        $params = JComponentHelper::getParams('com_itptransifex');
         /** @var  $params Joomla\Registry\Registry */
 
-        $manifestFile = Joomla\Utilities\ArrayHelper::getValue($options, "manifest_filename");
+        $manifestFile = ArrayHelper::getValue($options, 'manifest_filename');
 
         // Load the template file
-        $templateFile = JPath::clean(JPATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "lang_template.xml");
+        $templateFile = JPath::clean(JPATH_COMPONENT_ADMINISTRATOR . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'lang_template.xml');
         $template     = file_get_contents($templateFile);
 
-        $author      = $params->get("author");
-        $authorEmail = $params->get("author_email");
-        $copyright   = $params->get("copyright");
-        $site        = $params->get("site");
+        $author      = $params->get('author');
+        $authorEmail = $params->get('author_email');
+        $copyright   = $params->get('copyright');
+        $site        = $params->get('site');
 
-        $name         = Joomla\Utilities\ArrayHelper::getValue($options, "name");
-        $creationDate = Joomla\Utilities\ArrayHelper::getValue($options, "creation_date");
-        $description  = Joomla\Utilities\ArrayHelper::getValue($options, "description");
-        $version      = Joomla\Utilities\ArrayHelper::getValue($options, "version");
+        $name         = ArrayHelper::getValue($options, 'name');
+        $creationDate = ArrayHelper::getValue($options, 'creation_date');
+        $description  = ArrayHelper::getValue($options, 'description');
+        $version      = ArrayHelper::getValue($options, 'version');
 
-        $template = str_replace("{NAME}", $name, $template);
-        $template = str_replace("{AUTHOR}", $author, $template);
-        $template = str_replace("{AUTHOR_EMAIL}", $authorEmail, $template);
-        $template = str_replace("{COPYRIGHT}", $copyright, $template);
-        $template = str_replace("{SITE}", $site, $template);
-        $template = str_replace("{CREATION_DATE}", $creationDate, $template);
-        $template = str_replace("{VERSION}", $version, $template);
-        $template = str_replace("{DESCRIPTION}", $description, $template);
+        $template = str_replace('{NAME}', $name, $template);
+        $template = str_replace('{AUTHOR}', $author, $template);
+        $template = str_replace('{AUTHOR_EMAIL}', $authorEmail, $template);
+        $template = str_replace('{COPYRIGHT}', $copyright, $template);
+        $template = str_replace('{SITE}', $site, $template);
+        $template = str_replace('{CREATION_DATE}', $creationDate, $template);
+        $template = str_replace('{VERSION}', $version, $template);
+        $template = str_replace('{DESCRIPTION}', $description, $template);
 
-        $template = str_replace("{FILES_LIST}", $filesList, $template);
+        $template = str_replace('{FILES_LIST}', $filesList, $template);
 
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -834,19 +612,19 @@ class ItpTransifexModelPackage extends JModelAdmin
     protected function downloadFile($slug, $langCode, $destination)
     {
         $headers = array(
-            "headers" => array(
+            'headers' => array(
                 'Content-type: application/json',
                 'X-HTTP-Method-Override: GET'
             )
         );
 
-        $transifex = new Prism\Transifex\Request($this->options["url"]);
+        $transifex = new Prism\Transifex\Request($this->options['url']);
 
-        $transifex->setUsername($this->options["username"]);
-        $transifex->setPassword($this->options["password"]);
+        $transifex->setUsername($this->options['username']);
+        $transifex->setPassword($this->options['password']);
         $transifex->enableAuthentication();
 
-        $path = $this->options["project_path"] . "/resource/" . $slug . "/translation/" . $langCode . "/";
+        $path = $this->options['project_path'] . '/resource/' . $slug . '/translation/' . $langCode . '/';
 
         $response = $transifex->get($path, $headers);
 
@@ -855,16 +633,16 @@ class ItpTransifexModelPackage extends JModelAdmin
         }
 
         // Copy index.html
-        $indexFile = dirname($destination) . DIRECTORY_SEPARATOR . "index.html";
+        $indexFile = dirname($destination) . DIRECTORY_SEPARATOR . 'index.html';
         $html      = '<html><body style="background-color: #fff;"></body></html>';
         if (true !== JFile::write($indexFile, $html)) {
-            JLog::add(JText::sprintf("COM_ITPTRANSIFEX_ERROR_CANNOT_CREATE_FILE", $indexFile));
+            JLog::add(JText::sprintf('COM_ITPTRANSIFEX_ERROR_CANNOT_CREATE_FILE', $indexFile));
         }
     }
 
     protected function createPackage($packageName, $projectFolder)
     {
-        $archiveFile = $packageName . ".zip";
+        $archiveFile = $packageName . '.zip';
         $destination = $projectFolder . DIRECTORY_SEPARATOR . $archiveFile;
 
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($projectFolder));
@@ -874,8 +652,8 @@ class ItpTransifexModelPackage extends JModelAdmin
             $key = JPath::clean($key);
             if (!is_dir($key)) {
                 $filesToZip[] = array(
-                    "name" => substr($key, strlen($destination) - strlen(basename($destination))),
-                    "data" => file_get_contents($key)
+                    'name' => substr($key, strlen($destination) - strlen(basename($destination))),
+                    'data' => file_get_contents($key)
                 );
             }
         }
@@ -885,7 +663,6 @@ class ItpTransifexModelPackage extends JModelAdmin
         $zipAdapter->create($destination, $filesToZip, array());
 
         return $destination;
-
     }
 
     /**
@@ -899,8 +676,8 @@ class ItpTransifexModelPackage extends JModelAdmin
 
         $query = $db->getQuery(true);
         $query
-            ->delete($db->quoteName("#__itptfx_packages_map"))
-            ->where($db->quoteName("package_id") ." IN ( " . implode(",", $cid) . " )");
+            ->delete($db->quoteName('#__itptfx_packages_map'))
+            ->where($db->quoteName('package_id') .' IN ( ' . implode(',', $cid) . ' )');
 
         $db->setQuery($query);
         $db->execute();
@@ -914,35 +691,20 @@ class ItpTransifexModelPackage extends JModelAdmin
      *
      * @return array|string
      */
-    protected function getPackageName($resources, $type)
+    protected function getPackageName($resources, $type = '')
     {
-        $fileName = JFile::makeSafe($resources[0]["filename"]);
+        $fileName = JFile::makeSafe($resources[0]['filename']);
 
         $fileName = JFile::stripExt($fileName);
-        if (false !== strpos($fileName, ".sys")) {
+        if (false !== strpos($fileName, '.sys')) {
             $fileName = JFile::stripExt($fileName);
         }
 
-        switch ($type) {
+        if (strcmp($type, 'plugin') === 0) {
+            $fileNames    = explode('_', $fileName);
+            $fileNames[3] = $fileName;
 
-            case "component":
-                break;
-
-            case "module":
-                break;
-
-            case "library":
-                break;
-
-            case "plugin":
-
-                $fileNames    = explode("_", $fileName);
-                $fileNames[3] = $fileName;
-
-                $fileName = $fileNames;
-
-                break;
-
+            $fileName = $fileNames;
         }
 
         return $fileName;
@@ -969,25 +731,25 @@ class ItpTransifexModelPackage extends JModelAdmin
         $app = JFactory::getApplication();
         /** @var $app JApplicationAdministrator */
 
-        $fileName = "error.txt";
+        $fileName = 'error.txt';
 
-        $errorFile = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $fileName);
+        $errorFile = JPath::clean($app->get('tmp_path') . DIRECTORY_SEPARATOR . $fileName);
         if (JFile::exists($errorFile)) {
             JFile::delete($errorFile);
         }
 
-        $buffer = "System error!";
+        $buffer = 'System error!';
         JFile::write($errorFile, $buffer);
 
-        $archiveFile = "error.zip";
-        $destination = JPath::clean($app->get("tmp_path") . DIRECTORY_SEPARATOR . $archiveFile);
+        $archiveFile = 'error.zip';
+        $destination = JPath::clean($app->get('tmp_path') . DIRECTORY_SEPARATOR . $archiveFile);
         if (JFile::exists($destination)) {
             JFile::delete($destination);
         }
 
         $filesToZip[] = array(
-            "name" => $fileName,
-            "data" => file_get_contents($errorFile)
+            'name' => $fileName,
+            'data' => file_get_contents($errorFile)
         );
 
         // compression type
@@ -1003,9 +765,9 @@ class ItpTransifexModelPackage extends JModelAdmin
         $db     = $this->getDbo();
         $query  = $db->getQuery(true);
         $query
-            ->delete($db->quoteName("#__itptfx_packages_map"))
-            ->where($db->quoteName("package_id")  ." = ". (int)$packageId)
-            ->where($db->quoteName("resource_id") ." = ". (int)$resourceId);
+            ->delete($db->quoteName('#__itptfx_packages_map'))
+            ->where($db->quoteName('package_id')  .' = '. (int)$packageId)
+            ->where($db->quoteName('resource_id') .' = '. (int)$resourceId);
         
         $db->setQuery($query);
         $db->execute();
@@ -1016,6 +778,7 @@ class ItpTransifexModelPackage extends JModelAdmin
      *
      * @param string $string
      *
+     * @throws \RuntimeException
      * @return array
      */
     public function getResources($string)
@@ -1023,12 +786,13 @@ class ItpTransifexModelPackage extends JModelAdmin
         $db    = $this->getDbo();
         $query = $db->getQuery(true);
 
-        $search = $db->quote("%".$db->escape($string, true) . '%');
+        $search = $db->quote('%'.$db->escape($string, true) . '%');
 
         $query
-            ->select("a.id, a.name")
-            ->from($db->quoteName("#__itptfx_resources", "a"))
-            ->where("a.name LIKE " . $search);
+            ->select('a.id, a.name')
+            ->from($db->quoteName('#__itptfx_resources', 'a'))
+            ->where('a.name LIKE ' . $search)
+            ->where('a.published = ' . (int)Prism\Constants::PUBLISHED);
 
         $db->setQuery($query, 0, 8);
         $results = $db->loadAssocList();
@@ -1052,23 +816,22 @@ class ItpTransifexModelPackage extends JModelAdmin
         $query = $db->getQuery(true);
 
         $query
-            ->select("COUNT(*)")
-            ->from($db->quoteName("#__itptfx_packages_map", "a"))
-            ->where("a.package_id = " . (int)$packageId)
-            ->where("a.resource_id = " . (int)$resourceId);
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__itptfx_packages_map', 'a'))
+            ->where('a.package_id = ' . (int)$packageId)
+            ->where('a.resource_id = ' . (int)$resourceId);
 
         $db->setQuery($query, 0, 1);
         $result = $db->loadResult();
 
         // Add a resource.
         if (!$result) {
-
             // Add the record to database.
             $query = $db->getQuery(true);
             $query
-                ->insert($db->quoteName("#__itptfx_packages_map"))
-                ->set($db->quoteName("package_id") ." = " . (int)$packageId)
-                ->set($db->quoteName("resource_id") ." = " . (int)$resourceId);
+                ->insert($db->quoteName('#__itptfx_packages_map'))
+                ->set($db->quoteName('package_id') .' = ' . (int)$packageId)
+                ->set($db->quoteName('resource_id') .' = ' . (int)$resourceId);
 
             $db->setQuery($query);
             $db->execute();
@@ -1081,43 +844,39 @@ class ItpTransifexModelPackage extends JModelAdmin
     public function copyPackages(array $packagesIds, $language)
     {
         $options = array(
-            "ids" => $packagesIds
+            'ids' => $packagesIds
         );
         $packages = new Transifex\Package\Packages(JFactory::getDbo());
         $packages->load($options);
 
         // Check for existing packages.
         if (count($packages) > 0) {
-
-            $toPackageLanguageCode = JString::strtolower($language);
+            $toPackageLanguageCode = StringHelper::strtolower($language);
 
             foreach ($packages as $key => $package) {
+                $newAlias        = StringHelper::substr($package['alias'], 0, -5);
+                $endString       = StringHelper::substr($package['alias'], -5, 5);
 
-                $newAlias        = JString::substr($package["alias"], 0, -5);
-                $endString       = JString::substr($package["alias"], -5, 5);
-
-                $fromPackageLanguageCode = JString::strtolower($package["language"]);
+                $fromPackageLanguageCode = StringHelper::strtolower($package['language']);
 
                 // If the end of string does not match old language code, or
                 // the end of string match new language code,
                 // I am going to generate a new string.
-                if ((strcmp($endString, $fromPackageLanguageCode) != 0) or (strcmp($endString, $toPackageLanguageCode) == 0)) {
-                    $newAlias = Prism\String\StringHelper::generateRandomString(32);
+                if ((strcmp($endString, $fromPackageLanguageCode) !== 0) or (strcmp($endString, $toPackageLanguageCode) === 0)) {
+                    $newAlias = Prism\Utilities\StringHelper::generateRandomString(32);
                 } else { // or I am going to add the new language code to the end of alias string.
                     $newAlias .= $toPackageLanguageCode;
                 }
 
-                $package["alias"]    = $newAlias;
-                $package["language"] = $language;
+                $package['alias']    = $newAlias;
+                $package['language'] = $language;
 
                 $packages[$key] = $package;
             }
 
             $this->preventDuplications($packages);
             $this->createPackages($packages);
-
         }
-
     }
 
     /**
@@ -1133,32 +892,30 @@ class ItpTransifexModelPackage extends JModelAdmin
         // Get aliases.
         $aliases = array();
         foreach ($packages as $package) {
-            $aliases[] = $db->quote($package["alias"]);
+            $aliases[] = $db->quote($package['alias']);
         }
 
         $query = $db->getQuery(true);
 
         $query
-            ->select("a.alias")
-            ->from($db->quoteName("#__itptfx_packages", "a"))
-            ->where("a.alias IN (". implode(",", $aliases) . ")");
+            ->select('a.alias')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.alias IN ('. implode(',', $aliases) . ')');
 
         $db->setQuery($query);
         $results = $db->loadColumn();
 
         if (!empty($aliases)) {
             foreach ($results as $alias) {
-
                 foreach ($packages as $key => $package) {
-                    if (strcmp($alias, $package["alias"]) == 0) {
-                        $package["alias"] = Prism\String\StringHelper::generateRandomString(32);
+                    if (strcmp($alias, $package['alias']) == 0) {
+                        $package['alias'] = Prism\Utilities\StringHelper::generateRandomString(32);
                         $packages[$key] = $package;
                     }
                 }
 
             }
         }
-
     }
 
     /**
@@ -1169,12 +926,11 @@ class ItpTransifexModelPackage extends JModelAdmin
     protected function createPackages($packages)
     {
         foreach ($packages as $package) {
-
-            $packageId  = $package["id"];
-            unset($package["id"]);
+            $packageId  = $package['id'];
+            unset($package['id']);
 
             $options = array(
-                "package_id" => $packageId
+                'package_id' => $packageId
             );
 
             // Get package resources.
@@ -1188,7 +944,6 @@ class ItpTransifexModelPackage extends JModelAdmin
 
             $packageId = $p->getId();
             $this->copyResources($packageId, $resources);
-
         }
     }
 
@@ -1206,9 +961,9 @@ class ItpTransifexModelPackage extends JModelAdmin
             $query = $db->getQuery(true);
 
             $query
-                ->insert($db->quoteName("#__itptfx_packages_map"))
-                ->set($db->quoteName("package_id")  ."=". (int)$packageId)
-                ->set($db->quoteName("resource_id") ."=". $resource["id"]);
+                ->insert($db->quoteName('#__itptfx_packages_map'))
+                ->set($db->quoteName('package_id')  .'='. (int)$packageId)
+                ->set($db->quoteName('resource_id') .'='. $resource['id']);
 
             $db->setQuery($query);
             $db->execute();
@@ -1217,16 +972,16 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     public function changeVersion(array $packagesIds, $newVersion)
     {
-        $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+        $packagesIds = ArrayHelper::toInteger($packagesIds);
 
         if (!empty($packagesIds)) {
             $db = $this->getDbo();
 
             $query = $db->getQuery(true);
             $query
-                ->update($db->quoteName("#__itptfx_packages"))
-                ->set($db->quoteName("version") . " = " . (float)$newVersion)
-                ->where($db->quoteName("id") . " IN (" . implode(",", $packagesIds) . ")");
+                ->update($db->quoteName('#__itptfx_packages'))
+                ->set($db->quoteName('version') . ' = ' . (float)$newVersion)
+                ->where($db->quoteName('id') . ' IN (' . implode(',', $packagesIds) . ')');
 
             $db->setQuery($query);
             $db->execute();
@@ -1235,16 +990,16 @@ class ItpTransifexModelPackage extends JModelAdmin
 
     public function replaceText(array $packagesIds, $search, $replace)
     {
-        $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
+        $packagesIds = ArrayHelper::toInteger($packagesIds);
 
         if (!empty($packagesIds) and !empty($search) and !empty($replace)) {
             $db = $this->getDbo();
 
             $query = $db->getQuery(true);
             $query
-                ->update($db->quoteName("#__itptfx_packages"))
-                ->set($db->quoteName("description") . " = REPLACE(" . $db->quoteName("description") .", ".$db->quote($search).", ".$db->quote($replace).")")
-                ->where($db->quoteName("id") . " IN (" . implode(",", $packagesIds) . ")");
+                ->update($db->quoteName('#__itptfx_packages'))
+                ->set($db->quoteName('description') . ' = REPLACE(' . $db->quoteName('description') .', '.$db->quote($search).', '.$db->quote($replace).')')
+                ->where($db->quoteName('id') . ' IN (' . implode(',', $packagesIds) . ')');
 
             $db->setQuery($query);
             $db->execute();

@@ -7,6 +7,9 @@
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
+use Joomla\Utilities\ArrayHelper;
+use Joomla\String\StringHelper;
+
 // no direct access
 defined('_JEXEC') or die;
 
@@ -18,8 +21,24 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexModelProject extends JModelAdmin
 {
-    protected $sitePrefixes = array("site", "module", "library");
-    protected $adminPrefixes = array("admin", "plugin");
+    protected $sitePrefixes = array();
+    protected $adminPrefixes = array();
+
+    /**
+     * Constructor.
+     *
+     * @param   array $config An optional associative array of configuration settings.
+     *
+     * @see     JModelLegacy
+     * @since   12.2
+     */
+    public function __construct($config = array())
+    {
+        parent::__construct($config);
+
+        $this->sitePrefixes  = array('site', 'module', 'library');
+        $this->adminPrefixes = array('admin', 'plugin');
+    }
 
     /**
      * Returns a reference to the a Table object, always creating it.
@@ -39,17 +58,17 @@ class ItpTransifexModelProject extends JModelAdmin
     /**
      * Method to get the record form.
      *
-     * @param   array   $data     An optional array of data for the form to interogate.
+     * @param   array   $data     An optional array of data for the form to interrogate.
      * @param   boolean $loadData True if the form is to load its own data (default case), false if not.
      *
-     * @return  JForm   A JForm object on success, false on failure
+     * @return  JForm|bool   A JForm object on success, false on failure
      * @since   1.6
      */
     public function getForm($data = array(), $loadData = true)
     {
         // Get the form.
         $form = $this->loadForm($this->option . '.project', 'project', array('control' => 'jform', 'load_data' => $loadData));
-        if (empty($form)) {
+        if (!$form) {
             return false;
         }
 
@@ -67,7 +86,7 @@ class ItpTransifexModelProject extends JModelAdmin
         // Check the session for previously entered form data.
         $data = JFactory::getApplication()->getUserState($this->option . '.edit.project.data', array());
 
-        if (empty($data)) {
+        if (!$data) {
             $data = $this->getItem();
         }
 
@@ -79,76 +98,86 @@ class ItpTransifexModelProject extends JModelAdmin
      *
      * @param array $data   The data about item
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
+     * @throws \Exception
+     *
      * @return   int  Item ID
      */
     public function save($data)
     {
-        $id         = Joomla\Utilities\ArrayHelper::getValue($data, "id");
-        $name       = Joomla\Utilities\ArrayHelper::getValue($data, "name");
-        $alias      = Joomla\Utilities\ArrayHelper::getValue($data, "alias");
-        $filename   = Joomla\Utilities\ArrayHelper::getValue($data, "filename");
-        $desc       = Joomla\Utilities\ArrayHelper::getValue($data, "description");
-        $link       = Joomla\Utilities\ArrayHelper::getValue($data, "link");
-        $published  = Joomla\Utilities\ArrayHelper::getValue($data, "published");
+        $id         = ArrayHelper::getValue($data, 'id', 0, 'int');
+        $name       = StringHelper::trim(ArrayHelper::getValue($data, 'name', '', 'string'));
+        $alias      = StringHelper::trim(ArrayHelper::getValue($data, 'alias', '', 'string'));
+        $filename   = StringHelper::trim(ArrayHelper::getValue($data, 'filename', '', 'string'));
+        $desc       = StringHelper::trim(ArrayHelper::getValue($data, 'description', '', 'string'));
+        $link       = StringHelper::trim(ArrayHelper::getValue($data, 'link', '', 'string'));
+        $published  = ArrayHelper::getValue($data, 'published', 0, 'int');
 
         // Load a record from the database
         $row = $this->getTable();
         $row->load($id);
 
-        $row->set("name", $name);
-        $row->set("alias", $alias);
-        $row->set("filename", $filename);
-        $row->set("description", $desc);
-        $row->set("link", $link);
-        $row->set("published", $published);
+        $row->set('name', $name);
+        $row->set('alias', $alias);
+        $row->set('filename', $filename);
+        $row->set('description', $desc);
+        $row->set('link', $link);
+        $row->set('published', $published);
 
         $this->prepareImage($row, $data);
         $this->prepareTable($row);
 
         $row->store(true);
 
-        return $row->get("id");
+        return $row->get('id');
     }
 
     protected function prepareTable($table)
     {
         // get maximum order number
-        if (!$table->get("id")) {
-
+        if (!$table->get('id') and !$table->get('ordering')) {
             // Set ordering to the last item if not set
-            if (!$table->get("ordering")) {
-                $db    = $this->getDbo();
-                $query = $db->getQuery(true);
-                $query
-                    ->select("MAX(ordering)")
-                    ->from($db->quoteName("#__itptfx_projects"));
+            $db    = $this->getDbo();
+            $query = $db->getQuery(true);
+            $query
+                ->select('MAX(ordering)')
+                ->from($db->quoteName('#__itptfx_projects'));
 
-                $db->setQuery($query, 0, 1);
-                $max = $db->loadResult();
+            $db->setQuery($query, 0, 1);
+            $max = $db->loadResult();
 
-                $table->set("ordering", $max + 1);
-            }
+            $table->set('ordering', $max + 1);
         }
 
-        // Fix magic quotes
+        // Fix magic quotes.
         if (get_magic_quotes_gpc()) {
-            $table->set("name", stripcslashes($table->get("name")));
-            $table->set("description", stripcslashes($table->get("description")));
+            $table->set('name', stripcslashes($table->get('name')));
+            $table->set('description', stripcslashes($table->get('description')));
         }
 
-        if (!$table->get("filename")) {
-            $table->set("filename", null);
+        if (!$table->get('description')) {
+            $table->set('description', null);
         }
 
-        if (!$table->get("description")) {
-            $table->set("description", null);
+        if (!$table->get('source_language_code')) {
+            $table->set('source_language_code', null);
+        }
+
+        if (!$table->get('image')) {
+            $table->set('image', null);
+        }
+
+        if (!$table->get('link')) {
+            $table->set('link', null);
         }
     }
 
     /**
      * Prepare project image before saving.
      *
-     * @param   object $table
+     * @param   JTable $table
      * @param   array  $data
      *
      * @throws Exception
@@ -158,23 +187,21 @@ class ItpTransifexModelProject extends JModelAdmin
     protected function prepareImage($table, $data)
     {
         // Prepare pitch image.
-        if (!empty($data["image"])) {
-
+        if (array_key_exists('image', $data) and $data['image'] !== '') {
             // Delete old image if I upload a new one
-            if (!empty($table->image)) {
-
+            if ($table->get('image')) {
                 $params       = JComponentHelper::getParams($this->option);
-                $imagesFolder = $params->get("images_directory", "images/itptransifex");
+                $imagesFolder = $params->get('images_directory', 'images/itptransifex');
 
                 // Remove an image from the filesystem
-                $image = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $imagesFolder . DIRECTORY_SEPARATOR . $table->image);
+                $image = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $imagesFolder . DIRECTORY_SEPARATOR . $table->get('image'));
 
                 if (JFile::exists($image)) {
                     JFile::delete($image);
                 }
             }
 
-            $table->set("image", $data["image"]);
+            $table->set('image', $data['image']);
         }
     }
 
@@ -185,27 +212,27 @@ class ItpTransifexModelProject extends JModelAdmin
      *
      * @throws Exception
      *
-     * @return array
+     * @return string
      */
     public function uploadImage($image)
     {
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
 
-        $uploadedFile = Joomla\Utilities\ArrayHelper::getValue($image, 'tmp_name');
-        $uploadedName = Joomla\Utilities\ArrayHelper::getValue($image, 'name');
-        $errorCode    = Joomla\Utilities\ArrayHelper::getValue($image, 'error');
+        $uploadedFile = ArrayHelper::getValue($image, 'tmp_name');
+        $uploadedName = ArrayHelper::getValue($image, 'name');
+        $errorCode    = ArrayHelper::getValue($image, 'error');
 
         // Load parameters.
         $params     = JComponentHelper::getParams($this->option);
         /** @var  $params Joomla\Registry\Registry */
 
-        $destFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get("images_directory", "images/itptransifex"));
+        $destFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get('images_directory', 'images/itptransifex'));
 
-        $tmpFolder = $app->get("tmp_path");
+        $tmpFolder = $app->get('tmp_path');
 
         // Joomla! media extension parameters
-        $mediaParams = JComponentHelper::getParams("com_media");
+        $mediaParams = JComponentHelper::getParams('com_media');
         /** @var  $mediaParams Joomla\Registry\Registry */
 
         $file = new Prism\File\File();
@@ -213,7 +240,7 @@ class ItpTransifexModelProject extends JModelAdmin
         // Prepare size validator.
         $KB            = 1024 * 1024;
         $fileSize      = (int)$app->input->server->get('CONTENT_LENGTH');
-        $uploadMaxSize = $mediaParams->get("upload_maxsize") * $KB;
+        $uploadMaxSize = $mediaParams->get('upload_maxsize') * $KB;
 
         $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
 
@@ -224,11 +251,11 @@ class ItpTransifexModelProject extends JModelAdmin
         $imageValidator = new Prism\File\Validator\Image($uploadedFile, $uploadedName);
 
         // Get allowed mime types from media manager options
-        $mimeTypes = explode(",", $mediaParams->get("upload_mime"));
+        $mimeTypes = explode(',', $mediaParams->get('upload_mime'));
         $imageValidator->setMimeTypes($mimeTypes);
 
         // Get allowed image extensions from media manager options
-        $imageExtensions = explode(",", $mediaParams->get("image_extensions"));
+        $imageExtensions = explode(',', $mediaParams->get('image_extensions'));
         $imageValidator->setImageExtensions($imageExtensions);
 
         $file
@@ -242,11 +269,10 @@ class ItpTransifexModelProject extends JModelAdmin
         }
 
         // Generate temporary file name
-        $ext = JString::strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
+        $ext = strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
 
-        $generatedName = Prism\String\StringHelper::generateRandomString(16);
-
-        $tmpDestFile = $tmpFolder . DIRECTORY_SEPARATOR . $generatedName . "." . $ext;
+        $generatedName = Prism\Utilities\StringHelper::generateRandomString(16);
+        $tmpDestFile   = JPath::clean($tmpFolder . DIRECTORY_SEPARATOR . $generatedName . '.' . $ext);
 
         // Prepare uploader object.
         $uploader = new Prism\File\Uploader\Local($uploadedFile);
@@ -261,23 +287,23 @@ class ItpTransifexModelProject extends JModelAdmin
         $tmpDestFile = $file->getFile();
 
         if (!is_file($tmpDestFile)) {
-            throw new Exception('COM_ITPTRANSIFEX_ERROR_FILE_CANT_BE_UPLOADED');
+            throw new RuntimeException('COM_ITPTRANSIFEX_ERROR_FILE_CANT_BE_UPLOADED');
         }
 
         // Resize image
         $image = new JImage();
         $image->loadFile($tmpDestFile);
         if (!$image->isLoaded()) {
-            throw new Exception(JText::sprintf('COM_ITPTRANSIFEX_ERROR_FILE_NOT_FOUND', $tmpDestFile));
+            throw new RuntimeException(JText::sprintf('COM_ITPTRANSIFEX_ERROR_FILE_NOT_FOUND', $tmpDestFile));
         }
 
-        $imageName = $generatedName . ".png";
+        $imageName = $generatedName . '.png';
         $imageFile = JPath::clean($destFolder . DIRECTORY_SEPARATOR . $imageName);
 
         // Create main image
-        $width  = $params->get("image_width", 200);
-        $height = $params->get("image_height", 200);
-        $scale  = $params->get("image_resizing_scale", 2);
+        $width  = $params->get('image_width', 200);
+        $height = $params->get('image_height', 200);
+        $scale  = $params->get('image_resizing_scale', 2);
 
         $image->resize($width, $height, false, $scale);
         $image->toFile($imageFile, IMAGETYPE_PNG);
@@ -294,6 +320,10 @@ class ItpTransifexModelProject extends JModelAdmin
      * Delete image.
      *
      * @param integer $id Item id
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
     public function removeImage($id)
     {
@@ -302,22 +332,21 @@ class ItpTransifexModelProject extends JModelAdmin
         $row->load($id);
 
         // Delete old image if I upload the new one
-        if (!empty($row->image)) {
-
+        if ($row->get('image')) {
             $params       = JComponentHelper::getParams($this->option);
             /** @var  $params Joomla\Registry\Registry */
 
-            $imagesFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get("images_directory", "images/itptransifex"));
+            $imagesFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get('images_directory', 'images/itptransifex'));
 
             // Remove an image from the filesystem.
-            $image = $imagesFolder . DIRECTORY_SEPARATOR . $row->image;
+            $image = $imagesFolder . DIRECTORY_SEPARATOR . $row->get('image');
 
             if (JFile::exists($image)) {
                 JFile::delete($image);
             }
         }
 
-        $row->set("image", null);
+        $row->set('image', null);
         $row->store(true);
     }
     
@@ -326,43 +355,44 @@ class ItpTransifexModelProject extends JModelAdmin
      *
      * @param array $ids Projects IDs
      * @param array $options Options for connection to Transifex ( username, password, URL, etc. )
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function synchronize($ids, $options)
     {
         $db    = $this->getDbo();
         $query = $db->getQuery(true);
         $query
-            ->select("a.id, a.alias")
-            ->from($db->quoteName("#__itptfx_projects", "a"))
-            ->where("a.id IN (" . implode(",", $ids) . ")");
+            ->select('a.id, a.alias')
+            ->from($db->quoteName('#__itptfx_projects', 'a'))
+            ->where('a.id IN (' . implode(',', $ids) . ')');
 
         $db->setQuery($query);
-        $projects = $db->loadObjectList("alias");
+        $projects = (array)$db->loadObjectList('alias');
 
-        if (!empty($projects)) {
-
+        if (count($projects) > 0) {
             $data = array();
 
-            $username = Joomla\Utilities\ArrayHelper::getValue($options, "username");
-            $password = Joomla\Utilities\ArrayHelper::getValue($options, "password");
-            $url      = Joomla\Utilities\ArrayHelper::getValue($options, "url");
+            $username = ArrayHelper::getValue($options, 'username');
+            $password = ArrayHelper::getValue($options, 'password');
+            $url      = ArrayHelper::getValue($options, 'url');
 
             $headers = array(
-                "headers" => array(
+                'headers' => array(
                     'Content-type: application/json',
                     'X-HTTP-Method-Override: GET'
                 )
             );
 
             foreach ($projects as $project) {
-
                 $transifex = new Prism\Transifex\Request($url);
 
                 $transifex->setUsername($username);
                 $transifex->setPassword($password);
                 $transifex->enableAuthentication();
 
-                $path = "/" . $project->alias . "/";
+                $path = '/' . $project->alias . '/';
 
                 $response = $transifex->get($path, $headers);
 
@@ -370,7 +400,7 @@ class ItpTransifexModelProject extends JModelAdmin
                 $data[$project->alias] = $response;
             }
 
-            if (!empty($data)) {
+            if (count($data) > 0) {
                 $this->prepareProjectsData($projects, $data);
                 $this->updateProjectsData($projects);
                 $this->updateProjectsResources($projects, $options);
@@ -396,18 +426,19 @@ class ItpTransifexModelProject extends JModelAdmin
      * Store the data that comes from Transifex.
      *
      * @param array $projects
+     *
+     * @throws \RuntimeException
      */
     protected function updateProjectsData($projects)
     {
-        $db = $this->getDbo();
-
         foreach ($projects as $project) {
-            $query = $db->getQuery(true);
+            $db     = $this->getDbo();
+            $query  = $db->getQuery(true);
             $query
-                ->update($db->quoteName("#__itptfx_projects"))
-                ->set($db->quoteName('description') . "=" . $db->quote($project->description))
-                ->set($db->quoteName('source_language_code') . "=" . $db->quote($project->source_language_code))
-                ->where($db->quoteName('id') . "=" . $db->quote($project->id));
+                ->update($db->quoteName('#__itptfx_projects'))
+                ->set($db->quoteName('description') . '=' . $db->quote($project->description))
+                ->set($db->quoteName('source_language_code') . '=' . $db->quote($project->source_language_code))
+                ->where($db->quoteName('id') . '=' . $db->quote($project->id));
 
             $db->setQuery($query);
             $db->execute();
@@ -420,16 +451,19 @@ class ItpTransifexModelProject extends JModelAdmin
      * @param array $data
      * @param array $options
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     *
      * @todo Add functionality for deleting resources, if they are removed on Transifex.
      */
     protected function updateProjectsResources($data, $options)
     {
-        $username = Joomla\Utilities\ArrayHelper::getValue($options, "username");
-        $password = Joomla\Utilities\ArrayHelper::getValue($options, "password");
-        $url      = Joomla\Utilities\ArrayHelper::getValue($options, "url");
+        $username = ArrayHelper::getValue($options, 'username');
+        $password = ArrayHelper::getValue($options, 'password');
+        $url      = ArrayHelper::getValue($options, 'url');
 
         $headers = array(
-            "headers" => array(
+            'headers' => array(
                 'Content-type: application/json',
                 'X-HTTP-Method-Override: GET'
             )
@@ -437,33 +471,31 @@ class ItpTransifexModelProject extends JModelAdmin
 
         $resources = array();
 
+        $transifex = new Prism\Transifex\Request($url);
+
+        $transifex->setUsername($username);
+        $transifex->setPassword($password);
+        $transifex->enableAuthentication();
+
         // Get the resources from Transifex.
         foreach ($data as $alias => $itemData) {
+            $t    = clone $transifex;
+            $path = '/' . $alias . '/resources/';
 
-            $transifex = new Prism\Transifex\Request($url);
-
-            $transifex->setUsername($username);
-            $transifex->setPassword($password);
-            $transifex->enableAuthentication();
-
-            $path = "/" . $alias . "/resources/";
-
-            $response = $transifex->get($path, $headers);
+            $response = $t->get($path, $headers);
 
             // Get the data
             $resources[$itemData->id] = $response;
-
         }
 
         // Store the data about the resources.
-        if (!empty($resources)) {
-
+        if (count($resources) > 0) {
             $db    = $this->getDbo();
             $query = $db->getQuery(true);
 
             $query
-                ->select("a.id, a.alias, a.project_id")
-                ->from($db->quoteName("#__itptfx_resources", "a"));
+                ->select('a.id, a.alias, a.project_id')
+                ->from($db->quoteName('#__itptfx_resources', 'a'));
 
             $db->setQuery($query);
             $currentResources_ = $db->loadObjectList();
@@ -479,18 +511,18 @@ class ItpTransifexModelProject extends JModelAdmin
             $resourcesData = $this->prepareResources($resources, $currentResources);
 
             // Update resources
-            if (!empty($resourcesData["update"])) {
-                $this->updateResources($resourcesData["update"]);
+            if (!empty($resourcesData['update'])) {
+                $this->updateResources($resourcesData['update']);
             }
 
             // Insert resources
-            if (!empty($resourcesData["insert"])) {
-                $this->insertResources($resourcesData["insert"]);
+            if (!empty($resourcesData['insert'])) {
+                $this->insertResources($resourcesData['insert']);
             }
 
             // Delete resources
-            if (!empty($resourcesData["delete"])) {
-                $this->deleteResources($resourcesData["delete"]);
+            if (!empty($resourcesData['delete'])) {
+                $this->deleteResources($resourcesData['delete']);
             }
         }
     }
@@ -498,27 +530,25 @@ class ItpTransifexModelProject extends JModelAdmin
     protected function insertResources($resources)
     {
         foreach ($resources as $projectId => $value) {
-
             foreach ($value as $item) {
-
-                $prasedSlug = $this->parseSlug($item["slug"]);
+                $parsedSlug = $this->parseSlug($item['slug']);
+                $category   = ArrayHelper::getValue($item['categories'], 0, '', 'string');
 
                 $db    = $this->getDbo();
                 $query = $db->getQuery(true);
 
                 $query
-                    ->insert($db->quoteName("#__itptfx_resources"))
-                    ->set($db->quoteName('name') . "=" . $db->quote($item["name"]))
-                    ->set($db->quoteName('i18n_type') . "=" . $db->quote($item["i18n_type"]))
-                    ->set($db->quoteName('alias') . "=" . $db->quote($item["slug"]))
-                    ->set($db->quoteName('project_id') . "=" . $db->quote($projectId))
-                    ->set($db->quoteName('filename') . "=" . $db->quote($prasedSlug['filename']))
-                    ->set($db->quoteName('type') . "=" . $db->quote($prasedSlug["type"]))
-                    ->set($db->quoteName('source_language_code') . "=" . $db->quote($item["source_language_code"]));
+                    ->insert($db->quoteName('#__itptfx_resources'))
+                    ->set($db->quoteName('name') . '=' . $db->quote($item['name']))
+                    ->set($db->quoteName('i18n_type') . '=' . $db->quote($item['i18n_type']))
+                    ->set($db->quoteName('alias') . '=' . $db->quote($item['slug']))
+                    ->set($db->quoteName('project_id') . '=' . $db->quote($projectId))
+                    ->set($db->quoteName('filename') . '=' . $db->quote($parsedSlug['filename']))
+                    ->set($db->quoteName('category') . '=' . $db->quote($category))
+                    ->set($db->quoteName('source_language_code') . '=' . $db->quote($item['source_language_code']));
 
                 $db->setQuery($query);
                 $db->execute();
-
             }
         }
     }
@@ -526,47 +556,42 @@ class ItpTransifexModelProject extends JModelAdmin
     protected function updateResources($resources)
     {
         foreach ($resources as $value) {
-
             foreach ($value as $item) {
-
                 $db    = $this->getDbo();
                 $query = $db->getQuery(true);
 
-                $langCode = (!empty($item["source_language_code"])) ? $db->quote($item["source_language_code"]) : "NULL";
-                $type     = (!empty($item["i18n_type"])) ? $db->quote($item["i18n_type"]) : "NULL";
+                $langCode = (!empty($item['source_language_code'])) ? $db->quote($item['source_language_code']) : 'NULL';
+                $type     = (!empty($item['i18n_type'])) ? $db->quote($item['i18n_type']) : 'NULL';
+                $category = ArrayHelper::getValue($item['categories'], 0, '', 'string');
 
                 $query
-                    ->update($db->quoteName("#__itptfx_resources"))
-                    ->set($db->quoteName('name') . "=" . $db->quote($item["name"]))
-                    ->set($db->quoteName('i18n_type') . "=" . $type)
-                    ->set($db->quoteName('source_language_code') . "=" . $langCode)
-                    ->where($db->quoteName('alias') . "=" . $db->quote($item["slug"]));
+                    ->update($db->quoteName('#__itptfx_resources'))
+                    ->set($db->quoteName('name') . '=' . $db->quote($item['name']))
+                    ->set($db->quoteName('i18n_type') . '=' . $type)
+                    ->set($db->quoteName('source_language_code') . '=' . $langCode)
+                    ->set($db->quoteName('category') . '=' . $db->quote($category))
+                    ->where($db->quoteName('alias') . '=' . $db->quote($item['slug']));
 
                 $db->setQuery($query);
                 $db->execute();
-
             }
-
         }
     }
 
     protected function deleteResources($resources)
     {
         foreach ($resources as $value) {
-
             foreach ($value as $item) {
-
                 $db    = $this->getDbo();
                 $query = $db->getQuery(true);
 
                 $query
-                    ->update($db->quoteName("#__itptfx_resources"))
-                    ->set($db->quoteName('published') . "=" . $db->quote("-2"))
-                    ->where($db->quoteName('alias') . "=" . $db->quote($item->alias));
+                    ->update($db->quoteName('#__itptfx_resources'))
+                    ->set($db->quoteName('published') . '=' . $db->quote(Prism\Constants::TRASHED))
+                    ->where($db->quoteName('alias') . '=' . $db->quote($item->alias));
 
                 $db->setQuery($query);
                 $db->execute();
-
             }
         }
     }
@@ -587,28 +612,24 @@ class ItpTransifexModelProject extends JModelAdmin
         $delete = array();
 
         foreach ($resources as $projectId => $items) {
-
             // Clear white spaces.
-            foreach ($items as &$resource) {
-                foreach ($resource as $key => $value) {
-
+            foreach ($items as $key => $resource) {
+                foreach ($resource as $key2 => $value) {
                     if (is_scalar($value)) {
-                        $resource[$key] = JString::trim($value);
+                        $resource[$key][$key2] = StringHelper::trim($value);
                     }
                 }
-
             }
 
-            if (!isset($currentResources[$projectId])) { // Insert all items because it is a new project and it does not have items.
+            if (!array_key_exists($projectId, $currentResources)) { // Insert all items because it is a new project and it does not have items.
                 $insert[$projectId] = $items;
             } else { // Insert, update and delete items to existed project.
 
                 // Get the new resources.
                 foreach ($items as $item) {
-
                     $isNew = true;
                     foreach ($currentResources[$projectId] as $currentResource) {
-                        if (strcmp($item["slug"], $currentResource->alias) == 0) {
+                        if (strcmp($item['slug'], $currentResource->alias) === 0) {
                             $isNew = false;
                             break;
                         }
@@ -617,39 +638,32 @@ class ItpTransifexModelProject extends JModelAdmin
                     if ($isNew) {
                         $insert[$projectId][] = $item;
                     }
-
                 }
 
                 // Update current resources and remove missing ones.
                 foreach ($currentResources[$projectId] as $currentResource) {
-
                     $deleteFlag = true;
                     foreach ($items as $item) {
-
                         // If there is a resource, add it for updating.
-                        if ((strcmp($currentResource->alias, $item["slug"]) == 0)) {
+                        if (strcmp($currentResource->alias, $item['slug']) === 0) {
                             $update[$projectId][] = $item;
                             $deleteFlag           = false;
                         }
-
                     }
 
-                    // If the resources has been removed on Transifes,
+                    // If the resources has been removed on Transifex,
                     // it have to be removed from the system too.
                     if ($deleteFlag) {
                         $delete[$projectId][] = $currentResource;
                     }
-
                 }
-
             }
-
         }
 
         $data = array(
-            "update" => $update,
-            "insert" => $insert,
-            "delete" => $delete,
+            'update' => $update,
+            'insert' => $insert,
+            'delete' => $delete,
         );
 
         return $data;
@@ -658,67 +672,55 @@ class ItpTransifexModelProject extends JModelAdmin
     /**
      * Remove resources which are part of project.
      *
-     * @param array $cid Projects IDs
+     * @param array $projectsIds
+     *
+     * @throws RuntimeException
      */
-    public function removeResources($cid)
+    public function removeResources(array $projectsIds = array())
     {
+        if (count($projectsIds) > 0) {
+            $db    = $this->getDbo();
+            $query = $db->getQuery(true);
+            $query
+                ->delete($db->quoteName('#__itptfx_resources'))
+                ->where($db->quoteName('project_id') . ' IN (' . implode(',', $projectsIds) .')');
 
-        if (!empty($cid)) {
-
-            $db = $this->getDbo();
-
-            foreach ($cid as $id) {
-
-                $query = $db->getQuery(true);
-                $query
-                    ->delete($db->quoteName("#__itptfx_resources"))
-                    ->where($db->quoteName("project_id") . "=" . (int)$id);
-
-                $db->setQuery($query);
-                $db->execute();
-
-            }
-
+            $db->setQuery($query);
+            $db->execute();
         }
-
     }
 
     /**
      * Remove packages which are part of project.
      *
-     * @param array $cid Projects IDs
+     * @param array $projectsIds
+     *
+     * @throws \RuntimeException
      */
-    public function removePackages($cid)
+    public function removePackages(array $projectsIds = array())
     {
-        if (!empty($cid)) {
-
-            $db = $this->getDbo();
-
-            foreach ($cid as $id) {
-
+        if (count($projectsIds) > 0) {
+            foreach ($projectsIds as $id) {
+                $db = $this->getDbo();
+                
                 // Get all packages
                 $query = $db->getQuery(true);
                 $query
-                    ->select("a.id")
-                    ->from($db->quoteName("#__itptfx_packages", "a"))
-                    ->where($db->quoteName("project_id") . "=" . (int)$id);
+                    ->select('a.id')
+                    ->from($db->quoteName('#__itptfx_packages', 'a'))
+                    ->where($db->quoteName('project_id') . '=' . (int)$id);
 
                 $db->setQuery($query);
-                $packagesIds = $db->loadColumn();
+                $packagesIds = (array)$db->loadColumn();
 
-                if (!$packagesIds) {
-                    $packagesIds = array();
-                }
+                $packagesIds = ArrayHelper::toInteger($packagesIds);
 
-                $packagesIds = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
-
-                if (!empty($packagesIds)) {
-
+                if (count($packagesIds) > 0) {
                     // Remove packages maps
                     $query = $db->getQuery(true);
                     $query
-                        ->delete($db->quoteName("#__itptfx_packages_map"))
-                        ->where($db->quoteName("package_id") . " IN ( " . implode(",", $packagesIds) . " )");
+                        ->delete($db->quoteName('#__itptfx_packages_map'))
+                        ->where($db->quoteName('package_id') . ' IN ( ' . implode(',', $packagesIds) . ' )');
 
                     $db->setQuery($query);
                     $db->execute();
@@ -726,14 +728,12 @@ class ItpTransifexModelProject extends JModelAdmin
                     // Remove packages
                     $query = $db->getQuery(true);
                     $query
-                        ->delete($db->quoteName("#__itptfx_packages"))
-                        ->where($db->quoteName("id") . " IN ( " . implode(",", $packagesIds) . " )");
+                        ->delete($db->quoteName('#__itptfx_packages'))
+                        ->where($db->quoteName('id') . ' IN ( ' . implode(',', $packagesIds) . ' )');
 
                     $db->setQuery($query);
                     $db->execute();
-
                 }
-
             }
         }
     }
@@ -741,25 +741,25 @@ class ItpTransifexModelProject extends JModelAdmin
     protected function parseSlug($slug)
     {
         $result = array(
-            "type" => null,
-            "filename" => null
+            'type' => null,
+            'filename' => null
         );
 
-        $slugParts = explode("-", $slug);
+        $slugParts = explode('-', $slug);
 
         // Prepare type.
-        if (in_array($slugParts[0], $this->sitePrefixes)) {
-            $result["type"] = "site";
-        } elseif (in_array($slugParts[0], $this->adminPrefixes)) {
-            $result["type"] = "admin";
+        if (in_array($slugParts[0], $this->sitePrefixes, true)) {
+            $result['type'] = 'site';
+        } elseif (in_array($slugParts[0], $this->adminPrefixes, true)) {
+            $result['type'] = 'admin';
         }
 
         // Generate default file name.
         $suffix = substr($slugParts[1], -4, 4);
-        if (strcmp("_sys", $suffix) != 0) {
-            $result["filename"] = $slugParts[1].".ini";
+        if (strcmp('_sys', $suffix) !== 0) {
+            $result['filename'] = $slugParts[1].'.ini';
         } else {
-            $result["filename"] = substr($slugParts[1], 0, -4) .".sys.ini";
+            $result['filename'] = substr($slugParts[1], 0, -4) .'.sys.ini';
         }
 
         return $result;

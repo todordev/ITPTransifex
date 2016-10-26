@@ -19,6 +19,13 @@ defined('_JEXEC') or die;
  */
 class ItpTransifexControllerProject extends Prism\Controller\Form\Backend
 {
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param array  $config
+     *
+     * @return ItpTransifexModelProject
+     */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))
     {
         $model = parent::getModel($name, $prefix, $config);
@@ -34,54 +41,48 @@ class ItpTransifexControllerProject extends Prism\Controller\Form\Backend
 
         // Get form data
         $data   = $app->input->post->get('jform', array(), 'array');
-        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, "id");
+        $itemId = Joomla\Utilities\ArrayHelper::getValue($data, 'id');
 
         $redirectOptions = array(
-            "task" => $this->getTask(),
-            "id"   => $itemId
+            'task' => $this->getTask(),
+            'id'   => $itemId
         );
 
         $model = $this->getModel();
         /** @var $model ItpTransifexModelProject */
 
         $form = $model->getForm($data, false);
-        /** @var $form JForm * */
+        /** @var $form JForm */
 
         if (!$form) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED'));
         }
 
         // Validate form data
         $validData = $model->validate($form, $data);
-
-        // Check for validation errors.
         if ($validData === false) {
             $this->displayNotice($form->getErrors(), $redirectOptions);
             return;
         }
 
         try {
-
             // Get image
             $files = $this->input->files->get('jform', array(), 'array');
-            $image = Joomla\Utilities\ArrayHelper::getValue($files, "image");
+            $image = Joomla\Utilities\ArrayHelper::getValue($files, 'image');
 
             // Upload image
             if (!empty($image['name'])) {
-
                 $imageName = $model->uploadImage($image);
-                if (!empty($imageName)) {
-                    $validData["image"] = $imageName;
+                if ($imageName !== '' and is_array($validData)) {
+                    $validData['image'] = $imageName;
                 }
-
             }
 
             $itemId = $model->save($validData);
-
-            $redirectOptions["id"] = $itemId;
+            $redirectOptions['id'] = $itemId;
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
@@ -94,13 +95,13 @@ class ItpTransifexControllerProject extends Prism\Controller\Form\Backend
     public function removeImage()
     {
         // Check for request forgeries.
-        JSession::checkToken("get") or jexit(JText::_('JINVALID_TOKEN'));
+        JSession::checkToken('get') or jexit(JText::_('JINVALID_TOKEN'));
 
         // Get item id
-        $itemId    = $this->input->get->getInt("id");
+        $itemId    = $this->input->get->getInt('id');
 
         $redirectOptions = array(
-            "view" => "projects",
+            'view' => 'projects',
         );
 
         // Check for registered user
@@ -110,19 +111,17 @@ class ItpTransifexControllerProject extends Prism\Controller\Form\Backend
         }
 
         try {
-
             $model = $this->getModel();
             $model->removeImage($itemId);
-
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
         $redirectOptions = array(
-            "view"   => "project",
-            "layout" => "edit",
-            "id"     => $itemId
+            'view'   => 'project',
+            'layout' => 'edit',
+            'id'     => $itemId
         );
 
         $this->displayMessage(JText::_('COM_ITPTRANSIFEX_IMAGE_DELETED'), $redirectOptions);

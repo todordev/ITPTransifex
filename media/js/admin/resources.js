@@ -25,7 +25,6 @@ jQuery(document).ready(function() {
         } else {
         	Joomla.submitform(task, document.getElementById('adminForm'));
         }
-    	
     };
     
     // Event for button Submit
@@ -75,11 +74,8 @@ jQuery(document).ready(function() {
 
 					PrismUIHelper.displayMessageSuccess(response.title, response.text);
 				}
-				
 			}
-				
 		});
-		
 	});
     
     // Event for button Cancel
@@ -121,11 +117,9 @@ jQuery(document).ready(function() {
 			if(jQuery(value).is(":checked")) {
 				hasSelectedItems = true;
 			}
-			
 		});
 		
 		return hasSelectedItems;
-		
     }
 
     function getCheckedBoxes(id) {
@@ -141,7 +135,6 @@ jQuery(document).ready(function() {
                     resourceIDs.push(resourceId);
                 }
             }
-
         });
 
         return resourceIDs;
@@ -195,9 +188,9 @@ jQuery(document).ready(function() {
 
     // Editable types
     jQuery('.js-editable-type').editable({
-        url: 'index.php?option=com_itptransifex&task=resource.saveType',
+        url: 'index.php?option=com_itptransifex&task=resource.saveCategory',
         type: 'select',
-        source: [{value: "site", text: "site"}, {value: "admin", text: "admin"}],
+        source: Joomla.optionsStorage.com_userideas_filter_categories,
         prepend: Joomla.JText._('COM_ITPTRANSIFEX_NOT_SELECTED'),
         title: Joomla.JText._('COM_ITPTRANSIFEX_SELECT_TYPE_EDITABLE'),
         emptytext: Joomla.JText._('COM_ITPTRANSIFEX_EMPTY'),

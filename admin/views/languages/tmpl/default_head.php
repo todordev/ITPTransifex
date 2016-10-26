@@ -18,13 +18,12 @@ defined('_JEXEC') or die;
 	     <?php echo JHtml::_('grid.sort',  'COM_ITPTRANSIFEX_NAME', 'a.name', $this->listDirn, $this->listOrder); ?>
 	</th>
 	<th width="10%" class="nowrap hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_LOCALE_CODE"); ?>
+	    <?php echo JText::_('COM_ITPTRANSIFEX_LOCALE_CODE'); ?>
 	</th>
 	<th width="10%" class="nowrap center hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_COUNTRY_CODE"); ?>
+	    <?php echo JText::_('COM_ITPTRANSIFEX_COUNTRY_CODE'); ?>
 	</th>
     <th width="1%" class="nowrap center hidden-phone">
          <?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ID', 'a.id', $this->listDirn, $this->listOrder); ?>
     </th>
 </tr>
-	  

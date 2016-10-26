@@ -21,22 +21,22 @@ defined('_JEXEC') or die;
     <table class="table table-striped">
         <thead>
             <tr>
-                <th><?php echo JText::_("COM_ITPTRANSIFEX_PACKAGE"); ?></th>
+                <th><?php echo JText::_('COM_ITPTRANSIFEX_PACKAGE'); ?></th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
         <tbody>
-        <?php foreach($this->items as $item) {?>
+        <?php foreach ($this->items as $item) {?>
             <tr>
                 <td class="js-pkg-title<?php echo $item->id; ?> has-context col-md-10">
                     <strong><?php echo $this->escape($item->name); ?> (<?php echo $this->escape($item->language); ?>)</strong>
                     <p><?php echo $this->escape($item->description); ?></p>
-                    <div class="font-xsmall"><?php echo JText::sprintf("COM_ITPTRANSIFEX_VERSION_S", $item->version); ?></div>
+                    <div class="font-xsmall"><?php echo JText::sprintf('COM_ITPTRANSIFEX_VERSION_S', $item->version); ?></div>
                 </td>
                 <td class="col-md-2">
                     <button class="btn btn-primary js-pkg-btn-download" data-package-id="<?php echo (int)$this->escape($item->id); ?>">
                         <span class="fa fa-download" aria-hidden="true"></span>
-                        <?php echo JText::_("COM_ITPTRANSIFEX_DOWNLOAD"); ?>
+                        <?php echo JText::_('COM_ITPTRANSIFEX_DOWNLOAD'); ?>
                     </button>
                 </td>
             </tr>
@@ -55,8 +55,8 @@ defined('_JEXEC') or die;
 </div>
 
 <?php
-if (!$this->params->get("enable_captcha", 0)) {
-    echo $this->loadTemplate("nocaptcha");
+if (!$this->params->get('enable_captcha', 0)) {
+    echo $this->loadTemplate('nocaptcha');
 } else {
-    echo $this->loadTemplate("captcha");
+    echo $this->loadTemplate('captcha');
 }

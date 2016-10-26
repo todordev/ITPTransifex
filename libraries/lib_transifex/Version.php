@@ -3,7 +3,7 @@
  * @package      ITPTransifex
  * @subpackage   Libraries
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -24,21 +24,21 @@ class Version
      *
      * @var string
      */
-    public $product = 'ITP Transifex';
+    public $product = 'ITPTransifex';
 
     /**
      * Main Release Level
      *
      * @var integer
      */
-    public $release = '2';
+    public $release = '3';
 
     /**
      * Sub Release Level
      *
      * @var integer
      */
-    public $devLevel = '1';
+    public $devLevel = '0';
 
     /**
      * Release Type
@@ -59,7 +59,7 @@ class Version
      *
      * @var string
      */
-    public $releaseDate = '21 September, 2015';
+    public $releaseDate = '26 October, 2016';
 
     /**
      * License

@@ -21,19 +21,18 @@ defined('_JEXEC') or die;
 	     <?php echo JHtml::_('grid.sort',  'COM_ITPTRANSIFEX_NAME', 'a.name', $this->listDirn, $this->listOrder); ?>
 	</th>
 	<th width="20%" class="nowrap hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_SLUG"); ?>
+	    <?php echo JText::_('COM_ITPTRANSIFEX_SLUG'); ?>
 	</th>
 	<th width="20%" class="nowrap hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_FILENAME"); ?>
+	    <?php echo JText::_('COM_ITPTRANSIFEX_FILENAME'); ?>
+	</th>
+	<th width="10%" class="nowrap hidden-phone">
+	    <?php echo JText::_('COM_ITPTRANSIFEX_CATEGORY'); ?>
 	</th>
 	<th width="10%" class="nowrap center hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_TYPE"); ?>
-	</th>
-	<th width="10%" class="nowrap center hidden-phone">
-	    <?php echo JText::_("COM_ITPTRANSIFEX_SOURCE_LANGUAGE_CODE"); ?>
+	    <?php echo JText::_('COM_ITPTRANSIFEX_SOURCE_LANGUAGE'); ?>
 	</th>
     <th width="1%" class="nowrap center hidden-phone">
          <?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ID', 'a.id', $this->listDirn, $this->listOrder); ?>
     </th>
 </tr>
-	  

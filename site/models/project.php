@@ -24,7 +24,7 @@ class ItpTransifexModelProject extends JModelList
     {
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
-                "id", "a.id"
+                'id', 'a.id'
             );
         }
 
@@ -44,7 +44,7 @@ class ItpTransifexModelProject extends JModelList
      */
     protected function populateState($ordering = 'ordering', $direction = 'ASC')
     {
-        parent::populateState("a.name", "ASC");
+        parent::populateState('a.name', 'ASC');
 
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
@@ -54,7 +54,7 @@ class ItpTransifexModelProject extends JModelList
         $this->setState('params', $params);
 
         // Set project id.
-        $value = $app->input->get("id", 0, "uint");
+        $value = $app->input->get('id', 0, 'uint');
         $this->setState($this->context . '.id', $value);
     }
 
@@ -90,14 +90,14 @@ class ItpTransifexModelProject extends JModelList
         /** @var $db JDatabaseDriver */
 
         // Create a sub query object.
-        $projectId = $this->getState($this->context.".id");
+        $projectId = $this->getState($this->context.'.id');
 
         $subQuery = $db->getQuery(true);
         $subQuery
-            ->select("a.language")
-            ->from($db->quoteName("#__itptfx_packages", "a"))
-            ->where("a.project_id = ".(int)$projectId)
-            ->group("a.language");
+            ->select('a.language')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.project_id = '.(int)$projectId)
+            ->group('a.language');
 
         // Create a new query object.
         $query = $db->getQuery(true);
@@ -106,11 +106,11 @@ class ItpTransifexModelProject extends JModelList
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.code, a.short_code'
+                'a.id, a.name, a.locale, a.code'
             )
         );
         $query->from($db->quoteName('#__itptfx_languages', 'a'));
-        $query->where("a.code IN (" .$subQuery. ")");
+        $query->where('a.locale IN (' .$subQuery. ')');
 
         // Add the list ordering clause.
         $orderString = $this->getOrderString();
@@ -121,8 +121,8 @@ class ItpTransifexModelProject extends JModelList
 
     protected function getOrderString()
     {
-        $orderCol  = $this->getState("list.ordering", "a.title");
-        $orderDirn = $this->getState("list.direction", "ASC");
+        $orderCol  = $this->getState('list.ordering', 'a.title');
+        $orderDirn = $this->getState('list.direction', 'ASC');
 
         $orderString = $orderCol . ' ' . $orderDirn;
 
@@ -136,13 +136,13 @@ class ItpTransifexModelProject extends JModelList
 
         $query = $db->getQuery(true);
         $query
-            ->select("COUNT(*) as number, a.language")
-            ->from($db->quoteName("#__itptfx_packages", "a"))
-            ->where("a.project_id = ".(int)$projectId)
-            ->group("a.language");
+            ->select('COUNT(*) as number, a.language')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.project_id = '.(int)$projectId)
+            ->group('a.language');
 
         $db->setQuery($query);
-        $results = $db->loadAssocList("language");
+        $results = $db->loadAssocList('language');
 
         if (!$results) {
             $results = array();

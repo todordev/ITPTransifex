@@ -47,22 +47,21 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
 
         // Check for validation errors.
         if (!$resourcesIDs) {
-
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_INVALID_RESOURCES"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(JText::_('COM_ITPTRANSIFEX_INVALID_RESOURCES'))
                 ->failure();
 
             echo $response;
 
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         $form = $model->getForm($data, false);
         /** @var $form JForm */
 
         if (!$form) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_FORM_CANNOT_BE_LOADED'));
         }
 
         // Validate form data
@@ -70,7 +69,6 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
 
         // Check for validation errors.
         if ($validData === false) {
-
             $messages = array();
 
             $errors = $form->getErrors();
@@ -81,48 +79,45 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
             }
 
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(implode("\n", $messages))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(implode('\n', $messages))
                 ->failure();
 
             echo $response;
 
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         try {
-
             // Set the language code to the session.
-            // I will use it as default value of the field "language" in the form.
-            $app->setUserState("package.language", $validData["language"]);
-            $app->setUserState("package.type", $validData["type"]);
+            // I will use it as default value of the field 'language' in the form.
+            $app->setUserState('package.language', $validData['language']);
+            $app->setUserState('package.type', $validData['type']);
 
-            $validData["project_id"] = $projectId;
+            $validData['project_id'] = $projectId;
 
             $packageId = $model->save($validData);
             $model->saveResourcesIds($packageId, $resourcesIDs);
 
         } catch (Exception $e) {
-
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
 
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
                 ->setText($e->getMessage())
                 ->failure();
 
             echo $response;
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         $response
-            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::sprintf("COM_ITPTRANSIFEX_PACKAGE_CREATED_S", htmlentities($validData['name'], ENT_QUOTES, "UTF-8")))
+            ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+            ->setText(JText::sprintf('COM_ITPTRANSIFEX_PACKAGE_CREATED_S', htmlentities($validData['name'], ENT_QUOTES, 'UTF-8')))
             ->success();
 
         echo $response;
         $app->close();
-
     }
 
     /**
@@ -140,10 +135,9 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
 
         // Check for validation errors.
         if (!$packageId or !$resourceId) {
-
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_INVALID_RESOURCES"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(JText::_('COM_ITPTRANSIFEX_INVALID_RESOURCES'))
                 ->failure();
 
             echo $response;
@@ -152,17 +146,15 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
         }
 
         try {
-
             $model->removeResource($packageId, $resourceId);
-
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
         $response
-            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::_("COM_ITPTRANSIFEX_RESOURCE_REMOVED"))
+            ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+            ->setText(JText::_('COM_ITPTRANSIFEX_RESOURCE_REMOVED'))
             ->success();
 
         echo $response;
@@ -178,7 +170,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
     public function loadResources()
     {
         // Get the input
-        $query = $this->input->get->get('query', "", 'string');
+        $query = $this->input->get->get('query', '', 'string');
 
         $response = new Prism\Response\Json();
 
@@ -189,7 +181,7 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
         try {
             $data = $model->getResources($query);
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
         
@@ -220,31 +212,30 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
         try {
             $success = $model->storeResource($packageId, $resourceId);
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
-        $resource = new Transifex\Resource\Resource(JFactory::getDbo());
+        $resource = new Transifex\Resource\ResourceItem(JFactory::getDbo());
         $resource->load($resourceId);
 
         if ($success and $resource->getId()) {
-
             $response = '
     <tr id="resource-id'.$resourceId.'">
         <td class="nowrap">
             '.$resource->getName().'
             <div class="small">
-                '. JText::sprintf("COM_ITPTRANSIFEX_ALIAS_S", $resource->getAlias()) .'
+                '. JText::sprintf('COM_ITPTRANSIFEX_ALIAS_S', $resource->getAlias()) .'
             </div>
         </td>
         <td>
-            <a href="'.JRoute::_("index.php?option=com_itptransifex&task=package.removeResource&format=raw").'"
+            <a href="'.JRoute::_('index.php?option=com_itptransifex&task=package.removeResource&format=raw').'"
                data-rid="'.$resourceId.'"
                data-pid="'.$packageId.'"
                class="btn btn-danger itptfx-btn-remove"
                 >
                 <i class="icon-trash"></i>
-                '.JText::_("COM_ITPTRANSIFEX_REMOVE").'
+                '.JText::_('COM_ITPTRANSIFEX_REMOVE').'
             </a>
         </td>
     </tr>';
@@ -257,13 +248,15 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
 
     public function batch()
     {
+        $app = JFactory::getApplication();
+        
         JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
         $response = new Prism\Response\Json();
 
         // Get the input
         $packagesIds  = $this->input->post->getString('ids');
-        $packagesIds  = explode(",", $packagesIds);
+        $packagesIds  = explode(',', $packagesIds);
         $packagesIds  = Joomla\Utilities\ArrayHelper::toInteger($packagesIds);
         $packagesIds  = array_filter($packagesIds);
 
@@ -276,94 +269,90 @@ class ItpTransifexControllerPackage extends Prism\Controller\Admin
         // Check for selected packages.
         if (!$packagesIds) {
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(JText::_('COM_ITPTRANSIFEX_PACKAGES_NOT_SELECTED'))
                 ->failure();
 
             echo $response;
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
-
         try {
-
             switch ($action) {
-                case "copy":
-
+                case 'copy':
                     $language     = $this->input->post->get('language');
 
                     // Check for valid language.
                     if (!$language) {
                         $response
-                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                            ->setText(JText::_("COM_ITPTRANSIFEX_LANGUAGE_NOT_SELECTED"))
+                            ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                            ->setText(JText::_('COM_ITPTRANSIFEX_LANGUAGE_NOT_SELECTED'))
                             ->failure();
 
                         echo $response;
-                        JFactory::getApplication()->close();
+                        $app->close();
                     }
 
                     $model->copyPackages($packagesIds, $language);
 
                     $response
-                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_COPIED_SUCCESSFULLY"))
+                        ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+                        ->setText(JText::_('COM_ITPTRANSIFEX_PACKAGES_COPIED_SUCCESSFULLY'))
                         ->success();
 
                     break;
 
-                case "replace_string":
-
+                case 'replace_string':
                     $search     = $this->input->post->getString('search_string');
                     $replace    = $this->input->post->getString('replace_string');
 
                     if (!$search or !$replace) {
                         $response
-                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                            ->setText(JText::_("COM_ITPTRANSIFEX_SEARCH_REPLACE_MISSING"))
+                            ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                            ->setText(JText::_('COM_ITPTRANSIFEX_SEARCH_REPLACE_MISSING'))
                             ->failure();
 
                         echo $response;
-                        JFactory::getApplication()->close();
+                        $app->close();
                     }
 
                     $model->replaceText($packagesIds, $search, $replace);
 
                     $response
-                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_REPLACED_TEXT_SUCCESSFULLY"))
+                        ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+                        ->setText(JText::_('COM_ITPTRANSIFEX_PACKAGES_REPLACED_TEXT_SUCCESSFULLY'))
                         ->success();
 
                     break;
 
-                case "change_version":
-                    $newVersion = $this->input->post->get('version', 0, "float");
+                case 'change_version':
+                    $newVersion = $this->input->post->get('version', 0, 'float');
 
                     if (!$newVersion) {
                         $response
-                            ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                            ->setText(JText::_("COM_ITPTRANSIFEX_VERSION_NOT_SPECIFIED"))
+                            ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                            ->setText(JText::_('COM_ITPTRANSIFEX_VERSION_NOT_SPECIFIED'))
                             ->failure();
 
                         echo $response;
-                        JFactory::getApplication()->close();
+                        $app->close();
                     }
 
                     $model->changeVersion($packagesIds, $newVersion);
 
                     $response
-                        ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-                        ->setText(JText::_("COM_ITPTRANSIFEX_PACKAGES_VERSION_CHANGED_SUCCESSFULLY"))
+                        ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+                        ->setText(JText::_('COM_ITPTRANSIFEX_PACKAGES_VERSION_CHANGED_SUCCESSFULLY'))
                         ->success();
                     break;
             }
 
         } catch (Exception $e) {
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
             throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_SYSTEM'));
         }
 
         echo $response;
-        JFactory::getApplication()->close();
+        $app->close();
     }
 }

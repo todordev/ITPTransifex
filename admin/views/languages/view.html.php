@@ -35,14 +35,10 @@ class ItpTransifexViewLanguages extends JViewLegacy
 
     protected $sidebar;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option     = JFactory::getApplication()->input->get('option');
+        
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
@@ -66,7 +62,7 @@ class ItpTransifexViewLanguages extends JViewLegacy
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
-        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
+        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') === 0);
 
         $this->sortFields = array(
             'a.name' => JText::_('COM_ITPTRANSIFEX_NAME'),
@@ -91,13 +87,13 @@ class ItpTransifexViewLanguages extends JViewLegacy
     protected function addToolbar()
     {
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_LANGUAGES_MANAGER'));
-        JToolBarHelper::addNew('language.add');
-        JToolBarHelper::editList('language.edit');
-        JToolBarHelper::divider();
-        JToolBarHelper::deleteList(JText::_("COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION"), "languages.delete");
-        JToolBarHelper::divider();
-        JToolBarHelper::custom('languages.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
+        JToolbarHelper::title(JText::_('COM_ITPTRANSIFEX_LANGUAGES_MANAGER'));
+        JToolbarHelper::addNew('language.add');
+        JToolbarHelper::editList('language.edit');
+        JToolbarHelper::divider();
+        JToolbarHelper::deleteList(JText::_('COM_ITPTRANSIFEX_DELETE_ITEMS_QUESTION'), 'languages.delete');
+        JToolbarHelper::divider();
+        JToolbarHelper::custom('languages.backToDashboard', 'dashboard', '', JText::_('COM_ITPTRANSIFEX_BACK_DASHBOARD'), false);
     }
 
     /**
@@ -116,6 +112,6 @@ class ItpTransifexViewLanguages extends JViewLegacy
 
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }
 }

@@ -27,8 +27,8 @@ class ItpTransifexViewProject extends JViewLegacy
      */
     protected $params;
 
-    protected $items = null;
-    protected $pagination = null;
+    protected $items;
+    protected $pagination;
 
     /**
      * @var Transifex\Project\Project
@@ -49,43 +49,42 @@ class ItpTransifexViewProject extends JViewLegacy
         /** @var $app JApplicationSite */
 
         // Get current project
-        $projectId = $app->input->getInt("id");
+        $projectId = $app->input->getInt('id');
         if (!$projectId) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT'));
         }
 
         // Load project data.
         $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($projectId);
         if (!$this->project->getId() or !$this->project->isPublished()) {
-            throw new Exception(JText::_("COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT"));
+            throw new Exception(JText::_('COM_ITPTRANSIFEX_ERROR_INVALID_PROJECT'));
         }
 
         $model = $this->getModel();
         /** @var $model ItpTransifexModelProject */
 
         // Initialise variables
-        $this->state      = $this->get("State");
+        $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
         // Get params
-        $this->params = $this->state->get("params");
+        $this->params = $this->state->get('params');
         /** @var  $this->params Joomla\Registry\Registry */
 
-        // Prepare layout data.
-        $this->layoutData = array(
-            "params"  => $this->params,
-            "project" => $this->project,
-            "clean_title" => $this->escape($this->project->getName()),
-            "h_tag" => (!$this->params->get('show_page_heading', 1)) ? "h1" : "h2",
-            "image_width" => $this->params->get("image_width", "200"),
-            "image_height" => $this->params->get("image_height", "200"),
-            "images_folder" => $this->params->get("images_directory", "images/itptransifex")
-        );
-
         // Get the folder with images
-        $this->imageFolder = $this->params->get("images_directory", "images/itptransifex");
+        $this->imageFolder = $this->params->get('images_directory', 'images/itptransifex');
+
+        // Prepare layout data.
+        $this->layoutData = new stdClass;
+        $this->layoutData->params      = $this->params;
+        $this->layoutData->project     = $this->project;
+        $this->layoutData->cleanTitle  = $this->escape($this->project->getName());
+        $this->layoutData->hTag        = (!$this->params->get('show_page_heading', 1)) ? 'h1' : 'h2';
+        $this->layoutData->imageWidth  = $this->params->get('image_width', '200');
+        $this->layoutData->imageHeight = $this->params->get('image_height', '200');
+        $this->layoutData->imageFolder = $this->imageFolder;
 
         $this->packagesNumber = $model->getPackagesNumber($projectId);
 
@@ -118,11 +117,11 @@ class ItpTransifexViewProject extends JViewLegacy
 
         // Meta keywords
         if ($this->params->get('menu-meta_keywords')) {
-            $this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
+            $this->document->setMetaData('keywords', $this->params->get('menu-meta_keywords'));
         }
 
         // Breadcrumb
-        $pathway           = $app->getPathWay();
+        $pathway           = $app->getPathway();
         $currentBreadcrumb = JHtmlString::truncate($this->project->getName(), 64);
         $pathway->addItem($currentBreadcrumb, '');
 
@@ -140,13 +139,13 @@ class ItpTransifexViewProject extends JViewLegacy
         $menus = $app->getMenu();
         $menu  = $menus->getActive();
 
-        $defaultPageHeading = JText::sprintf("COM_ITPTRANSIFEX_PROJECT_DEFAULT_PAGE_HEADING", $this->project->getName());
+        $defaultPageHeading = JText::sprintf('COM_ITPTRANSIFEX_PROJECT_DEFAULT_PAGE_HEADING', $this->project->getName());
 
         // Prepare page heading
         if (!$menu) {
             $this->params->def('page_heading', $defaultPageHeading);
         } else {
-            $title = (isset($menu->query["id"])) ? $this->params->get('page_title', $menu->title) : $defaultPageHeading;
+            $title = array_key_exists('id', $menu->query) ? $this->params->get('page_title', $menu->title) : $defaultPageHeading;
             $this->params->def('page_heading', $title);
         }
     }
@@ -161,21 +160,21 @@ class ItpTransifexViewProject extends JViewLegacy
         $menus = $app->getMenu();
         $menu  = $menus->getActive();
 
-        $defaultTitle = JText::sprintf("COM_ITPTRANSIFEX_PROJECT_DEFAULT_PAGE_TITLE", $this->project->getName());
+        $defaultTitle = JText::sprintf('COM_ITPTRANSIFEX_PROJECT_DEFAULT_PAGE_TITLE', $this->project->getName());
 
         // Prepare page title
         if (!$menu) {
             $title = $defaultTitle;
         } else {
-            $title = (isset($menu->query["id"])) ? $this->params->get('page_title', $menu->title) : $defaultTitle;
+            $title = array_key_exists('id', $menu->query) ? $this->params->get('page_title', $menu->title) : $defaultTitle;
         }
 
         // Add title before or after Site Name
         if (!$title) {
             $title = $app->get('sitename');
-        } elseif ($app->get('sitename_pagetitles', 0) == 1) {
+        } elseif ((int)$app->get('sitename_pagetitles', 0) === 1) {
             $title = JText::sprintf('JPAGETITLE', $app->get('sitename'), $title);
-        } elseif ($app->get('sitename_pagetitles', 0) == 2) {
+        } elseif ((int)$app->get('sitename_pagetitles', 0) === 2) {
             $title = JText::sprintf('JPAGETITLE', $title, $app->get('sitename'));
         }
 

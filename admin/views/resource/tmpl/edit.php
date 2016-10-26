@@ -28,8 +28,16 @@ defined('_JEXEC') or die;
     				<div class="controls"><?php echo $this->form->getInput('filename'); ?></div>
                 </div>
                 <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('type'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('type'); ?></div>
+                    <div class="control-label"><?php echo $this->form->getLabel('category'); ?></div>
+    				<div class="controls"><?php echo $this->form->getInput('category'); ?></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><?php echo $this->form->getLabel('source'); ?></div>
+                    <div class="controls"><?php echo $this->form->getInput('source'); ?></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><?php echo $this->form->getLabel('path'); ?></div>
+                    <div class="controls"><?php echo $this->form->getInput('path'); ?></div>
                 </div>
                 <div class="control-group">
                     <div class="control-label"><?php echo $this->form->getLabel('id'); ?></div>

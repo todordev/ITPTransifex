@@ -91,6 +91,7 @@ class ItpTransifexModelPackages extends JModelList
     /**
      * Build an SQL query to load the list data.
      *
+     * @throws RuntimeException
      * @return  JDatabaseQuery
      * @since   1.6
      */
@@ -112,36 +113,36 @@ class ItpTransifexModelPackages extends JModelList
             )
         );
 
-        $query->from($db->quoteName("#__itptfx_packages", "a"));
-        $query->leftJoin($db->quoteName("#__itptfx_projects", "b") . " ON a.project_id = b.id");
-        $query->leftJoin($db->quoteName("#__itptfx_languages", "c") . " ON a.language = c.code");
+        $query->from($db->quoteName('#__itptfx_packages', 'a'));
+        $query->leftJoin($db->quoteName('#__itptfx_projects', 'b') . ' ON a.project_id = b.id');
+        $query->leftJoin($db->quoteName('#__itptfx_languages', 'c') . ' ON a.language = c.locale');
 
         // Filter by project
-        $projectId = $this->getState('filter.project');
-        if (!empty($projectId)) {
+        $projectId = (int)$this->getState('filter.project');
+        if ($projectId > 0) {
             $query->where('a.project_id = ' . (int)$projectId);
         }
 
         // Filter by language
-        $languageCode = $this->getState('filter.language');
-        if (!empty($languageCode)) {
+        $languageCode = (string)$this->getState('filter.language');
+        if ($languageCode !== '') {
             $query->where('a.language = ' . $db->quote($languageCode));
         }
 
         // Filter by type
-        $type = $this->getState('filter.type');
-        if (!empty($type)) {
+        $type = (string)$this->getState('filter.type');
+        if ($type !== '') {
             $query->where('a.type = ' . $db->quote($type));
         }
 
         // Filter by search in title
-        $search = $this->getState('filter.search');
-        if (!empty($search)) {
+        $search = (string)$this->getState('filter.search');
+        if ($search !== '') {
             if (stripos($search, 'id:') === 0) {
                 $query->where('a.id = ' . (int)substr($search, 3));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }

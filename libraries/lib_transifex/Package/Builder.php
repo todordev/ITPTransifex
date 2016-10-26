@@ -3,17 +3,19 @@
  * @package      ITPTransifex
  * @subpackage   Libraries
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
 namespace Transifex\Package;
 
+use Prism\Constants;
 use Transifex\Project\Project;
 use Transifex\Resource\Resources;
 use Transifex\Language\Language;
 use Prism\Transifex\Request;
-use Prism\String\StringHelper;
+use Prism\Utilities\StringHelper;
+use Joomla\String\StringHelper as JoomlaStringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Registry\Registry;
 
@@ -62,7 +64,7 @@ class Builder
 
     /**
      * Set some options.
-     * 
+     *
      * <code>
      * $options = array(
      *     "username" => $params->get("username"),
@@ -73,7 +75,7 @@ class Builder
      * $package = new Transifex\Package\Builder(\JFactory::getDbo());
      * $package->setOptions($options);
      * </code>
-     * 
+     *
      * @param array $options
      */
     public function setOptions(array $options)
@@ -83,34 +85,33 @@ class Builder
 
     /**
      * Build a package.
-     * 
+     *
      * @param Package $package
      *
+     * @throws \UnexpectedValueException
      * @return string
      */
     public function build(Package $package)
     {
-        $filePath = "";
+        $filePath = '';
 
         // Prepare project URL that points to Transifex.
-        $this->serviceProjectPath = "project/" . $this->project->getAlias();
+        $this->serviceProjectPath = 'project/' . $this->project->getAlias();
 
         // Prepare project package.
         if ($package->getId()) {
-
             $fileName = $package->getFilename();
             if (!$fileName) {
                 $filePath = $this->createErrorFile();
                 return $filePath;
             }
 
-            $fileName .= "_".str_replace("_", "-", $package->getLanguage());
+            $fileName .= '_'.str_replace('_', '-', $package->getLanguage());
 
             // Check for existing package.
             $cacheExists = false;
-            $cachedFile  = \JPath::clean($this->options["archives_folder"] . "/" . $fileName . ".zip");
-            if ($this->getOption("cache_days") and \JFile::exists($cachedFile)) {
-                
+            $cachedFile  = \JPath::clean($this->options['archives_folder'] . '/' . $fileName . '.zip');
+            if ($this->getOption('cache_days') and \JFile::exists($cachedFile)) {
                 $time = filemtime($cachedFile);
 
                 $fileDate = new \DateTime();
@@ -119,7 +120,7 @@ class Builder
                 $today    = new \DateTime();
                 $interval = $fileDate->diff($today);
 
-                if ($interval->days < $this->getOption("cache_days", 7)) {
+                if ($interval->days < $this->getOption('cache_days', 7)) {
                     $cacheExists = true;
                 } else {
                     // Remove the old file.
@@ -128,10 +129,9 @@ class Builder
             }
 
             // If cached file does not exist, generate new one.
+            $filePath = $cachedFile;
             if (!$cacheExists) {
-                $filePath = $this->preparePackage($package, (bool)$this->getOption("include_lang_name", 1));
-            } else {
-                $filePath = $cachedFile;
+                $filePath = $this->preparePackage($package, (bool)$this->getOption('include_lang_name', 1));
             }
         }
 
@@ -145,30 +145,31 @@ class Builder
 
     public function buildProject($languageCode)
     {
-        $filePath = "";
+        $filePath = '';
 
         // Get packages.
-        $packages   = $this->project->getPackages(array("language" => $languageCode));
-
+        $packages   = $this->project->getPackages(array('language' => $languageCode));
+        
         // Extract package IDs.
+        $ids = array();
         foreach ($packages as $package) {
-            $ids[] = $package["id"];
+            $ids[] = $package['id'];
         }
 
         // Prepare project URL that points to Transifex.
-        $this->serviceProjectPath = "project/" . $this->project->getAlias();
+        $this->serviceProjectPath = 'project/' . $this->project->getAlias();
 
         // Prepare project package.
-        if (!empty($ids)) {
+        if (count($ids) > 0) {
             $fileName = $this->project->getFilename();
             if (!$fileName) {
-                $fileName = "UNZIPFIRST_".\JFilterOutput::stringURLSafe($this->project->getName());
+                $fileName = 'UNZIPFIRST_'.\JFilterOutput::stringURLSafe($this->project->getName());
             }
 
-            $fileName .= "_".$languageCode;
+            $fileName .= '_'.$languageCode;
 
             // Check for existing package.
-            $cachedFile = \JPath::clean($this->options["archives_folder"] ."/". $fileName. ".zip");
+            $cachedFile = \JPath::clean($this->options['archives_folder'] .'/'. $fileName. '.zip');
             $cacheExists = false;
 
             if (\JFile::exists($cachedFile)) {
@@ -180,7 +181,7 @@ class Builder
                 $today    = new \DateTime();
                 $interval = $fileDate->diff($today);
 
-                if ($interval->d < $this->options["cache_days"]) {
+                if ($interval->d < $this->options['cache_days']) {
                     $cacheExists = true;
                 } else {
                     // Remove the old file.
@@ -189,10 +190,9 @@ class Builder
             }
 
             // If cached file does not exist, generate new one.
+            $filePath = $cachedFile;
             if (!$cacheExists) {
-                $filePath = $this->prepareProjectPackage($ids, $fileName, (bool)$this->getOption("include_lang_name", 1));
-            } else {
-                $filePath = $cachedFile;
+                $filePath = $this->prepareProjectPackage($ids, $fileName, (bool)$this->getOption('include_lang_name', 1));
             }
         }
 
@@ -210,14 +210,18 @@ class Builder
      * @param Package $package
      * @param bool $includeLanguageName Include or not language name to package name.
      *
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @return string
      */
     protected function preparePackage($package, $includeLanguageName = true)
     {
-        $packageFile  = "";
-
+        $archivesFile    = '';
+        $packageFile     = '';
+        
         $packageFileName = $package->getFilename();
-        $packageFolder   = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . $packageFileName);
+        $packageFolder   = \JPath::clean($this->options['tmp_path'] . DIRECTORY_SEPARATOR . $packageFileName);
 
         // Remove old folder
         if (\JFolder::exists($packageFolder)) {
@@ -228,35 +232,28 @@ class Builder
         \JFolder::create($packageFolder);
 
         // Get project resources
-        $published   = 1;
-        $resources   = $package->getResources($published);
-
+        $resources   = $package->getResources(Constants::PUBLISHED);
         $packageType = $package->getType();
 
         switch ($packageType) {
-
-            case "component":
-                $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
-                break;
-
-            case "module":
-                $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
-                break;
-
-            case "plugin":
+            case 'plugin':
                 $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
                 break;
 
-            case "library":
-                $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
+            case 'library':
+            case 'component':
+            case 'module':
+                $packageFile = $this->prepareExtension($package, $resources, $packageFolder, $includeLanguageName);
                 break;
         }
 
-        // Prepare archives folder.
-        $archivesFile = \JPath::clean($this->options["archives_folder"] ."/". basename($packageFile));
+        if ($packageFile !== null and $packageFile !== '') {
+            // Prepare archives folder.
+            $archivesFile = \JPath::clean($this->options['archives_folder'] . '/' . basename($packageFile));
 
-        // Move the file to archives.
-        \JFile::move($packageFile, $archivesFile);
+            // Move the file to archives.
+            \JFile::move($packageFile, $archivesFile);
+        }
 
         // Remove the temporary folder.
         \JFolder::delete($packageFolder);
@@ -271,22 +268,25 @@ class Builder
      * @param string $fileName
      * @param bool $includeLanguageName
      *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      * @return string
      */
-    protected function prepareProjectPackage(array $packagesIds, $fileName = "UNZIPFIRST", $includeLanguageName = true)
+    protected function prepareProjectPackage(array $packagesIds, $fileName = 'UNZIPFIRST', $includeLanguageName = true)
     {
         $files        = array();
-        $packageFile  = "";
-        $archivesFile = "";
+        $archivesFile = '';
 
         foreach ($packagesIds as $packageId) {
-
+            $packageFile  = '';
+            
             // Get package.
             $package = new Package($this->db);
             $package->load($packageId);
 
             $packageFileName = $package->getFilename();
-            $packageFolder   = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . $packageFileName);
+            $packageFolder   = \JPath::clean($this->options['tmp_path'] . DIRECTORY_SEPARATOR . $packageFileName);
 
             // Remove old folder
             if (\JFolder::exists($packageFolder)) {
@@ -297,38 +297,31 @@ class Builder
             \JFolder::create($packageFolder);
 
             // Get project resources
-            $published = 1;
-            $resources = $package->getResources($published);
+            $resources   = $package->getResources(Constants::PUBLISHED);
 
             $packageType = $package->getType();
-
+            
             switch ($packageType) {
-
-                case "component":
-                    $packageFile = $this->prepareComponent($package, $resources, $packageFolder, $includeLanguageName);
-                    break;
-
-                case "module":
-                    $packageFile = $this->prepareModule($package, $resources, $packageFolder, $includeLanguageName);
-                    break;
-
-                case "plugin":
+                case 'plugin':
                     $packageFile = $this->preparePlugin($package, $resources, $packageFolder, $includeLanguageName);
                     break;
 
-                case "library":
-                    $packageFile = $this->prepareLibrary($package, $resources, $packageFolder, $includeLanguageName);
+                case 'library':
+                case 'component':
+                case 'module':
+                    $packageFile = $this->prepareExtension($package, $resources, $packageFolder, $includeLanguageName);
                     break;
             }
 
-            $files[] = $packageFile;
+            if ($packageFile !== null and $packageFile !== '') {
+                $files[] = $packageFile;
+            }
         }
 
         // Make an archive.
-        if (!empty($files)) {
-
+        if (count($files) > 0) {
             // Create temporary folder.
-            $tmpFolder   = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . "tmp_".(string)StringHelper::generateRandomString());
+            $tmpFolder   = \JPath::clean($this->options['tmp_path'] . DIRECTORY_SEPARATOR . 'tmp_'.(string)StringHelper::generateRandomString());
             \JFolder::create($tmpFolder);
 
             // Copy files to the temporary folder.
@@ -337,14 +330,16 @@ class Builder
                 \JFile::copy($file, $baseName);
             }
 
-            // Create an archive with files.
+            // Create a package.
             $packageFile = $this->createPackage($fileName, $tmpFolder);
 
-            // Prepare archives folder.
-            $archivesFile = \JPath::clean($this->options["archives_folder"] ."/". basename($packageFile));
+            // Move the package to archive folder.
+            if ($packageFile !== null and $packageFile !== '') {
+                $archivesFile = \JPath::clean($this->options['archives_folder'] . '/' . basename($packageFile));
 
-            // Move the file to archives.
-            \JFile::move($packageFile, $archivesFile);
+                // Move the file to archives.
+                \JFile::move($packageFile, $archivesFile);
+            }
 
             // Remove the temporary folder.
             \JFolder::delete($tmpFolder);
@@ -354,61 +349,29 @@ class Builder
     }
 
     /**
+     * Prepare component, module, library or other package.
+     *
      * @param Package $package
      * @param Resources $resources
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
      * @return string
      */
-    protected function prepareComponent($package, $resources, $packageFolder, $includeLanguageName)
+    protected function prepareExtension($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "component");
+        $packageName = $this->getPackageName($resources, 'component');
 
         // Get package language code. Generate a language code with dash.
         $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
-            $targetAdminFolder = "administrator/components/" . $packageName . "/language/" . $langCodeDash;
-            $targetSiteFolder  = "components/" . $packageName . "/language/" . $langCodeDash;
-        } else {// "language_folders"
-            $targetAdminFolder = "administrator/language/" . $langCodeDash;
-            $targetSiteFolder  = "language/" . $langCodeDash;
-        }
-
-        $sourceAdminFolder = "admin/" . $langCodeDash;
-        $sourceSiteFolder  = "site/" . $langCodeDash;
+        $langCodeDash = str_replace('_', '-', $langCode);
 
         // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        // Create admin folder.
-        $packageAdminFolder = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . "admin");
-        if (!\JFolder::exists($packageAdminFolder)) {
-            \JFolder::create($packageAdminFolder);
-        }
-
-        // Create admin language folder
-        $packageAdminLangFolder = \JPath::clean($packageAdminFolder . DIRECTORY_SEPARATOR . $langCodeDash);
-        if (!\JFolder::exists($packageAdminLangFolder)) {
-            \JFolder::create($packageAdminLangFolder);
-        }
-
-        // Create site folder.
-        $packageSiteFolder = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . "site");
-        if (!\JFolder::exists($packageSiteFolder)) {
-            \JFolder::create($packageSiteFolder);
-        }
-
-        // Create site language folder
-        $projectSiteLangFolder = \JPath::clean($packageSiteFolder . DIRECTORY_SEPARATOR . $langCodeDash);
-        if (!\JFolder::exists($projectSiteLangFolder)) {
-            \JFolder::create($projectSiteLangFolder);
-        }
+        $manifestFileName = $langCodeDash . '.' . $packageName;
+        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . '.xml');
 
         $date = new \JDate();
 
@@ -416,30 +379,25 @@ class Builder
 
         // Prepare options
         $options = array(
-            "name"                => $name,
-            "description"         => $package->getDescription(),
-            "version"             => $package->getVersion(),
-            "creation_date"       => $date->format("d F, Y"),
-            "source_admin_folder" => $sourceAdminFolder,
-            "source_site_folder"  => $sourceSiteFolder,
-            "target_admin_folder" => $targetAdminFolder,
-            "target_site_folder"  => $targetSiteFolder,
-            "lang_code"           => $langCode,
-            "lang_code_dash"      => $langCodeDash,
-            "manifest_filename"   => $manifestFile,
-            "package_folder"      => $packageFolder
+            'name'                => $name,
+            'description'         => $package->getDescription(),
+            'version'             => $package->getVersion(),
+            'creation_date'       => $date->format('d F, Y'),
+            'lang_code'           => $langCode,
+            'lang_code_dash'      => $langCodeDash,
+            'manifest_filename'   => $manifestFile,
+            'package_folder'      => $packageFolder
         );
 
         // Download files
-        $filesList = $this->downloadComponentFiles($resources, $options);
+        $filesList = $this->fetchFiles($resources, $options);
 
         // Generate manifest
         $this->generateManifest($options, $filesList);
 
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
+        $packageFileName = $package->getFilename() . '_' . $langCodeDash;
 
-        return $packageFile;
+        return $this->createPackage($packageFileName, $packageFolder);
     }
 
     /**
@@ -448,173 +406,52 @@ class Builder
      * @param string  $packageFolder
      * @param bool  $includeLanguageName
      *
-     * @return string
-     */
-    protected function prepareModule($package, $resources, $packageFolder, $includeLanguageName)
-    {
-        // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "module");
-
-        // Get package language code. Generate a language code with dash.
-        $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
-            $targetFolder = "modules/" . $packageName . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "language/" . $langCodeDash;
-        }
-
-        // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        $date = new \JDate();
-
-        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
-
-        $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
-        );
-
-        // Download files
-        $filesList = $this->downloadFiles($resources, $options);
-
-        // Generate manifest
-        $this->generateManifest($options, $filesList);
-
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
-
-        return $packageFile;
-    }
-
-    /**
-     * @param Package $package
-     * @param Resources $resources
-     * @param string  $packageFolder
-     * @param bool  $includeLanguageName
-     *
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      * @return string
      */
     protected function preparePlugin($package, $resources, $packageFolder, $includeLanguageName)
     {
         // Get the name of the extension folder from resource name.
-        $packageNames = $this->getPackageName($resources, "plugin");
+        $packageNames = $this->getPackageName($resources, 'plugin');
 
-        $pluginType = $packageNames[1];
-        $pluginName = $packageNames[2];
-
+//        $pluginType  = $packageNames[1];
+//        $pluginName  = $packageNames[2];
         $packageName = $packageNames[3];
 
         // Get package language code. Generate a language code with dash.
         $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
-            $targetFolder = "plugins/" . $pluginType . "/" . $pluginName . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "administrator/language/" . $langCodeDash;
-        }
+        $langCodeDash = str_replace('_', '-', $langCode);
 
         // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
+        $manifestFileName = $langCodeDash . '.' . $packageName;
+        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . '.xml');
 
         $date = new \JDate();
 
         $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
 
         $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
+            'name'              => $name,
+            'description'       => $package->getDescription(),
+            'version'           => $package->getVersion(),
+            'creation_date'     => $date->format('d F, Y'),
+            'lang_code'         => $langCode,
+            'lang_code_dash'    => $langCodeDash,
+            'manifest_filename' => $manifestFile,
+            'package_folder'    => $packageFolder
         );
 
         // Download files
-        $siteFilesList = $this->downloadFiles($resources, $options, "plugin");
+        $siteFilesList = $this->fetchFiles($resources, $options);
 
         // Generate manifest
         $this->generateManifest($options, $siteFilesList);
 
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
+        $packageFileName = $package->getFilename() . '_' . $langCodeDash;
 
-        return $packageFile;
-    }
-
-    /**
-     * Prepare a package for a library.
-     *
-     * @param Package $package
-     * @param Resources $resources
-     * @param string  $packageFolder
-     * @param bool  $includeLanguageName
-     *
-     * @return string
-     */
-    protected function prepareLibrary($package, $resources, $packageFolder, $includeLanguageName)
-    {
-        // Get the name of the extension folder from resource name.
-        $packageName = $this->getPackageName($resources, "library");
-
-        // Get package language code. Generate a language code with dash.
-        $langCode     = $package->getLanguage();
-        $langCodeDash = str_replace("_", "-", $langCode);
-
-        // Generate target folder of the language files.
-        if (strcmp("extension_folders", $this->getOption("files_location")) == 0) {
-            $targetFolder = "libraries/" . \JString::ucfirst(substr($packageName, 4)) . "/language/" . $langCodeDash;
-        } else { // "language_folders"
-            $targetFolder = "language/" . $langCodeDash;
-        }
-
-        // Prepare options
-        $manifestFileName = $langCodeDash . "." . $packageName;
-        $manifestFile     = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $manifestFileName . ".xml");
-
-        $date = new \JDate();
-
-        $name = $this->generatePackageName($package, $langCode, $includeLanguageName);
-
-        $options = array(
-            "name"              => $name,
-            "description"       => $package->getDescription(),
-            "version"           => $package->getVersion(),
-            "creation_date"     => $date->format("d F, Y"),
-            "target_folder"     => $targetFolder,
-            "lang_code"         => $langCode,
-            "lang_code_dash"    => $langCodeDash,
-            "manifest_filename" => $manifestFile,
-            "package_folder"    => $packageFolder
-        );
-
-        // Download files
-        $filesList = $this->downloadFiles($resources, $options);
-
-        // Generate manifest
-        $this->generateManifest($options, $filesList);
-
-        $packageFileName = $package->getFileName() . "_" . $langCodeDash;
-        $packageFile     = $this->createPackage($packageFileName, $packageFolder);
-
-        return $packageFile;
+        return $this->createPackage($packageFileName, $packageFolder);
     }
 
     /**
@@ -627,31 +464,18 @@ class Builder
      */
     protected function getPackageName($resources, $type)
     {
-        $fileName = \JFile::makeSafe($resources[0]["filename"]);
+        $fileName = \JFile::makeSafe($resources[0]['filename']);
 
         $fileName = \JFile::stripExt($fileName);
-        if (false !== strpos($fileName, ".sys")) {
+        if (false !== strpos($fileName, '.sys')) {
             $fileName = \JFile::stripExt($fileName);
         }
 
-        switch ($type) {
+        if (strcmp($type, 'plugin') === 0) {
+            $fileNames    = explode('_', $fileName);
+            $fileNames[3] = $fileName;
 
-            case "component":
-                break;
-
-            case "module":
-                break;
-
-            case "library":
-                break;
-
-            case "plugin":
-                $fileNames    = explode("_", $fileName);
-                $fileNames[3] = $fileName;
-
-                $fileName = $fileNames;
-
-                break;
+            $fileName = $fileNames;
         }
 
         return $fileName;
@@ -664,6 +488,7 @@ class Builder
      * @param string $langCode
      * @param bool $includeLanguageName
      *
+     * @throws \RuntimeException
      * @return string
      */
     protected function generatePackageName($package, $langCode, $includeLanguageName)
@@ -672,13 +497,13 @@ class Builder
             $name = $package->getName();
         } else {
             $keys = array(
-                "code" => $langCode
+                'locale' => $langCode
             );
 
             $language = new Language(\JFactory::getDbo());
             $language->load($keys);
 
-            $name = $package->getName() . " - ".$language->getName();
+            $name = $package->getName() . ' - '.$language->getName();
         }
 
         return $name;
@@ -686,7 +511,7 @@ class Builder
 
     protected function createPackage($packageName, $projectFolder)
     {
-        $archiveFile = $packageName . ".zip";
+        $archiveFile = $packageName . '.zip';
         $destination = $projectFolder . DIRECTORY_SEPARATOR . $archiveFile;
 
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($projectFolder));
@@ -696,8 +521,8 @@ class Builder
             $key = \JPath::clean($key);
             if (!is_dir($key)) {
                 $filesToZip[] = array(
-                    "name" => substr($key, strlen($destination) - strlen(basename($destination))),
-                    "data" => file_get_contents($key)
+                    'name' => substr($key, strlen($destination) - strlen(basename($destination))),
+                    'data' => file_get_contents($key)
                 );
             }
         }
@@ -706,54 +531,57 @@ class Builder
         $zipAdapter = \JArchive::getAdapter('zip');
         /** @var $zipAdapter \JArchiveZip */
 
-        $zipAdapter->create($destination, $filesToZip, array());
+        $zipAdapter->create($destination, $filesToZip);
 
         return $destination;
     }
 
-    protected function downloadComponentFiles($resources, $options)
+    protected function fetchFiles($resources, $options)
     {
-        $sourceAdminLangFolder = ArrayHelper::getValue($options, "source_admin_folder");
-        $sourceSiteLangFolder  = ArrayHelper::getValue($options, "source_site_folder");
-        $targetAdminLangFolder = ArrayHelper::getValue($options, "target_admin_folder");
-        $targetSiteLangFolder  = ArrayHelper::getValue($options, "target_site_folder");
-        $langCode              = ArrayHelper::getValue($options, "lang_code");
-        $langCodeDash          = ArrayHelper::getValue($options, "lang_code_dash");
-        $packageFolder         = ArrayHelper::getValue($options, "package_folder");
+        $langCode              = ArrayHelper::getValue($options, 'lang_code');
+        $langCodeDash          = ArrayHelper::getValue($options, 'lang_code_dash');
+        $packageFolder         = ArrayHelper::getValue($options, 'package_folder');
 
-        $adminFiles = array();
-        $siteFiles  = array();
+        $files = array();
 
         // Separate admin files and site ones.
         foreach ($resources as $resource) {
-            if (strcmp("admin", $resource["type"]) == 0) { // Admin folder
-                $adminFiles[] = array(
-                    "filename" => $langCodeDash . "." . $resource["filename"],
-                    "slug"     => $resource["alias"],
-                );
-            }
+            if (!empty($resource['path'])) {
+                $path = md5($resource['path']);
 
-            if (strcmp("site", $resource["type"]) == 0) { // Site folder
-                $siteFiles[] = array(
-                    "filename" => $langCodeDash . "." . $resource["filename"],
-                    "slug"     => $resource["alias"],
+                $files[$path]['paths'] = array(
+                    'source_folder' => $resource['source'],
+                    'target_path'   => $resource['path'] .'/'. $langCodeDash,
+                );
+
+                $files[$path]['files'][] = array(
+                    'filename'      => $langCodeDash . '.' . $resource['filename'],
+                    'slug'          => $resource['alias']
                 );
             }
         }
 
-        // Download admin files
-        if (!empty($adminFiles)) {
-            foreach ($adminFiles as $fileData) {
-                $destination = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceAdminLangFolder . DIRECTORY_SEPARATOR . $fileData["filename"]);
-                $this->downloadFile($fileData["slug"], $langCode, $destination);
-            }
-        }
+        // Download files
+        foreach ($files as $key => $filesData) {
+            $paths        = $filesData['paths'];
+            $sourceFolder = $paths['source_folder'] ?: '';
 
-        // Download site files
-        if (!empty($siteFiles)) {
-            foreach ($siteFiles as $fileData) {
-                $destination = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceSiteLangFolder . DIRECTORY_SEPARATOR . $fileData["filename"]);
-                $this->downloadFile($fileData["slug"], $langCode, $destination);
+            // Create site folder.
+            $sourceFolderPath = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $sourceFolder);
+
+            if (!\JFolder::exists($sourceFolderPath)) {
+                \JFolder::create($sourceFolderPath);
+            }
+
+            foreach ($filesData['files'] as $fileData) {
+                $destination = \JPath::clean($sourceFolderPath . DIRECTORY_SEPARATOR . $fileData['filename']);
+                
+                try {
+                    $this->downloadFile($fileData['slug'], $langCode, $destination);
+                } catch (\Exception $e) {
+                    unset($files[$key]);
+                    \JLog::add($e->getMessage() . "\n SLUG: ".$fileData['slug'], \JLog::ERROR, 'com_userideas');
+                }
             }
         }
 
@@ -761,57 +589,22 @@ class Builder
         $filesList = array();
 
         // A list with admin files
-        if (!empty($adminFiles)) {
-            $filesList[] = '<files folder="' . $sourceAdminLangFolder . '" target="' . $targetAdminLangFolder . '">';
-            foreach ($adminFiles as $fileData) {
-                $filesList[] = '<filename>' . $fileData["filename"] . '</filename>';
+        if (count($files) > 0) {
+            foreach ($files as $filesData) {
+                $paths       = $filesData['paths'];
+                if ($paths['source_folder'] !== null and $paths['source_folder'] !== '') {
+                    $filesList[] = '<files folder="' . $paths['source_folder'] . '" target="' . $paths['target_path'] . '">';
+                } else {
+                    $filesList[] = '<files target="' . $paths['target_path'] . '">';
+                }
+
+                foreach ($filesData['files'] as $fileData) {
+                    $filesList[] = '<filename>' . $fileData['filename'] . '</filename>';
+                }
+
+                $filesList[] = '</files>';
             }
-            $filesList[] = '</files>';
         }
-
-        // A list with site files
-        if (!empty($siteFiles)) {
-            $filesList[] = '<files folder="' . $sourceSiteLangFolder . '" target="' . $targetSiteLangFolder . '">';
-            foreach ($siteFiles as $fileData) {
-                $filesList[] = '<filename>' . $fileData["filename"] . '</filename>';
-            }
-            $filesList[] = '</files>';
-        }
-
-        return implode("\n", $filesList);
-    }
-
-    /**
-     * This method downloads plugin and module files and generate a string with files list.
-     *
-     * @param Resources $resources
-     * @param array $options
-     *
-     * @return string
-     */
-    protected function downloadFiles($resources, $options)
-    {
-        $targetFolder  = ArrayHelper::getValue($options, "target_folder");
-        $langCode      = ArrayHelper::getValue($options, "lang_code");
-        $langCodeDash  = ArrayHelper::getValue($options, "lang_code_dash");
-        $packageFolder = ArrayHelper::getValue($options, "package_folder");
-
-        $filesList = array();
-
-        // Download files
-
-        $filesList[] = '<files target="' . $targetFolder . '">';
-
-        foreach ($resources as $resource) {
-            $filename    = \JFile::makeSafe($langCodeDash . "." . $resource["filename"]);
-            $destination = \JPath::clean($packageFolder . DIRECTORY_SEPARATOR . $filename);
-
-            $this->downloadFile($resource["alias"], $langCode, $destination);
-
-            $filesList[] = '<filename>' . $filename . '</filename>';
-        }
-
-        $filesList[] = '</files>';
 
         return implode("\n", $filesList);
     }
@@ -826,19 +619,19 @@ class Builder
     protected function downloadFile($slug, $langCode, $destination)
     {
         $headers = array(
-            "headers" => array(
+            'headers' => array(
                 'Content-type: application/json',
                 'X-HTTP-Method-Override: GET'
             )
         );
 
-        $transifex = new Request($this->options["url"]);
+        $transifex = new Request($this->options['url']);
 
-        $transifex->setUsername($this->options["username"]);
-        $transifex->setPassword($this->options["password"]);
+        $transifex->setUsername($this->options['username']);
+        $transifex->setPassword($this->options['password']);
         $transifex->enableAuthentication();
 
-        $path = $this->serviceProjectPath . "/resource/" . $slug . "/translation/" . $langCode . "/";
+        $path = $this->serviceProjectPath . '/resource/' . $slug . '/translation/' . $langCode . '/';
 
         $response = $transifex->get($path, $headers);
 
@@ -847,44 +640,44 @@ class Builder
         }
 
         // Copy index.html
-        $indexFile = dirname($destination) . DIRECTORY_SEPARATOR . "index.html";
+        $indexFile = dirname($destination) . DIRECTORY_SEPARATOR . 'index.html';
         $html      = '<html><body style="background-color: #fff;"></body></html>';
         if (true !== \JFile::write($indexFile, $html)) {
-            \JLog::add(\JText::sprintf("COM_ITPTRANSIFEX_ERROR_CANNOT_CREATE_FILE", $indexFile));
+            \JLog::add(\JText::sprintf('COM_ITPTRANSIFEX_ERROR_CANNOT_CREATE_FILE', $indexFile));
         }
     }
 
     protected function generateManifest($options, $filesList)
     {
-        $params = \JComponentHelper::getParams("com_itptransifex");
+        $params = \JComponentHelper::getParams('com_itptransifex');
         /** @var  $params Registry */
 
-        $manifestFile = ArrayHelper::getValue($options, "manifest_filename");
+        $manifestFile = ArrayHelper::getValue($options, 'manifest_filename');
 
         // Load the template file
-        $templateFile = \JPath::clean(JPATH_BASE . "/administrator/components/com_itptransifex/assets/lang_template.xml");
+        $templateFile = \JPath::clean(JPATH_BASE . '/administrator/components/com_itptransifex/assets/lang_template.xml');
         $template     = file_get_contents($templateFile);
 
-        $author      = $params->get("author");
-        $authorEmail = $params->get("author_email");
-        $copyright   = $params->get("copyright");
-        $site        = $params->get("site");
+        $author      = $params->get('author');
+        $authorEmail = $params->get('author_email');
+        $copyright   = $params->get('copyright');
+        $site        = $params->get('site');
 
-        $name         = ArrayHelper::getValue($options, "name");
-        $creationDate = ArrayHelper::getValue($options, "creation_date");
-        $description  = ArrayHelper::getValue($options, "description");
-        $version      = ArrayHelper::getValue($options, "version");
+        $name         = ArrayHelper::getValue($options, 'name');
+        $creationDate = ArrayHelper::getValue($options, 'creation_date');
+        $description  = ArrayHelper::getValue($options, 'description');
+        $version      = ArrayHelper::getValue($options, 'version');
 
-        $template = str_replace("{NAME}", $name, $template);
-        $template = str_replace("{AUTHOR}", $author, $template);
-        $template = str_replace("{AUTHOR_EMAIL}", $authorEmail, $template);
-        $template = str_replace("{COPYRIGHT}", $copyright, $template);
-        $template = str_replace("{SITE}", $site, $template);
-        $template = str_replace("{CREATION_DATE}", $creationDate, $template);
-        $template = str_replace("{VERSION}", $version, $template);
-        $template = str_replace("{DESCRIPTION}", $description, $template);
+        $template = str_replace('{NAME}', $name, $template);
+        $template = str_replace('{AUTHOR}', $author, $template);
+        $template = str_replace('{AUTHOR_EMAIL}', $authorEmail, $template);
+        $template = str_replace('{COPYRIGHT}', $copyright, $template);
+        $template = str_replace('{SITE}', $site, $template);
+        $template = str_replace('{CREATION_DATE}', $creationDate, $template);
+        $template = str_replace('{VERSION}', $version, $template);
+        $template = str_replace('{DESCRIPTION}', $description, $template);
 
-        $template = str_replace("{FILES_LIST}", $filesList, $template);
+        $template = str_replace('{FILES_LIST}', $filesList, $template);
 
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = false;
@@ -900,36 +693,37 @@ class Builder
      * Create an error file, which will be returned if there was an error,
      * during the process of package creating.
      *
+     * @throws \UnexpectedValueException
      * @return string
      */
     protected function createErrorFile()
     {
-        $fileName = "error.txt";
+        $fileName = 'error.txt';
 
-        $errorFile = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . $fileName);
+        $errorFile = \JPath::clean($this->options['tmp_path'] . DIRECTORY_SEPARATOR . $fileName);
         if (\JFile::exists($errorFile)) {
             \JFile::delete($errorFile);
         }
 
-        $buffer = "System error!";
+        $buffer = 'System error!';
         \JFile::write($errorFile, $buffer);
 
-        $archiveFile = "error.zip";
-        $destination = \JPath::clean($this->options["tmp_path"] . DIRECTORY_SEPARATOR . $archiveFile);
+        $archiveFile = 'error.zip';
+        $destination = \JPath::clean($this->options['tmp_path'] . DIRECTORY_SEPARATOR . $archiveFile);
         if (\JFile::exists($destination)) {
             \JFile::delete($destination);
         }
 
         $filesToZip[] = array(
-            "name" => $fileName,
-            "data" => file_get_contents($errorFile)
+            'name' => $fileName,
+            'data' => file_get_contents($errorFile)
         );
 
         // compression type
         $zipAdapter = \JArchive::getAdapter('zip');
         /** @var $zipAdapter \JArchiveZip */
 
-        $zipAdapter->create($destination, $filesToZip, array());
+        $zipAdapter->create($destination, $filesToZip);
 
         return $destination;
     }
@@ -946,12 +740,12 @@ class Builder
      *
      * $package = new Transifex\Package\Builder(\JFactory::getDbo());
      * $package->setOptions($options);
-     * 
+     *
      * if (!$package->getOption("cache_days")) {
      * ...
      * }
      * </code>
-     * 
+     *
      * @param string     $key
      * @param mixed $default
      *
@@ -959,6 +753,6 @@ class Builder
      */
     public function getOption($key, $default = null)
     {
-        return (isset($this->options[$key])) ? $this->options[$key] : $default;
+        return array_key_exists($key, $this->options) ? $this->options[$key] : $default;
     }
 }

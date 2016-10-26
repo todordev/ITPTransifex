@@ -3,7 +3,7 @@
  * @package      Transifex\Language
  * @subpackage   Languages
  * @author       Todor Iliev
- * @copyright    Copyright (C) 2015 Todor Iliev <todor@itprism.com>. All rights reserved.
+ * @copyright    Copyright (C) 2016 Todor Iliev <todor@itprism.com>. All rights reserved.
  * @license      GNU General Public License version 3 or later; see LICENSE.txt
  */
 
@@ -23,8 +23,8 @@ class Language extends TableImmutable
 {
     protected $id;
     protected $name;
+    protected $locale;
     protected $code;
-    protected $short_code;
 
     /**
      * Load language data by ID.
@@ -42,29 +42,29 @@ class Language extends TableImmutable
      *
      * @param int|array $keys
      * @param array $options
+     *
+     * @throws \RuntimeException
      */
-    public function load($keys, $options = array())
+    public function load($keys, array $options = array())
     {
         $query = $this->db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.code, a.short_code")
-            ->from($this->db->quoteName("#__itptfx_languages", "a"));
+            ->select('a.id, a.name, a.locale, a.code')
+            ->from($this->db->quoteName('#__itptfx_languages', 'a'));
 
         if (is_array($keys)) {
             foreach ($keys as $key => $value) {
-                $query->where($this->db->quoteName("a.".$key) . " = " . $this->db->quote($value));
+                $query->where($this->db->quoteName('a.'.$key) . ' = ' . $this->db->quote($value));
             }
         } else {
-            $query->where("a.id = " . (int)$keys);
+            $query->where('a.id = ' . (int)$keys);
         }
 
         $this->db->setQuery($query);
-        $result = $this->db->loadAssoc();
+        $result = (array)$this->db->loadAssoc();
 
-        if (!empty($result)) {
-            $this->bind($result);
-        }
+        $this->bind($result);
     }
 
     /**
@@ -85,7 +85,7 @@ class Language extends TableImmutable
      */
     public function getId()
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     /**
@@ -116,14 +116,15 @@ class Language extends TableImmutable
      * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
-     * $code = $this->getCode();
+     * // Returns locale code - en_GB, bg_BG,...
+     * $locale = $this->getLocale();
      * </code>
      *
      * @return string
      */
-    public function getCode()
+    public function getLocale()
     {
-        return $this->code;
+        return $this->locale;
     }
 
     /**
@@ -135,13 +136,14 @@ class Language extends TableImmutable
      * $language = new Transifex\Language\Language(\JFactory::getDbo());
      * $language->load($id);
      *
-     * $shortCode = $this->getShortCode();
+     * // Return country code - en, bg, de,...
+     * $shortCode = $this->getCode();
      * </code>
      *
      * @return string
      */
-    public function getShortCode()
+    public function getCode()
     {
-        return $this->short_code;
+        return $this->code;
     }
 }

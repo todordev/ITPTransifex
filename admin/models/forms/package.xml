@@ -2,7 +2,7 @@
 <form>
     <fieldset addfieldpath="/administrator/components/com_itptransifex/models/fields">
 
-        <field name="name" type="text" class="span12"
+        <field name="name" type="text" class="input-xxlarge"
                label="COM_ITPTRANSIFEX_NAME"
                description="COM_ITPTRANSIFEX_PACKAGE_NAME_DESC"
                filter="trim"
@@ -10,57 +10,38 @@
                hint="Plugin - Content - ITPShare, Component - Crowdfunding Platform"
                />
 
-        <field name="alias" type="text" class="span12"
+        <field name="alias" type="text" class="input-xxlarge"
                label="COM_ITPTRANSIFEX_ALIAS"
                description="COM_ITPTRANSIFEX_PACKAGE_ALIAS_DESC"
                filter="trim"
                hint="plugin-content-itpshare-de_DE"
                />
 
-        <field name="filename" type="text" class="span12"
+        <field name="filename" type="text" class="input-xxlarge"
                label="COM_ITPTRANSIFEX_FILENAME"
                description="COM_ITPTRANSIFEX_PACKAGE_FILENAME_DESC"
                required="true"
                hint="lang_plg_content_itpshare"
                 />
 
-        <field name="language" type="transifexlanguage"
+        <field name="language" type="transifexlocale"
                label="COM_ITPTRANSIFEX_LANGUAGE"
                description="COM_ITPTRANSIFEX_FIELD_LANGUAGE_DESC"
                required="true"
                 />
 
-        <field name="type" type="list"
-               label="COM_ITPTRANSIFEX_TYPE"
-               description="COM_ITPTRANSIFEX_FIELD_PACKAGE_TYPE_DESC"
-               required="true"
-                >
+        <field name="type" type="list" label="COM_ITPTRANSIFEX_TYPE" description="COM_ITPTRANSIFEX_FIELD_PACKAGE_TYPE_DESC" required="true">
                 <option value="component">COM_ITPTRANSIFEX_COMPONENT</option>
                 <option value="module">COM_ITPTRANSIFEX_MODULE</option>
                 <option value="plugin">COM_ITPTRANSIFEX_PLUGIN</option>
                 <option value="library">COM_ITPTRANSIFEX_LIBRARY</option>
+                <option value="template">COM_ITPTRANSIFEX_TEMPLATE</option>
+                <option value="other">COM_ITPTRANSIFEX_OTHER</option>
         </field>
 
-        <field name="version" type="text"
-               label="COM_ITPTRANSIFEX_VERSION"
-               description="COM_ITPTRANSIFEX_VERSION_DESC"
-               default="1.0"
-               hint="1.0"
-                />
-
-        <field name="id" type="text"
-               label="JGLOBAL_FIELD_ID_LABEL"
-               description="JGLOBAL_FIELD_ID_DESC"
-               default="0"
-               readonly="true"
-               />
-
-        <field name="description" type="textarea" class="span12"
-               label="COM_ITPTRANSIFEX_DESCRIPTION"
-               description="COM_ITPTRANSIFEX_PACKAGE_DESCRIPTION_DESC"
-               rows="5"
-                />
-
+        <field name="version" type="text" label="COM_ITPTRANSIFEX_VERSION" description="COM_ITPTRANSIFEX_VERSION_DESC" default="1.0" hint="1.0"/>
+        <field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" default="0" readonly="true"/>
+        <field name="description" type="textarea" class="span12" label="COM_ITPTRANSIFEX_DESCRIPTION" description="COM_ITPTRANSIFEX_PACKAGE_DESCRIPTION_DESC" rows="5"/>
         <field name="project_id" type="hidden"/>
 
     </fieldset>

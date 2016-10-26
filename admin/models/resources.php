@@ -56,13 +56,12 @@ class ItpTransifexModelResources extends JModelList
         $this->setState('project_id', $value);
 
         // Filter type
-        $value = $this->getUserStateFromRequest($this->context . '.filter.type', 'filter_type');
-        $this->setState('filter.type', $value);
+        $value = $this->getUserStateFromRequest($this->context . '.filter.category', 'filter_category');
+        $this->setState('filter.category', $value);
 
         // Filter state
         $value = $this->getUserStateFromRequest($this->context . '.filter.state', 'filter_state');
         $this->setState('filter.state', $value);
-
     }
 
     /**
@@ -81,7 +80,7 @@ class ItpTransifexModelResources extends JModelList
     {
         // Compile the store id.
         $id .= ':' . $this->getState('filter.search');
-        $id .= ':' . $this->getState('filter.type');
+        $id .= ':' . $this->getState('filter.category');
         $id .= ':' . $this->getState('filter.state');
         $id .= ':' . $this->getState('project_id');
 
@@ -91,6 +90,7 @@ class ItpTransifexModelResources extends JModelList
     /**
      * Build an SQL query to load the list data.
      *
+     * @throws \RuntimeException
      * @return  JDatabaseQuery
      * @since   1.6
      */
@@ -106,39 +106,39 @@ class ItpTransifexModelResources extends JModelList
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.name, a.alias, a.filename, a.type, ' .
+                'a.id, a.name, a.alias, a.filename, a.category, a.source, a.path, ' .
                 'a.published, a.source_language_code'
             )
         )
-        ->from($db->quoteName("#__itptfx_resources", "a"))
-        ->where('a.project_id = ' . (int)$this->getState("project_id"));
+        ->from($db->quoteName('#__itptfx_resources', 'a'))
+        ->where('a.project_id = ' . (int)$this->getState('project_id'));
 
-        // Filter by type
-        $type = $this->getState('filter.type');
-        if (!empty($type)) {
-            $query->where('a.type = ' . $db->quote($type));
+        // Filter by category
+        $category = (string)$this->getState('filter.category');
+        if ($category !== '') {
+            $query->where('a.category = ' . $db->quote($category));
         }
 
         // Filter by state
         $published = $this->getState('filter.state');
         if (is_numeric($published)) {
             $query->where('a.published = ' . (int)$published);
-        } elseif (is_null($published)) {
+        } elseif ($published === null or $published === '') {
             $query->where('(a.published IN (0, 1))');
         }
 
         // Filter by search in title
-        $search = $this->getState('filter.search');
-        if (!empty($search)) {
+        $search = (string)$this->getState('filter.search');
+        if ($search !== '') {
             if (stripos($search, 'id:') === 0) {
                 $query->where('a.id = ' . (int)substr($search, 3));
 
             } elseif (stripos($search, 'pid:') === 0) { // Filter by package ID.
-                $query->leftJoin($db->quoteName("#__itptfx_packages_map", "b") . " ON a.id = b.resource_id");
+                $query->leftJoin($db->quoteName('#__itptfx_packages_map', 'b') . ' ON a.id = b.resource_id');
                 $query->where('b.package_id = ' . (int)substr($search, 4));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }
@@ -166,8 +166,8 @@ class ItpTransifexModelResources extends JModelList
         $query = $db->getQuery(true);
 
         $query
-            ->select("a.id, a.name, a.code, a.short_code")
-            ->from($db->quoteName("#__itptfx_languages", "a"));
+            ->select('a.id, a.name, a.code, a.short_code')
+            ->from($db->quoteName('#__itptfx_languages', 'a'));
 
         $db->setQuery($query);
         $results = $db->loadObjectList();

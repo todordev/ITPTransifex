@@ -69,6 +69,7 @@ class ItpTransifexModelExport extends JModelList
     /**
      * Build an SQL query to load the list data.
      *
+     * @throws \RuntimeException
      * @return  JDatabaseQuery
      * @since   1.6
      */
@@ -88,16 +89,16 @@ class ItpTransifexModelExport extends JModelList
             )
         );
 
-        $query->from($db->quoteName("#__itptfx_projects", "a"));
+        $query->from($db->quoteName('#__itptfx_projects', 'a'));
 
         // Filter by search in title
-        $search = $this->getState('filter.search');
-        if (!empty($search)) {
+        $search = (string)$this->getState('filter.search');
+        if ($search !== '') {
             if (stripos($search, 'id:') === 0) {
                 $query->where('a.id = ' . (int)substr($search, 3));
             } else {
                 $escaped = $db->escape($search, true);
-                $quoted  = $db->quote("%" . $escaped . "%", false);
+                $quoted  = $db->quote('%' . $escaped . '%', false);
                 $query->where('a.name LIKE ' . $quoted);
             }
         }
@@ -123,21 +124,22 @@ class ItpTransifexModelExport extends JModelList
      * @param Transifex\Project\Project $project
      * @param string $language
      *
+     * @throws \RuntimeException
      * @return string
      */
     public function getProject($project, $language)
     {
         // Get packages
         $options  = array(
-            "project_id" => $project->getId(),
-            "language" => $language
+            'project_id' => $project->getId(),
+            'language'   => $language
         );
 
         $packages = new Transifex\Package\Packages(JFactory::getDbo());
         $packages->load($options);
 
         $resources = $packages->getResources();
-        
+
         return $this->prepareXML($project, $packages, $resources);
     }
 
@@ -153,44 +155,36 @@ class ItpTransifexModelExport extends JModelList
     protected function prepareXML($project, $packages, $resources)
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8" ?><project/>');
-        $xml->addAttribute("generator", "com_itptransifex");
+        $xml->addAttribute('generator', 'com_itptransifex');
 
         // Set project data.
-        $xml->addChild("name", $project->getName());
-        $xml->addChild("alias", $project->getAlias());
-        $xml->addChild("description", $project->getDescription());
-        $xml->addChild("source_language_code", $project->getLanguage());
-        $xml->addChild("filename", $project->getFilename());
+        $xml->addChild('name', $project->getName());
+        $xml->addChild('alias', $project->getAlias());
+        $xml->addChild('description', $project->getDescription());
+        $xml->addChild('source_language_code', $project->getLanguage());
+        $xml->addChild('filename', $project->getFilename());
 
         // Create package items.
-        $ignorePackageKeys = array("id", "project_id");
+        $ignorePackageKeys = array('id', 'project_id');
 
         foreach ($packages as $package) {
-
-            $item = $xml->addChild("package");
-
+            $item = $xml->addChild('package');
             foreach ($package as $key => $value) {
-
-                if (in_array($key, $ignorePackageKeys)) {
+                if (in_array($key, $ignorePackageKeys, true)) {
                     continue;
                 }
-
                 $item->addChild($key, $value);
             }
         }
 
         // Create resource items
-        $ignorePackageKeys = array("id", "project_id", "package_id");
+        $ignorePackageKeys = array('id', 'project_id', 'package_id');
         foreach ($resources as $resource) {
-
-            $item = $xml->addChild("resource");
-
+            $item = $xml->addChild('resource');
             foreach ($resource as $key => $value) {
-
-                if (in_array($key, $ignorePackageKeys)) {
+                if (in_array($key, $ignorePackageKeys, true)) {
                     continue;
                 }
-
                 $item->addChild($key, $value);
             }
         }

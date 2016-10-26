@@ -1,0 +1,2 @@
+ALTER TABLE `#__itptfx_packages` ADD `folder` VARCHAR(32) NULL DEFAULT NULL AFTER `type`;
+ALTER TABLE `#__itptfx_packages` CHANGE `filename` `filename` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;

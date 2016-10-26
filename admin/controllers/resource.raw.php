@@ -29,6 +29,9 @@ class ItpTransifexControllerResource extends JControllerLegacy
      */
     public function saveFilename()
     {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationAdministrator */
+
         $response = new Prism\Response\Json();
 
         // Get form data
@@ -40,95 +43,87 @@ class ItpTransifexControllerResource extends JControllerLegacy
 
         // Check for validation errors.
         if (!$itemId or !$filename) {
-
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_INVALID_RESOURCE"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(JText::_('COM_ITPTRANSIFEX_INVALID_RESOURCE'))
                 ->failure();
 
             echo $response;
 
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         try {
-
             $model->saveFilename($itemId, $filename);
-
         } catch (Exception $e) {
-
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
 
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
                 ->setText($e->getMessage())
                 ->failure();
 
             echo $response;
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         $response
-            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::_("COM_ITPTRANSIFEX_FILENAME_SAVED_SUCCESSFULLY"))
+            ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+            ->setText(JText::_('COM_ITPTRANSIFEX_FILENAME_SAVED_SUCCESSFULLY'))
             ->success();
 
         echo $response;
-        JFactory::getApplication()->close();
-
+        $app->close();
     }
 
     /**
-     * This method save a type.
+     * This method save a category.
      */
-    public function saveType()
+    public function saveCategory()
     {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationAdministrator */
+
         $response = new Prism\Response\Json();
 
         // Get form data
-        $itemId  = $this->input->getInt('pk');
-        $type    = $this->input->get('value');
+        $itemId     = $this->input->getInt('pk');
+        $category   = $this->input->get('value');
 
         $model = $this->getModel();
         /** @var $model ItpTransifexModelResource */
 
         // Check for validation errors.
-        if (!$itemId or !$type) {
-
+        if (!$itemId or !$category) {
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
-                ->setText(JText::_("COM_ITPTRANSIFEX_INVALID_RESOURCE"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
+                ->setText(JText::_('COM_ITPTRANSIFEX_INVALID_RESOURCE'))
                 ->failure();
 
             echo $response;
-
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         try {
-
-            $model->saveType($itemId, $type);
-
+            $model->saveCategory($itemId, $category);
         } catch (Exception $e) {
-
-            JLog::add($e->getMessage());
+            JLog::add($e->getMessage(), JLog::ERROR, 'com_userideas');
 
             $response
-                ->setTitle(JText::_("COM_ITPTRANSIFEX_FAIL"))
+                ->setTitle(JText::_('COM_ITPTRANSIFEX_FAIL'))
                 ->setText($e->getMessage())
                 ->failure();
 
             echo $response;
-            JFactory::getApplication()->close();
+            $app->close();
         }
 
         $response
-            ->setTitle(JText::_("COM_ITPTRANSIFEX_SUCCESS"))
-            ->setText(JText::_("COM_ITPTRANSIFEX_TYPE_SAVED_SUCCESSFULLY"))
+            ->setTitle(JText::_('COM_ITPTRANSIFEX_SUCCESS'))
+            ->setText(JText::_('COM_ITPTRANSIFEX_TYPE_SAVED_SUCCESSFULLY'))
             ->success();
 
         echo $response;
-        JFactory::getApplication()->close();
-
+        $app->close();
     }
 }

@@ -19,13 +19,10 @@ defined('_JEXEC') or die;
     </th>
     <th width="2%" class="center hidden-phone">&nbsp;</th>
     <th width="10%" class="nowrap hidden-phone">
-        <?php echo JText::_("COM_ITPTRANSIFEX_FILENAME"); ?>
+        <?php echo JText::_('COM_ITPTRANSIFEX_FILENAME'); ?>
     </th>
     <th width="10%" class="nowrap hidden-phone">
         <?php echo JHtml::_('grid.sort', 'COM_ITPTRANSIFEX_LANGUAGE', 'c.name', $this->listDirn, $this->listOrder); ?>
-    </th>
-    <th width="10%" class="nowrap center hidden-phone">
-        <?php echo JText::_("COM_ITPTRANSIFEX_LANG_CODE"); ?>
     </th>
     <th width="10%" class="nowrap hidden-phone">
         <?php echo JHtml::_('grid.sort', 'COM_ITPTRANSIFEX_TYPE', 'a.type', $this->listDirn, $this->listOrder); ?>
@@ -34,10 +31,9 @@ defined('_JEXEC') or die;
         <?php echo JHtml::_('grid.sort', 'COM_ITPTRANSIFEX_PROJECT', 'b.name', $this->listDirn, $this->listOrder); ?>
     </th>
     <th width="6%" class="nowrap center hidden-phone">
-        <?php echo JText::_("COM_ITPTRANSIFEX_VERSION"); ?>
+        <?php echo JText::_('COM_ITPTRANSIFEX_VERSION'); ?>
     </th>
     <th width="1%" class="nowrap center hidden-phone">
         <?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->listDirn, $this->listOrder); ?>
     </th>
 </tr>
-	  

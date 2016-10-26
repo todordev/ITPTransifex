@@ -20,18 +20,17 @@ defined('_JEXEC') or die;
     				<div class="controls"><?php echo $this->form->getInput('name'); ?></div>
                 </div>
                 <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('code'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('code'); ?></div>
+                    <div class="control-label"><?php echo $this->form->getLabel('locale'); ?></div>
+                    <div class="controls"><?php echo $this->form->getInput('locale'); ?></div>
                 </div>
                 <div class="control-group">
-                    <div class="control-label"><?php echo $this->form->getLabel('short_code'); ?></div>
-    				<div class="controls"><?php echo $this->form->getInput('short_code'); ?></div>
+                    <div class="control-label"><?php echo $this->form->getLabel('code'); ?></div>
+    				<div class="controls"><?php echo $this->form->getInput('code'); ?></div>
                 </div>
                 <div class="control-group">
                     <div class="control-label"><?php echo $this->form->getLabel('id'); ?></div>
     				<div class="controls"><?php echo $this->form->getInput('id'); ?></div>
                 </div>
-                
             </fieldset>
         
             <input type="hidden" name="task" value="" />

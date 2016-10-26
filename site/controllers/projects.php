@@ -25,7 +25,7 @@ class ItpTransifexControllerProjects extends Prism\Controller\Admin
      * @param    string $prefix The class prefix. Optional.
      * @param    array  $config Configuration array for model. Optional.
      *
-     * @return    object    The model.
+     * @return    ItpTransifexModelProject    The model.
      * @since    1.5
      */
     public function getModel($name = 'Project', $prefix = 'ItpTransifexModel', $config = array('ignore_request' => true))

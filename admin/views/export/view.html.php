@@ -38,14 +38,9 @@ class ItpTransifexViewExport extends JViewLegacy
 
     protected $sidebar;
 
-    public function __construct($config)
-    {
-        parent::__construct($config);
-        $this->option = JFactory::getApplication()->input->get("option");
-    }
-
     public function display($tpl = null)
     {
+        $this->option     = JFactory::getApplication()->input->get('option');
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
@@ -63,7 +58,7 @@ class ItpTransifexViewExport extends JViewLegacy
         $languages = new Transifex\Language\Languages(JFactory::getDbo());
         $languages->load();
 
-        $this->languages = $languages->toOptions("code", "name");
+        $this->languages = $languages->toOptions('locale', 'name');
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -84,7 +79,7 @@ class ItpTransifexViewExport extends JViewLegacy
         // Prepare filters
         $this->listOrder = $this->escape($this->state->get('list.ordering'));
         $this->listDirn  = $this->escape($this->state->get('list.direction'));
-        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') != 0) ? false : true;
+        $this->saveOrder = (strcmp($this->listOrder, 'a.ordering') === 0);
 
         $this->sortFields = array(
             'a.name' => JText::_('COM_ITPTRANSIFEX_NAME'),
@@ -109,20 +104,20 @@ class ItpTransifexViewExport extends JViewLegacy
     protected function addToolbar()
     {
         // Set toolbar items for the page
-        JToolBarHelper::title(JText::_('COM_ITPTRANSIFEX_IMPORT_EXPORT_MANAGER'));
+        JToolbarHelper::title(JText::_('COM_ITPTRANSIFEX_IMPORT_EXPORT_MANAGER'));
 
         // Add custom buttons
         $bar = JToolbar::getInstance('toolbar');
 
         // Import
         $link = JRoute::_('index.php?option=com_itptransifex&view=import');
-        $bar->appendButton('Link', 'unarchive', JText::_("COM_ITPTRANSIFEX_IMPORT"), $link);
+        $bar->appendButton('Link', 'unarchive', JText::_('COM_ITPTRANSIFEX_IMPORT'), $link);
 
         // Export
-        JToolBarHelper::custom('export.download', "archive", "", JText::_("COM_ITPTRANSIFEX_EXPORT"), false);
+        JToolbarHelper::custom('export.download', 'archive', '', JText::_('COM_ITPTRANSIFEX_EXPORT'), false);
 
-        JToolBarHelper::divider();
-        JToolBarHelper::custom('export.backToDashboard', "dashboard", "", JText::_("COM_ITPTRANSIFEX_BACK_DASHBOARD"), false);
+        JToolbarHelper::divider();
+        JToolbarHelper::custom('export.backToDashboard', 'dashboard', '', JText::_('COM_ITPTRANSIFEX_BACK_DASHBOARD'), false);
     }
 
     /**
@@ -144,6 +139,6 @@ class ItpTransifexViewExport extends JViewLegacy
 
         JHtml::_('Prism.ui.joomlaList');
 
-        $this->document->addScript('../media/' . $this->option . '/js/admin/' . JString::strtolower($this->getName()) . '.js');
+        $this->document->addScript('../media/' . $this->option . '/js/admin/' . strtolower($this->getName()) . '.js');
     }
 }

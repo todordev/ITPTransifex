@@ -20,8 +20,8 @@ defined('_JEXEC') or die;
         $disableClassName = 'inactive tip-top';
     }
 
-    $numberOfResources = (!isset($this->numberOfResources[$item->id])) ? 0 : $this->numberOfResources[$item->id]["number"];
-    $numberOfPackages = (!isset($this->numberOfPackages[$item->id])) ? 0 : $this->numberOfPackages[$item->id]["number"];
+    $numberOfResources = (!isset($this->numberOfResources[$item->id])) ? 0 : $this->numberOfResources[$item->id]['number'];
+    $numberOfPackages = (!isset($this->numberOfPackages[$item->id])) ? 0 : $this->numberOfPackages[$item->id]['number'];
 ?>
 	<tr class="row<?php echo $i % 2; ?>">
         <td class="order nowrap center hidden-phone">
@@ -34,10 +34,10 @@ defined('_JEXEC') or die;
             <?php echo JHtml::_('grid.id', $i, $item->id); ?>
         </td>
         <td class="center">
-            <?php echo JHtml::_('jgrid.published', $item->published, $i, "projects."); ?>
+            <?php echo JHtml::_('jgrid.published', $item->published, $i, 'projects.'); ?>
         </td>
         <td class="nowrap has-context">
-            <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=project&layout=edit&id=".(int)$item->id);?>">
+            <a href="<?php echo JRoute::_('index.php?option=com_itptransifex&view=project&layout=edit&id='.(int)$item->id);?>">
                 <?php echo $this->escape($item->name); ?>
             </a>
             <?php if ($item->link) {?>
@@ -46,14 +46,14 @@ defined('_JEXEC') or die;
             </a>
             <?php } ?>
             <div class="small">
-                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=resources&id=".(int)$item->id);?>">
-                    <?php echo JText::sprintf("COM_ITPTRANSIFEX_RESOURCES_D", $numberOfResources)?>
+                <a href="<?php echo JRoute::_('index.php?option=com_itptransifex&view=resources&id='.(int)$item->id);?>">
+                    <?php echo JText::sprintf('COM_ITPTRANSIFEX_RESOURCES_D', $numberOfResources)?>
                 </a>
             </div>
 
             <div class="small">
-                <a href="<?php echo JRoute::_("index.php?option=com_itptransifex&view=packages&filter_project=".(int)$item->id);?>">
-                    <?php echo JText::sprintf("COM_ITPTRANSIFEX_PACKAGES_D", $numberOfPackages)?>
+                <a href="<?php echo JRoute::_('index.php?option=com_itptransifex&view=packages&filter_project='.(int)$item->id);?>">
+                    <?php echo JText::sprintf('COM_ITPTRANSIFEX_PACKAGES_D', $numberOfPackages)?>
                 </a>
             </div>
         </td>
@@ -63,7 +63,9 @@ defined('_JEXEC') or die;
 		<td class="nowrap hidden-phone">
 		    <?php echo $this->escape($item->filename); ?>
 		</td>
+        <td class="nowrap center hidden-phone">
+            <?php echo $this->escape($item->source_language_code); ?>
+        </td>
         <td class="nowrap center hidden-phone"><?php echo $item->id;?></td>
 	</tr>
 <?php }?>
-	  

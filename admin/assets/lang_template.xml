@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="file" version="3.4" method="upgrade">
- 
+<extension type="file" version="3.6" method="upgrade">
     <name>{NAME}</name>
     <author>{AUTHOR}</author>
     <creationDate>{CREATION_DATE}</creationDate>
     <copyright>{COPYRIGHT}</copyright>
-    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <license>http://www.gnu.org/licenses/gpl-3.0.en.html GNU/GPLv3</license>
     <authorEmail>{AUTHOR_EMAIL}</authorEmail>
     <authorUrl>{SITE}</authorUrl>
     <version>{VERSION}</version>
@@ -14,5 +13,4 @@
     <fileset>
         {FILES_LIST}
     </fileset>
-    
 </extension>

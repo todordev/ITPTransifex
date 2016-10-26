@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<extension type="library" version="3.4" method="upgrade">
+<extension type="library" version="3.6" method="upgrade">
 	<name>Transifex Library</name>
 	<libraryname>Transifex</libraryname>
 	<author>Todor Iliev</author>
 	<authorEmail>todor@itprism.com</authorEmail>
     <authorUrl>http://itprism.com</authorUrl>
-	<copyright>Copyright (C) 2015 Todor Iliev ( ITPrism.com ). All rights reserved.</copyright>
-	<license>http://www.gnu.org/licenses/gpl-3.0.en.html GNU/GPL</license>
+	<copyright>Copyright (C) 2016 Todor Iliev ( ITPrism.com ). All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.en.html GNU/GPLv3</license>
 	<packager>ITPrism</packager>
 	<packagerurl>http://itprism.com</packagerurl>
-	<version>2.1</version>
-	<creationDate>21 September, 2015</creationDate>
+	<version>3.0</version>
+	<creationDate>26 October, 2016</creationDate>
 	<description>Transifex Library</description>
     
 	<files>
