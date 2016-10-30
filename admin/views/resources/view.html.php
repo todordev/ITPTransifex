@@ -13,6 +13,11 @@ defined('_JEXEC') or die;
 class ItpTransifexViewResources extends JViewLegacy
 {
     /**
+     * @var JApplicationAdministrator
+     */
+    public $app;
+
+    /**
      * @var JDocumentHtml
      */
     public $document;
@@ -47,17 +52,25 @@ class ItpTransifexViewResources extends JViewLegacy
 
     public function display($tpl = null)
     {
-        $this->option     = JFactory::getApplication()->input->get('option');
+        $this->app        = JFactory::getApplication();
+
+        $this->option     = $this->app->input->get('option');
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
         $this->pagination = $this->get('Pagination');
 
         $this->projectId  = $this->state->get('project_id');
+        if (!$this->projectId) {
+            $this->app->redirect(JRoute::_('index.php?option=com_itptransifex&view=projects', false));
+            return;
+        }
 
         $this->project = new Transifex\Project\Project(JFactory::getDbo());
         $this->project->load($this->projectId);
 
         $model      = JModelLegacy::getInstance('Package', 'ItpTransifexModel', $config = array('ignore_request' => true));
+        /** @var ItpTransifexModelPackage $model */
+
         $this->form = $model->getForm();
 
         // Prepare sorting data
@@ -129,6 +142,17 @@ class ItpTransifexViewResources extends JViewLegacy
         $categories = array_map('unserialize', array_unique(array_map('serialize', $categories)));
 
         $this->document->addScriptOptions('com_userideas_filter_categories', $categories);
+
+        $assignedOptions = array(
+            ['text' => JText::_('COM_ITPTRANSIFEX_ASSIGNED'), 'value' => '1'],
+            ['text' => JText::_('COM_ITPTRANSIFEX_NOT_ASSIGNED'), 'value' => '0'],
+        );
+
+        JHtmlSidebar::addFilter(
+            JText::_('COM_ITPTRANSIFEX_SELECT_OPTION'),
+            'filter_assigned',
+            JHtml::_('select.options', $assignedOptions, 'value', 'text', $this->state->get('filter.assigned'), true)
+        );
 
         $this->sidebar = JHtmlSidebar::render();
     }

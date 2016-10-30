@@ -28,6 +28,7 @@
             <option value="3">COM_ITPTRANSIFEX_OUTSIDE</option>
             <option value="6">COM_ITPTRANSIFEX_FIT</option>
         </field>
+        <field name="image_quality" type="text" default="80" label="COM_ITPTRANSIFEX_IMAGE_QUALITY" description="COM_ITPTRANSIFEX_IMAGE_QUALITY_DESC" />
     </fieldset>
     
     <fieldset name="security" label="COM_ITPTRANSIFEX_SECURITY" description="COM_ITPTRANSIFEX_SECURITY_PARAMS">

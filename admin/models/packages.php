@@ -58,6 +58,9 @@ class ItpTransifexModelPackages extends JModelList
         $value = $this->getUserStateFromRequest($this->context . '.filter.language', 'filter_language');
         $this->setState('filter.language', $value);
 
+        $value = $this->getUserStateFromRequest($this->context . '.filter.language2', 'filter_language2');
+        $this->setState('filter.language2', $value);
+
         $value = $this->getUserStateFromRequest($this->context . '.filter.type', 'filter_type');
         $this->setState('filter.type', $value);
 
@@ -83,6 +86,7 @@ class ItpTransifexModelPackages extends JModelList
         $id .= ':' . $this->getState('filter.search');
         $id .= ':' . $this->getState('filter.project');
         $id .= ':' . $this->getState('filter.language');
+        $id .= ':' . $this->getState('filter.language2');
         $id .= ':' . $this->getState('filter.type');
 
         return parent::getStoreId($id);
@@ -135,6 +139,21 @@ class ItpTransifexModelPackages extends JModelList
             $query->where('a.type = ' . $db->quote($type));
         }
 
+        // Filter by second language
+        $language2 = (string)$this->getState('filter.language2');
+        if ($languageCode !== '' and $language2 !== '') {
+            $ids = $this->getPackagesWithoutLanguage($projectId, $languageCode, $language2);
+
+            if (count($ids) === 0) {
+                $ids = array(0);
+            }
+
+            $query->where('a.id IN ( ' . implode(',', $ids) . ')');
+
+            $app = JFactory::getApplication();
+            $app->enqueueMessage(JText::sprintf('COM_ITPTRANSIFEX_INFO_FILTER_SECOND_LANGUAGE_S', $language2), 'notice');
+        }
+
         // Filter by search in title
         $search = (string)$this->getState('filter.search');
         if ($search !== '') {
@@ -160,5 +179,31 @@ class ItpTransifexModelPackages extends JModelList
         $orderDirn = $this->getState('list.direction');
 
         return $orderCol . ' ' . $orderDirn;
+    }
+
+
+    protected function getPackagesWithoutLanguage($projectId, $language1, $language2)
+    {
+        $db = $this->getDbo();
+
+        $subQuery = $db->getQuery(true);
+        $subQuery
+            ->select('b.filename')
+            ->from($db->quoteName('#__itptfx_packages', 'b'))
+            ->where('b.project_id =' .(int)$projectId)
+            ->where('b.language = ' .$db->quote($language2));
+
+        $query = $db->getQuery(true);
+        $query
+            ->select('a.id')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.project_id =' .(int)$projectId)
+            ->where('a.language = ' .$db->quote($language1))
+            ->where('a.language != ' .$db->quote($language2))
+            ->where('a.filename NOT IN ( ' .$subQuery .')');
+
+        $db->setQuery($query);
+
+        return (array)$db->loadColumn();
     }
 }

@@ -13,6 +13,11 @@ defined('_JEXEC') or die;
 class ItpTransifexViewPackages extends JViewLegacy
 {
     /**
+     * @var JApplicationAdministrator
+     */
+    public $app;
+
+    /**
      * @var JDocumentHtml
      */
     public $document;
@@ -42,7 +47,8 @@ class ItpTransifexViewPackages extends JViewLegacy
 
     public function display($tpl = null)
     {
-        $this->option     = JFactory::getApplication()->input->get('option');
+        $this->app        = JFactory::getApplication();
+        $this->option     = $this->app->input->get('option');
         
         $this->state      = $this->get('State');
         $this->items      = $this->get('Items');
@@ -58,10 +64,13 @@ class ItpTransifexViewPackages extends JViewLegacy
 
         // Get project.
         $this->projectId  = $this->state->get('filter.project');
-        if ($this->projectId > 0) {
-            $this->project = new Transifex\Project\Project(JFactory::getDbo());
-            $this->project->load($this->projectId);
+        if (!$this->projectId) {
+            $this->app->redirect(JRoute::_('index.php?option=com_itptransifex&view=projects', false));
+            return;
         }
+
+        $this->project = new Transifex\Project\Project(JFactory::getDbo());
+        $this->project->load($this->projectId);
 
         // Prepare sorting data
         $this->prepareSorting();
@@ -128,7 +137,13 @@ class ItpTransifexViewPackages extends JViewLegacy
         JHtmlSidebar::addFilter(
             JText::_('COM_ITPTRANSIFEX_SELECT_LANGUAGE'),
             'filter_language',
-            JHtml::_('select.options', $filters->getLanguages('locale'), 'value', 'text', $this->state->get('filter.language'), true)
+            JHtml::_('select.options', $filters->getPackageLanguages($this->projectId), 'value', 'text', $this->state->get('filter.language'), true)
+        );
+
+        JHtmlSidebar::addFilter(
+            JText::_('COM_ITPTRANSIFEX_SELECT_SECOND_LANGUAGE'),
+            'filter_language2',
+            JHtml::_('select.options', $filters->getPackageLanguages($this->projectId), 'value', 'text', $this->state->get('filter.language2'), true)
         );
 
         JHtmlSidebar::addFilter(

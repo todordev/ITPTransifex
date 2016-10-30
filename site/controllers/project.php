@@ -97,10 +97,9 @@ class ItpTransifexControllerProject extends Prism\Controller\DefaultController
             'username'          => $params->get('username'),
             'password'          => $params->get('password'),
             'url'               => $params->get('api_url'),
-            'archives_folder'   => $archiveFolder,
             'cache_days'        => $params->get('cache_days', 1),
             'tmp_path'          => $app->get('tmp_path'),
-            'files_location'    => $params->get('files_location', 'extension_folders'),
+            'archives_folder'   => $archiveFolder,
             'include_lang_name' => (bool)$params->get('include_lang_name', 1)
         );
 

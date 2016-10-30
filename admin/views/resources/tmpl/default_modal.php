@@ -11,25 +11,25 @@
 defined('_JEXEC') or die;
 
 // Set default value of the language field.
-$packageLanguage = JFactory::getApplication()->getUserState("package.language");
-$packageType = JFactory::getApplication()->getUserState("package.type");
+$packageLanguage = JFactory::getApplication()->getUserState('package.language');
+$packageType = JFactory::getApplication()->getUserState('package.type');
 if (!empty($packageLanguage)) {
-    $this->form->setValue("language", null, $packageLanguage);
+    $this->form->setValue('language', null, $packageLanguage);
 }
 
 if (!empty($packageType)) {
-    $this->form->setValue("type", null, $packageType);
+    $this->form->setValue('type', null, $packageType);
 }
 ?>
 <div class="modal hide fade" id="js-cp-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3><?php echo JText::_("COM_ITPTRANSIFEX_PACKAGE_OPTIONS");?></h3>
+        <h3><?php echo JText::_('COM_ITPTRANSIFEX_PACKAGE_OPTIONS');?></h3>
 
     </div>
     <div class="modal-body">
 
-        <form action="<?php echo JRoute::_('index.php?option=com_itptransifex'); ?>" method="post" name="packageForm" id="packageForm">
+        <form action="<?php echo JRoute::_('index.php?option=com_itptransifex'); ?>" method="post" name="packageForm" id="packageForm" autocomplete="on">
 
             <div class="row-fluid">
                 <div class="span12">
@@ -58,7 +58,7 @@ if (!empty($packageType)) {
         </form>
     </div>
     <div class="modal-footer">
-        <img src="../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader" />
+        <img src="../../media/com_itptransifex/images/ajax-loader.gif" width="16" height="16" style="display: none;" id="js-ajaxloader" />
         <a href="#" class="btn btn-primary" id="js-btn-sp">
             <?php echo JText::_('COM_ITPTRANSIFEX_SUBMIT');?>
         </a>

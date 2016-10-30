@@ -65,7 +65,7 @@ class ItpTransifexModelLanguages extends JModelList
         $this->setState('filter.search', $value);
 
         // List state information.
-        parent::populateState('a.id', 'asc');
+        parent::populateState('a.name', 'asc');
     }
 
     /**

@@ -163,6 +163,7 @@ class ItpTransifexModelExport extends JModelList
         $xml->addChild('description', $project->getDescription());
         $xml->addChild('source_language_code', $project->getLanguage());
         $xml->addChild('filename', $project->getFilename());
+        $xml->addChild('link', $project->getLink());
 
         // Create package items.
         $ignorePackageKeys = array('id', 'project_id');

@@ -114,9 +114,10 @@ class Project extends Table
 
     protected function updateObject()
     {
-        $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
-        $language   = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
-        $image      = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
+        $description    = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
+        $language       = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
+        $image          = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
+        $link           = (!$this->link) ? 'NULL' : $this->db->quote($this->link);
 
         $query = $this->db->getQuery(true);
 
@@ -127,6 +128,7 @@ class Project extends Table
             ->set($this->db->quoteName('description') . '=' . $description)
             ->set($this->db->quoteName('source_language_code') . '=' . $language)
             ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('link') . '=' . $link)
             ->set($this->db->quoteName('image') . '=' . $image)
             ->set($this->db->quoteName('ordering') . '=' . (int)$this->ordering)
             ->set($this->db->quoteName('published') . '=' . (int)$this->published)
@@ -140,8 +142,9 @@ class Project extends Table
     protected function insertObject()
     {
         $description   = (!$this->description) ? 'NULL' : $this->db->quote($this->description);
-        $language   = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
-        $image      = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
+        $language      = (!$this->source_language_code) ? 'NULL' : $this->db->quote($this->source_language_code);
+        $image         = (!$this->image) ? 'NULL' : $this->db->quote($this->image);
+        $link          = (!$this->link) ? 'NULL' : $this->db->quote($this->link);
 
         $query = $this->db->getQuery(true);
 
@@ -152,6 +155,7 @@ class Project extends Table
             ->set($this->db->quoteName('description') . '=' . $description)
             ->set($this->db->quoteName('source_language_code') . '=' . $language)
             ->set($this->db->quoteName('filename') . '=' . $this->db->quote($this->filename))
+            ->set($this->db->quoteName('link') . '=' . $link)
             ->set($this->db->quoteName('image') . '=' . $image)
             ->set($this->db->quoteName('ordering') . '=' . (int)$this->ordering)
             ->set($this->db->quoteName('published') . '=' . (int)$this->published)
@@ -412,16 +416,38 @@ class Project extends Table
      * $project = new Transifex\Project\Project(\JFactory::getDbo());
      * $project->load($projectId);
      *
-     * $project->setFileName("UNZIPFIRST_Gamification");
+     * $project->setFilename("UNZIPFIRST_Gamification");
      * </code>
      *
      * @param string $filename
      *
      * @return self
      */
-    public function setFileName($filename)
+    public function setFilename($filename)
     {
         $this->filename = $filename;
+        return $this;
+    }
+
+    /**
+     * Set the link to a page.
+     *
+     * <code>
+     * $projectId = 1;
+     *
+     * $project = new Transifex\Project\Project(\JFactory::getDbo());
+     * $project->load($projectId);
+     *
+     * $project->setLink("http://mywebsite.com/");
+     * </code>
+     *
+     * @param string $link
+     *
+     * @return self
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
         return $this;
     }
 

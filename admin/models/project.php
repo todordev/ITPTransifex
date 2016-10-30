@@ -272,7 +272,7 @@ class ItpTransifexModelProject extends JModelAdmin
         $ext = strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
 
         $generatedName = Prism\Utilities\StringHelper::generateRandomString(16);
-        $tmpDestFile   = JPath::clean($tmpFolder . DIRECTORY_SEPARATOR . $generatedName . '.' . $ext);
+        $tmpDestFile   = JPath::clean($tmpFolder .DIRECTORY_SEPARATOR. $generatedName . '.' . $ext);
 
         // Prepare uploader object.
         $uploader = new Prism\File\Uploader\Local($uploadedFile);
@@ -297,7 +297,7 @@ class ItpTransifexModelProject extends JModelAdmin
             throw new RuntimeException(JText::sprintf('COM_ITPTRANSIFEX_ERROR_FILE_NOT_FOUND', $tmpDestFile));
         }
 
-        $imageName = $generatedName . '.png';
+        $imageName = $generatedName . '.'.$ext;
         $imageFile = JPath::clean($destFolder . DIRECTORY_SEPARATOR . $imageName);
 
         // Create main image
@@ -306,7 +306,33 @@ class ItpTransifexModelProject extends JModelAdmin
         $scale  = $params->get('image_resizing_scale', 2);
 
         $image->resize($width, $height, false, $scale);
-        $image->toFile($imageFile, IMAGETYPE_PNG);
+        switch ($ext) {
+            case 'gif':
+                $image->toFile($imageFile, IMAGETYPE_GIF);
+                break;
+
+            case 'jpg':
+                $options = array(
+                    'quality' => $params->get('image_quality', 60)
+                );
+
+                $image->toFile($imageFile, IMAGETYPE_JPEG, $options);
+                break;
+
+            case 'png':
+                if ($params->get('image_quality', 60) > 9) {
+                    $quality = $params->get('image_quality', 60) / 10;
+                } else {
+                    $quality = $params->get('image_quality', 6);
+                }
+
+                $options = array(
+                    'quality' => $quality
+                );
+
+                $image->toFile($imageFile, IMAGETYPE_PNG, $options);
+                break;
+        }
 
         // Remove the temporary
         if (JFile::exists($tmpDestFile)) {

@@ -62,6 +62,10 @@ class ItpTransifexModelResources extends JModelList
         // Filter state
         $value = $this->getUserStateFromRequest($this->context . '.filter.state', 'filter_state');
         $this->setState('filter.state', $value);
+
+        // Filter assigned
+        $value = $this->getUserStateFromRequest($this->context . '.filter.assigned', 'filter_assigned');
+        $this->setState('filter.assigned', $value);
     }
 
     /**
@@ -82,6 +86,7 @@ class ItpTransifexModelResources extends JModelList
         $id .= ':' . $this->getState('filter.search');
         $id .= ':' . $this->getState('filter.category');
         $id .= ':' . $this->getState('filter.state');
+        $id .= ':' . $this->getState('filter.assigned');
         $id .= ':' . $this->getState('project_id');
 
         return parent::getStoreId($id);
@@ -96,6 +101,8 @@ class ItpTransifexModelResources extends JModelList
      */
     protected function getListQuery()
     {
+        $projectId = (int)$this->getState('project_id');
+        
         $db = $this->getDbo();
         /** @var $db JDatabaseDriver */
 
@@ -111,7 +118,7 @@ class ItpTransifexModelResources extends JModelList
             )
         )
         ->from($db->quoteName('#__itptfx_resources', 'a'))
-        ->where('a.project_id = ' . (int)$this->getState('project_id'));
+        ->where('a.project_id = ' . $projectId);
 
         // Filter by category
         $category = (string)$this->getState('filter.category');
@@ -125,6 +132,22 @@ class ItpTransifexModelResources extends JModelList
             $query->where('a.published = ' . (int)$published);
         } elseif ($published === null or $published === '') {
             $query->where('(a.published IN (0, 1))');
+        }
+
+        // Filter by assigned
+        $assigned = $this->getState('filter.assigned');
+        if ($assigned !== null and $assigned !== '') {
+            if ((int)$assigned === 1) { // Select assigned resources.
+                $resourcesIds = $this->getAssignedResources($projectId);
+            } else {
+                $resourcesIds = $this->getNotAssignedResources($projectId);
+            }
+
+            if (count($resourcesIds) === 0) {
+                $resourcesIds[] = 0;
+            }
+
+            $query->where('a.id IN (' . implode(',', $resourcesIds) . ')');
         }
 
         // Filter by search in title
@@ -170,12 +193,49 @@ class ItpTransifexModelResources extends JModelList
             ->from($db->quoteName('#__itptfx_languages', 'a'));
 
         $db->setQuery($query);
-        $results = $db->loadObjectList();
 
-        if (!$results) {
-            $results = array();
+        return (array)$db->loadObjectList();
+    }
+
+    protected function getAssignedResources($projectId)
+    {
+        $db = $this->getDbo();
+
+        $subQuery = $db->getQuery(true);
+        $subQuery
+            ->select('a.id')
+            ->from($db->quoteName('#__itptfx_packages', 'a'))
+            ->where('a.project_id =' .(int)$projectId);
+
+        $query = $db->getQuery(true);
+        $query
+            ->select('DISTINCT b.resource_id')
+            ->from($db->quoteName('#__itptfx_packages_map', 'b'))
+            ->where('b.package_id IN ( '. $subQuery .')');
+
+        $db->setQuery($query);
+
+        return (array)$db->loadColumn();
+    }
+
+    protected function getNotAssignedResources($projectId)
+    {
+        $resources = $this->getAssignedResources($projectId);
+
+        $db = $this->getDbo();
+
+        $query = $db->getQuery(true);
+        $query
+            ->select('a.id')
+            ->from($db->quoteName('#__itptfx_resources', 'a'))
+            ->where('a.project_id =' .(int)$projectId);
+
+        if (count($resources) > 0) {
+            $query->where('a.id NOT IN (' . implode(',', $resources) . ')');
         }
 
-        return $results;
+        $db->setQuery($query);
+
+        return (array)$db->loadColumn();
     }
 }

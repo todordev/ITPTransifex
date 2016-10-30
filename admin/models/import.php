@@ -103,7 +103,8 @@ class ItpTransifexModelImport extends JModelForm
                     ->setName((string)$content->name)
                     ->setAlias((string)$content->alias)
                     ->setDescription((string)$content->description)
-                    ->setFileName((string)$content->filename)
+                    ->setFilename((string)$content->filename)
+                    ->setLink((string)$content->link)
                     ->setLanguage((string)$content->source_language_code);
 
                 $project->store();

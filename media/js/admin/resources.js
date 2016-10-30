@@ -99,7 +99,6 @@ jQuery(document).ready(function() {
     function resetPackageForm() {
     	jQuery("#jform_name").val("");
 		jQuery("#jform_filename").val("");
-		jQuery("#jform_version").val("");
 		jQuery("#jform_description").val("");
     }
     

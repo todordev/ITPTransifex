@@ -134,6 +134,62 @@ class Filters
     }
 
     /**
+     * Return the languages and the number of packages for those languages.
+     *
+     * <code>
+     * $projectId  = 1;
+     *
+     * $filters = new Transifex\Filter\Filters(\JFactory::getDbo());
+     * $options = $filters->getPackageLanguages($projectId);
+     * </code>
+     *
+     * @param int $projectId
+     *
+     * @throws \RuntimeException
+     * @return array
+     */
+    public function getPackageLanguages($projectId)
+    {
+        if (!array_key_exists('package_languages', $this->options)) {
+            $query = $this->db->getQuery(true);
+
+            $query
+                ->select('a.locale AS value, a.name AS text ')
+                ->from($this->db->quoteName('#__itptfx_languages', 'a'))
+                ->order('a.name ASC');
+
+            $this->db->setQuery($query);
+            $results = $this->db->loadAssocList();
+
+            $query = $this->db->getQuery(true);
+            $query
+                ->select('a.language, COUNT(a.id) as number')
+                ->from($this->db->quoteName('#__itptfx_packages', 'a'))
+                ->where('a.project_id = ' . (int)$projectId)
+                ->group('a.language');
+
+            $this->db->setQuery($query);
+            $resultsNumber = $this->db->loadAssocList('language', 'number');
+
+            foreach ($results as &$result) {
+                if (array_key_exists($result['value'], $resultsNumber)) {
+                    $result['text'] .= ' ['.$resultsNumber[$result['value']].']';
+                } else {
+                    $result['text'] .= ' [0]';
+                }
+            }
+
+            unset($result);
+
+            $this->options['package_languages'] = $results;
+        } else {
+            $results = $this->options['package_languages'];
+        }
+
+        return $results;
+    }
+
+    /**
      * Load and return languages as options.
      *
      * <code>
