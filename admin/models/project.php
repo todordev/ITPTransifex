@@ -194,7 +194,7 @@ class ItpTransifexModelProject extends JModelAdmin
                 $imagesFolder = $params->get('images_directory', 'images/itptransifex');
 
                 // Remove an image from the filesystem
-                $image = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $imagesFolder . DIRECTORY_SEPARATOR . $table->get('image'));
+                $image = JPath::clean(JPATH_ROOT .'/'. $imagesFolder .'/'. $table->get('image'), '/');
 
                 if (JFile::exists($image)) {
                     JFile::delete($image);
@@ -259,7 +259,7 @@ class ItpTransifexModelProject extends JModelAdmin
             throw new RuntimeException($file->getError());
         }
 
-        // Upload the file in temporary folder.
+        // Upload the file in temporary folder
         $temporaryFolder = JPath::clean($app->get('tmp_path'), '/');
         $filesystemLocal = new Prism\Filesystem\Adapter\Local($temporaryFolder);
         $sourceFile      = $filesystemLocal->upload($uploadedFileData);
@@ -279,10 +279,15 @@ class ItpTransifexModelProject extends JModelAdmin
         $options->set('quality', $params->get('image_quality', Prism\Constants::QUALITY_HIGH));
         $options->set('width', $params->get('image_width', 200));
         $options->set('height', $params->get('image_height', 200));
+        $options->set('filename_length', 16);
 
         $image   = new Prism\File\Image($sourceFile);
         $result  = $image->resize($destinationFolder, $options);
 
+        if (JFile::exists($sourceFile)) {
+            JFile::delete($sourceFile);
+        }
+        
         return $result['filename'];
     }
 
