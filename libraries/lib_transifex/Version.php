@@ -38,7 +38,7 @@ class Version
      *
      * @var integer
      */
-    public $devLevel = '0';
+    public $devLevel = '0.1';
 
     /**
      * Release Type
@@ -59,7 +59,7 @@ class Version
      *
      * @var string
      */
-    public $releaseDate = '26 October, 2016';
+    public $releaseDate = '14 November, 2016';
 
     /**
      * License
@@ -73,7 +73,7 @@ class Version
      *
      * @var string
      */
-    public $copyright = '&copy; 2015 ITPrism. All rights reserved.';
+    public $copyright = '&copy; 2016 ITPrism. All rights reserved.';
 
     /**
      * URL
@@ -101,7 +101,7 @@ class Version
      *
      * @var string
      */
-    public $requiredPrismVersion = '1.6';
+    public $requiredPrismVersion = '1.17';
 
     /**
      *  Build long format of the version text.

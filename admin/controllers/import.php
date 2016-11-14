@@ -65,60 +65,7 @@ class ItpTransifexControllerImport extends Prism\Controller\Form\Backend
         }
 
         try {
-            $uploadedFile = Joomla\Utilities\ArrayHelper::getValue($fileData, 'tmp_name');
-            $uploadedName = Joomla\Utilities\ArrayHelper::getValue($fileData, 'name');
-            $errorCode    = Joomla\Utilities\ArrayHelper::getValue($fileData, 'error');
-
-            $destination = JPath::clean($app->get('tmp_path')) . DIRECTORY_SEPARATOR . JFile::makeSafe($uploadedName);
-
-            $file = new Prism\File\File();
-
-            // Prepare size validator.
-            $KB       = 1024 * 1024;
-            $fileSize = (int)$this->input->server->get('CONTENT_LENGTH');
-
-            $mediaParams   = JComponentHelper::getParams('com_media');
-            /** @var $mediaParams Joomla\Registry\Registry */
-
-            $uploadMaxSize = $mediaParams->get('upload_maxsize') * $KB;
-
-            // Prepare size validator.
-            $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
-
-            // Prepare server validator.
-            $serverValidator = new Prism\File\Validator\Server($errorCode, array(UPLOAD_ERR_NO_FILE));
-
-            $file->addValidator($sizeValidator);
-            $file->addValidator($serverValidator);
-
-            // Validate the file
-            if (!$file->isValid()) {
-                throw new RuntimeException($file->getError());
-            }
-
-            // Prepare uploader object.
-            $uploader = new Prism\File\Uploader\Local($uploadedFile);
-            $uploader->setDestination($destination);
-
-            // Upload the file
-            $file->setUploader($uploader);
-            $file->upload();
-
-            $fileName = basename($destination);
-
-            // Extract file if it is archive
-            $ext = strtolower(JFile::getExt($fileName));
-            if (strcmp($ext, 'zip') === 0) {
-                $destinationFolder = JPath::clean($app->get('tmp_path')) . DIRECTORY_SEPARATOR . 'project';
-                if (JFolder::exists($destinationFolder)) {
-                    JFolder::delete($destinationFolder);
-                }
-
-                $filePath = $model->extractFile($destination, $destinationFolder);
-
-            } else {
-                $filePath = $destination;
-            }
+            $filePath = $model->uploadFile($fileData);
 
             $override   = Joomla\Utilities\ArrayHelper::getValue($data, 'override', false, 'bool');
             $model->importProject($filePath, $override);

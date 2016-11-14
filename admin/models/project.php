@@ -208,38 +208,28 @@ class ItpTransifexModelProject extends JModelAdmin
     /**
      * Upload an image.
      *
-     * @param  array $image
+     * @param  array $uploadedFileData
      *
      * @throws Exception
      *
      * @return string
      */
-    public function uploadImage($image)
+    public function uploadImage($uploadedFileData)
     {
         $app = JFactory::getApplication();
         /** @var $app JApplicationSite */
 
-        $uploadedFile = ArrayHelper::getValue($image, 'tmp_name');
-        $uploadedName = ArrayHelper::getValue($image, 'name');
-        $errorCode    = ArrayHelper::getValue($image, 'error');
-
-        // Load parameters.
-        $params     = JComponentHelper::getParams($this->option);
-        /** @var  $params Joomla\Registry\Registry */
-
-        $destFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get('images_directory', 'images/itptransifex'));
-
-        $tmpFolder = $app->get('tmp_path');
+        $uploadedFile = ArrayHelper::getValue($uploadedFileData, 'tmp_name');
+        $uploadedName = ArrayHelper::getValue($uploadedFileData, 'name');
+        $errorCode    = ArrayHelper::getValue($uploadedFileData, 'error');
 
         // Joomla! media extension parameters
         $mediaParams = JComponentHelper::getParams('com_media');
         /** @var  $mediaParams Joomla\Registry\Registry */
 
-        $file = new Prism\File\File();
-
         // Prepare size validator.
-        $KB            = 1024 * 1024;
-        $fileSize      = (int)$app->input->server->get('CONTENT_LENGTH');
+        $KB            = pow(1024, 2);
+        $fileSize      = ArrayHelper::getValue($uploadedFileData, 'size', 0, 'int');
         $uploadMaxSize = $mediaParams->get('upload_maxsize') * $KB;
 
         $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
@@ -258,6 +248,7 @@ class ItpTransifexModelProject extends JModelAdmin
         $imageExtensions = explode(',', $mediaParams->get('image_extensions'));
         $imageValidator->setImageExtensions($imageExtensions);
 
+        $file = new Prism\File\File($uploadedFile);
         $file
             ->addValidator($sizeValidator)
             ->addValidator($imageValidator)
@@ -268,78 +259,31 @@ class ItpTransifexModelProject extends JModelAdmin
             throw new RuntimeException($file->getError());
         }
 
-        // Generate temporary file name
-        $ext = strtolower(JFile::makeSafe(JFile::getExt($image['name'])));
+        // Upload the file in temporary folder.
+        $temporaryFolder = JPath::clean($app->get('tmp_path'), '/');
+        $filesystemLocal = new Prism\Filesystem\Adapter\Local($temporaryFolder);
+        $sourceFile      = $filesystemLocal->upload($uploadedFileData);
 
-        $generatedName = Prism\Utilities\StringHelper::generateRandomString(16);
-        $tmpDestFile   = JPath::clean($tmpFolder .DIRECTORY_SEPARATOR. $generatedName . '.' . $ext);
-
-        // Prepare uploader object.
-        $uploader = new Prism\File\Uploader\Local($uploadedFile);
-        $uploader->setDestination($tmpDestFile);
-
-        // Upload temporary file
-        $file->setUploader($uploader);
-
-        $file->upload();
-
-        // Get file
-        $tmpDestFile = $file->getFile();
-
-        if (!is_file($tmpDestFile)) {
-            throw new RuntimeException('COM_ITPTRANSIFEX_ERROR_FILE_CANT_BE_UPLOADED');
+        if (!JFile::exists($sourceFile)) {
+            throw new RuntimeException('COM_CROWDFUNDING_ERROR_FILE_CANT_BE_UPLOADED');
         }
 
-        // Resize image
-        $image = new JImage();
-        $image->loadFile($tmpDestFile);
-        if (!$image->isLoaded()) {
-            throw new RuntimeException(JText::sprintf('COM_ITPTRANSIFEX_ERROR_FILE_NOT_FOUND', $tmpDestFile));
-        }
-
-        $imageName = $generatedName . '.'.$ext;
-        $imageFile = JPath::clean($destFolder . DIRECTORY_SEPARATOR . $imageName);
+        // Load component parameters.
+        $params            = JComponentHelper::getParams($this->option);
+        $destinationFolder = JPath::clean(JPATH_ROOT .'/'. $params->get('images_directory', 'images/itptransifex'), '/');
 
         // Create main image
-        $width  = $params->get('image_width', 200);
-        $height = $params->get('image_height', 200);
-        $scale  = $params->get('image_resizing_scale', 2);
+        $options = new Joomla\Registry\Registry();
+        $options->set('filename_length', 24);
+        $options->set('scale', $params->get('image_resizing_scale', \JImage::SCALE_INSIDE));
+        $options->set('quality', $params->get('image_quality', Prism\Constants::QUALITY_HIGH));
+        $options->set('width', $params->get('image_width', 200));
+        $options->set('height', $params->get('image_height', 200));
 
-        $image->resize($width, $height, false, $scale);
-        switch ($ext) {
-            case 'gif':
-                $image->toFile($imageFile, IMAGETYPE_GIF);
-                break;
+        $image   = new Prism\File\Image($sourceFile);
+        $result  = $image->resize($destinationFolder, $options);
 
-            case 'jpg':
-                $options = array(
-                    'quality' => $params->get('image_quality', 60)
-                );
-
-                $image->toFile($imageFile, IMAGETYPE_JPEG, $options);
-                break;
-
-            case 'png':
-                if ($params->get('image_quality', 60) > 9) {
-                    $quality = $params->get('image_quality', 60) / 10;
-                } else {
-                    $quality = $params->get('image_quality', 6);
-                }
-
-                $options = array(
-                    'quality' => $quality
-                );
-
-                $image->toFile($imageFile, IMAGETYPE_PNG, $options);
-                break;
-        }
-
-        // Remove the temporary
-        if (JFile::exists($tmpDestFile)) {
-            JFile::delete($tmpDestFile);
-        }
-
-        return $imageName;
+        return $result['filename'];
     }
 
     /**
@@ -362,11 +306,10 @@ class ItpTransifexModelProject extends JModelAdmin
             $params       = JComponentHelper::getParams($this->option);
             /** @var  $params Joomla\Registry\Registry */
 
-            $imagesFolder = JPath::clean(JPATH_ROOT . DIRECTORY_SEPARATOR . $params->get('images_directory', 'images/itptransifex'));
+            $imagesFolder = JPath::clean(JPATH_ROOT .'/'. $params->get('images_directory', 'images/itptransifex'), '/');
 
             // Remove an image from the filesystem.
-            $image = $imagesFolder . DIRECTORY_SEPARATOR . $row->get('image');
-
+            $image = $imagesFolder .'/'. $row->get('image');
             if (JFile::exists($image)) {
                 JFile::delete($image);
             }

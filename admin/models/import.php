@@ -8,6 +8,7 @@
  */
 
 use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 // no direct access
 defined('_JEXEC') or die;
@@ -48,6 +49,63 @@ class ItpTransifexModelImport extends JModelForm
         return $data;
     }
 
+    public function uploadFile($uploadedFileData)
+    {
+        $app = JFactory::getApplication();
+        /** @var $app JApplicationAdministrator */
+
+        jimport('joomla.filesystem.archive');
+
+        $uploadedFile = ArrayHelper::getValue($uploadedFileData, 'tmp_name');
+//        $uploadedName = ArrayHelper::getValue($uploadedFileData, 'name');
+        $errorCode    = ArrayHelper::getValue($uploadedFileData, 'error');
+
+        // Prepare size validator.
+        $KB       = pow(1024, 2);
+        $fileSize = ArrayHelper::getValue($uploadedFileData, 'size', 0, 'int');
+
+        /** @var $mediaParams Joomla\Registry\Registry */
+        $mediaParams   = JComponentHelper::getParams('com_media');
+        $uploadMaxSize = $mediaParams->get('upload_maxsize') * $KB;
+
+        // Prepare size validator.
+        $sizeValidator = new Prism\File\Validator\Size($fileSize, $uploadMaxSize);
+
+        // Prepare server validator.
+        $serverValidator = new Prism\File\Validator\Server($errorCode, array(UPLOAD_ERR_NO_FILE));
+
+        $file = new Prism\File\File($uploadedFile);
+        $file->addValidator($sizeValidator);
+        $file->addValidator($serverValidator);
+
+        // Validate the file
+        if (!$file->isValid()) {
+            throw new RuntimeException($file->getError());
+        }
+
+        // Upload the file.
+        $rootFolder      = JPath::clean($app->get('tmp_path'), '/');
+        $filesystemLocal = new Prism\Filesystem\Adapter\Local($rootFolder);
+        $sourceFile      = $filesystemLocal->upload($uploadedFileData);
+
+        $fileName        = basename($sourceFile);
+
+        // Extract file if it is archive
+        $ext = StringHelper::strtolower(JFile::getExt($fileName));
+        if (strcmp($ext, 'zip') === 0) {
+            $destinationFolder = JPath::clean($app->get('tmp_path') .'/project', '/');
+            if (JFolder::exists($destinationFolder)) {
+                JFolder::delete($destinationFolder);
+            }
+
+            $filePath = $this->extractFile($sourceFile, $destinationFolder);
+        } else {
+            $filePath = $sourceFile;
+        }
+
+        return $filePath;
+    }
+
     public function extractFile($file, $destFolder)
     {
         $filePath = '';
@@ -58,14 +116,12 @@ class ItpTransifexModelImport extends JModelForm
 
         $dir = new DirectoryIterator($destFolder);
 
-        $fileName = JFile::stripExt(basename($file));
-
         /** @var $fileinfo object */
         foreach ($dir as $fileinfo) {
-            $currentFileName = JFile::stripExt($fileinfo->getFilename());
+            $ext = JFile::getExt($fileinfo->getFilename());
 
-            if (!$fileinfo->isDot() and strcmp($fileName, $currentFileName) === 0) {
-                $filePath = $destFolder . DIRECTORY_SEPARATOR . JFile::makeSafe($fileinfo->getFilename());
+            if (!$fileinfo->isDot() and strcmp('xml', $ext) === 0) {
+                $filePath = $destFolder .'/'. JFile::makeSafe($fileinfo->getFilename());
                 break;
             }
 

@@ -1,6 +1,9 @@
 ITPTransifex Changelog
 ==========================
 
+###v3.0.1
+* It was made compatible with Prism Library v1.17.
+
 ###v3.0
 * Added functionality to set source folder and destination folder of the resources.
 * It was removed functionality to generate destination path by package type. Now, it uses the destination folder of the resources.
